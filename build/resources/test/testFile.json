@@ -1,0 +1,36 @@
+{
+  "dragonCollection": [
+    {
+      "id": 1,
+      "name": "Alduin",
+      "coordinates": {
+        "x": 73,
+        "y": 256
+      },
+      "creationDate": "17.02.2022",
+      "age": 7800,
+      "color": "YELLOW",
+      "type": "AIR",
+      "character": "CUNNING",
+      "cave": {
+        "depth": 150
+      }
+    },
+    {
+      "id": 1,
+      "name": "Alduin",
+      "coordinates" {
+        "x": 73,
+        "y": 256
+      },
+      "creationDate": "17.02.2022",
+      "age": 7800,
+      "color": "YELLOW",
+      "type": "AIR",
+      "character": "CUNNING",
+      "cave": {
+        "depth": 150
+      }
+    },
+    ]
+}

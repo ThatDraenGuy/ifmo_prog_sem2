@@ -3,8 +3,14 @@ package Collection;
 import Collection.Classes.*;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONTokener;
 
 public class JSONToCollection {
+    public static java.util.PriorityQueue<Dragon> parseString(String string) {
+        JSONTokener tokenizedFile = new JSONTokener(string);
+        JSONArray dragonCollection = new JSONArray(tokenizedFile);
+        return JSONToCollection.parseDragons(dragonCollection);
+    }
     public static java.util.PriorityQueue<Dragon> parseDragons(JSONArray dragonArray) {
         java.util.PriorityQueue<Dragon> dragons = new java.util.PriorityQueue<>();
         for (int i=0; i<dragonArray.length(); i++) {

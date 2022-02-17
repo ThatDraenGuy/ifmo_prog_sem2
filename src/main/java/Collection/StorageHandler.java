@@ -3,7 +3,6 @@ package Collection;
 import Collection.Classes.Dragon;
 
 import java.io.*;
-import org.json.*;
 
 public class StorageHandler {
     private File file;
@@ -17,9 +16,7 @@ public class StorageHandler {
             while (scanner.hasNextLine()) {
                 JSONString += scanner.nextLine();
             }
-            JSONTokener tokenizedFile = new JSONTokener(JSONString);
-            JSONArray dragonCollection = new JSONArray(tokenizedFile);
-            return JSONToCollection.parseDragons(dragonCollection);
+            return JSONToCollection.parseString(JSONString);
         } catch (FileNotFoundException e) {
 
         } catch (IOException e) {
