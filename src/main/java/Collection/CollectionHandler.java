@@ -3,10 +3,10 @@ package Collection;
 import Collection.Classes.Dragon;
 
 public class CollectionHandler {
-    private java.util.Vector<Dragon> collection;
+    private java.util.PriorityQueue<Dragon> collection;
     private StorageHandler storageHandler;
     public  CollectionHandler(StorageHandler storageHandler) {
-        this.collection = new java.util.Vector<>();
+        this.collection = new java.util.PriorityQueue<>();
         this.storageHandler=storageHandler;
     }
     public void add(Dragon labWork) {
@@ -14,5 +14,8 @@ public class CollectionHandler {
     }
     public void load() {
         this.collection.addAll(this.storageHandler.load());
+    }
+    public void save() {
+        this.storageHandler.save(this.collection);
     }
 }

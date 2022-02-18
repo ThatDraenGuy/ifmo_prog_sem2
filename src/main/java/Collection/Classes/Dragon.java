@@ -1,6 +1,6 @@
 package Collection.Classes;
 
-public class Dragon {
+public class Dragon implements Comparable<Dragon>{
     private Long id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
     private Coordinates coordinates; //Поле не может быть null
@@ -20,5 +20,44 @@ public class Dragon {
         this.type=type;
         this.character=character;
         this.cave=cave;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public Long getAge() {
+        return age;
+    }
+
+    public Color getColor() {
+        return color;
+    }
+
+    public Coordinates getCoordinates() {
+        return coordinates;
+    }
+
+    public DragonCave getCave() {
+        return cave;
+    }
+
+    public DragonCharacter getCharacter() {
+        return character;
+    }
+
+    public DragonType getType() {
+        return type;
+    }
+
+    public Long getId() {
+        return id;
+    }
+    public java.time.ZonedDateTime getCreationDate() {
+        return  creationDate;
+    }
+
+    public int compareTo(Dragon dragon) {
+        return dragon.getName().length()-this.name.length();
     }
 }

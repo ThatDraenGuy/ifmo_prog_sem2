@@ -1,14 +1,12 @@
 package Collection;
 
 import Collection.Classes.*;
-import org.json.JSONArray;
-import org.json.JSONObject;
-import org.json.JSONTokener;
+import org.json.*;
 
 public class JSONToCollection {
-    public static java.util.PriorityQueue<Dragon> parseString(String string) {
-        JSONTokener tokenizedFile = new JSONTokener(string);
-        JSONArray dragonCollection = new JSONArray(tokenizedFile);
+    public static java.util.PriorityQueue<Dragon> parseString(String string) throws JSONException {
+        JSONObject fullFile = new JSONObject(string);
+        JSONArray dragonCollection = fullFile.getJSONArray("dragonCollection");
         return JSONToCollection.parseDragons(dragonCollection);
     }
     public static java.util.PriorityQueue<Dragon> parseDragons(JSONArray dragonArray) {
@@ -39,5 +37,42 @@ public class JSONToCollection {
     public static DragonCave parseCave(JSONObject cave) {
         int depth = cave.getInt("depth");
         return new DragonCave(depth);
+    }
+    public static String saveDragons(java.util.PriorityQueue<Dragon> collection) {
+        String str = "{ \"dragonCollection\": [ ";
+        for (int i=0; i<=collection.size(); i++) {
+            str += dragontoJSON(collection.poll()).toString();
+            if (i< collection.size()) {
+                str += ",";
+            }
+        }
+        str+="]}";
+        return  str;
+    }
+    public static JSONObject dragontoJSON(Dragon dragon) {
+        JSONObject jsonDragon = new JSONObject();
+        jsonDragon.put("id", dragon.getId());
+        jsonDragon.put("name", dragon.getName());
+        JSONObject coordinates = JSONToCollection.coordsToJSON(dragon.getCoordinates());
+        jsonDragon.put("coordinates", coordinates);
+        jsonDragon.put("creationDate", dragon.getCreationDate().toString());
+        jsonDragon.put("age", dragon.getAge());
+        jsonDragon.put("color", dragon.getColor().toString());
+        jsonDragon.put("type", dragon.getType().toString());
+        jsonDragon.put("character", dragon.getCharacter().toString());
+        JSONObject cave = JSONToCollection.caveToJSON(dragon.getCave());
+        jsonDragon.put("cave", cave);
+        return jsonDragon;
+    }
+    public static JSONObject coordsToJSON(Coordinates coordinates) {
+        JSONObject jsonCoordinates = new JSONObject();
+        jsonCoordinates.put("x", coordinates.getX());
+        jsonCoordinates.put("y", coordinates.getY());
+        return jsonCoordinates;
+    }
+    public static JSONObject caveToJSON(DragonCave cave) {
+        JSONObject jsonCave = new JSONObject();
+        jsonCave.put("depth", cave.getDepth());
+        return  jsonCave;
     }
 }

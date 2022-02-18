@@ -16,12 +16,26 @@ public class StorageHandler {
             while (scanner.hasNextLine()) {
                 JSONString += scanner.nextLine();
             }
+            scanner.close();
             return JSONToCollection.parseString(JSONString);
         } catch (FileNotFoundException e) {
-
+            System.out.println(e.getMessage());
         } catch (IOException e) {
-
+            System.out.println(e.getMessage());
         }
         return null;
+    }
+    public void save(java.util.PriorityQueue<Dragon> collection) {
+        String JSONString = JSONToCollection.saveDragons(collection);
+        try {
+            FileOutputStream fileOutputStream = new FileOutputStream(this.file);
+            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+            bufferedOutputStream.write(JSONString.getBytes());
+            bufferedOutputStream.close();
+        } catch (FileNotFoundException e) {
+            System.out.println(e.getMessage());
+        } catch (IOException e) {
+            System.out.println(e.getMessage());
+        }
     }
 }
