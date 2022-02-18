@@ -1,5 +1,8 @@
 package cmd;
 
+import common.CmdRequest;
+import common.CmdResponse;
+
 import java.util.HashMap;
 
 public class CmdHandler {
@@ -9,16 +12,24 @@ public class CmdHandler {
     }
     public void addComm(Command c) {
         final String name = c.getName();
-        if (!isInComms(name)) {
+        if (!isInCmds(name)) {
             this.cmds.put(name,c);
         }
     }
-    public void addComms(Command ... comms) {
+    public void addCmds(Command ... comms) {
         for (Command c : comms) {
             addComm(c);
         }
     }
-    public boolean isInComms(String name) {
+    public boolean isInCmds(String name) {
         return this.cmds.containsKey(name);
+    }
+
+    public HashMap<String, Command> getCmds() {
+        return cmds;
+    }
+    public CmdResponse executeCmd(CmdRequest request) {
+        ActionResult result = request.getCmd().action(request.getCmdArgs());
+        return new CmdResponse(result);
     }
 }
