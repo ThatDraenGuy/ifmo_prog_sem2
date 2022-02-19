@@ -1,7 +1,7 @@
 package cmd;
 
-import common.CmdRequest;
 import common.CmdResponse;
+import common.Request;
 
 import java.util.HashMap;
 
@@ -16,7 +16,7 @@ public class CmdHandler {
             this.cmds.put(name,c);
         }
     }
-    public void addCmds(Command ... comms) {
+    public void addCmds(Command... comms) {
         for (Command c : comms) {
             addComm(c);
         }
@@ -28,7 +28,7 @@ public class CmdHandler {
     public HashMap<String, Command> getCmds() {
         return cmds;
     }
-    public CmdResponse executeCmd(CmdRequest request) {
+    public CmdResponse executeCmd(Request request) {
         ActionResult result = request.getCmd().action(request.getCmdArgs());
         return new CmdResponse(result);
     }

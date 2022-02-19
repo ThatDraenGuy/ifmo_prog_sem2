@@ -60,4 +60,8 @@ public class Dragon implements Comparable<Dragon>{
     public int compareTo(Dragon dragon) {
         return dragon.getName().length()-this.name.length();
     }
+    @Override
+    public String toString() {
+        return this.id+": "+this.name+", a "+this.age+" years old "+this.color+" "+this.type+" "+this.character+" dragon. He was created at "+this.creationDate.toString()+" and is currently at "+this.coordinates.toString()+". His cave is "+this.cave.toString();
+    }
 }

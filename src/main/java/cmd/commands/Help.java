@@ -2,19 +2,24 @@ package cmd.commands;
 
 import cmd.*;
 
-import java.util.HashMap;
-
-public class Help extends Command {
+public class Help extends AbstractCommand {
+    private String message="";
     private CmdHandler cmdHandler;
     public Help(CmdHandler cmdHandler) {
-        super("Help", "This is a help command");
-        this.cmdType= CmdType.NO_ARGS;
+        super("help", "вывести справку по доступным командам", CmdType.NO_ARGS);
         this.cmdHandler = cmdHandler;
     }
     @Override
     public ActionResult action(CmdArgs args) {
-        HashMap<String, Command> cmds = cmdHandler.getCmds();
-        cmds.forEach((s, cmd) -> System.out.println(cmd.getName()+" "+cmd.getDescription()));
-        return new ActionResult(true, "Displayed cmd list");
+        if (message.equals("")) {
+            message = createMessage();
+        }
+        return new ActionResult(true, message);
+    }
+    private String createMessage() {
+        for (Command cmd : cmdHandler.getCmds().values()) {
+            message += cmd.getName() + ": " + cmd.getDescription() + "\n";
+        }
+        return message;
     }
 }

@@ -2,7 +2,7 @@ import Collection.CollectionHandler;
 import Collection.StorageHandler;
 import Console.ConsoleHandler;
 import cmd.CmdHandler;
-import cmd.commands.Help;
+import cmd.commands.*;
 
 import java.io.File;
 
@@ -13,7 +13,12 @@ public class Main {
         CollectionHandler collectionHandler = new CollectionHandler(storageHandler);
         collectionHandler.load();
         CmdHandler cmdHandler = new CmdHandler();
-        cmdHandler.addCmds(new Help(cmdHandler));
+        cmdHandler.addCmds(new Help(cmdHandler),
+                new Exit(),
+                new Save(collectionHandler),
+                new Show(collectionHandler),
+                new RemoveFirst(collectionHandler),
+                new RemoveById(collectionHandler));
         ConsoleHandler consoleHandler = new ConsoleHandler(collectionHandler, cmdHandler);
         consoleHandler.start();
     }

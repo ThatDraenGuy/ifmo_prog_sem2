@@ -1,13 +1,15 @@
 package Console;
 
 import Collection.CollectionHandler;
-import cmd.CmdArgs;
-import cmd.CmdHandler;
-import cmd.Command;
+import Exceptions.CmdArgsOverflowException;
+import Exceptions.CommandExecutionException;
+import Exceptions.CommandNonExistentException;
+import cmd.*;
 import common.CmdRequest;
 import common.CmdResponse;
+import common.Request;
+import common.Response;
 
-import java.util.HashMap;
 import java.util.Scanner;
 
 public class ConsoleHandler {
@@ -21,20 +23,25 @@ public class ConsoleHandler {
         loop();
     }
     public void loop() {
-        String input = promptInput();
-        CmdRequest cmdRequest = parseInput(input);
-        CmdResponse response = cmdHandler.executeCmd(cmdRequest);
-        loop();
+        while (true) {
+            try {
+                String input = promptInput();
+                CmdRequest cmdRequest = parseInput(input);
+                CmdResponse response = executeCmd(cmdRequest);
+                handleResponse(response);
+            } catch (CommandNonExistentException | CmdArgsOverflowException | CommandExecutionException e) {
+                errorMessage(e);
+                continue;
+            }
 
+        }
     }
     public String promptInput() {
-        System.out.println("input");
-        //TODO Understand if we need a message here
+        System.out.println("Awaiting your input: ");
         Scanner inputScanner = new Scanner(System.in);
-        String input = inputScanner.nextLine();
-        return input;
+        return inputScanner.nextLine();
     }
-    public CmdRequest parseInput(String input) {
+    public CmdRequest parseInput(String input) throws CommandNonExistentException, CmdArgsOverflowException {
         Command cmd;
         CmdArgs cmdArgs = null;
         if (input.contains(" ")) {
@@ -42,20 +49,17 @@ public class ConsoleHandler {
             input = str[0];
             cmdArgs = parseArgs(str[1]);
             if (str.length>2) {
-                System.out.println("too many args?");
-                //TODO Write an exception + check if this is true
+                throw new CmdArgsOverflowException();
             }
         }
         cmd = parseCommand(input);
         return (new CmdRequest(cmd, cmdArgs));
     }
-    public Command parseCommand(String input) {
+    public Command parseCommand(String input) throws CommandNonExistentException {
         if (cmdHandler.isInCmds(input)) {
             return cmdHandler.getCmds().get(input);
         } else {
-            // TODO Write an exception
-            System.out.println("No such command!");
-            return null;
+            throw new CommandNonExistentException(input);
         }
     }
     public CmdArgs parseArgs(String input) {
@@ -63,5 +67,28 @@ public class ConsoleHandler {
         return args;
         // TODO think about this
     }
+    public CmdResponse executeCmd(Request request) {
+        CmdType type = request.getCmd().getCmdType();
+        return switch (type) {
+            case NO_ARGS, SIMPLE_ARG -> cmdHandler.executeCmd(request);
+            case COMPLEX_ARG -> promptComplexArgs(request);
+        };
+    }
+    public CmdResponse promptComplexArgs(Request request) {
 
+        //TODO implement
+        return cmdHandler.executeCmd(request);
+    }
+    public void handleResponse(Response response) throws CommandExecutionException {
+        ActionResult result = response.getActionResult();
+        boolean isSuccess = result.isSuccess();
+        if (isSuccess) {
+            System.out.println(result.getMessage());
+        } else {
+            throw new CommandExecutionException(result);
+        }
+    }
+    public void errorMessage(Exception e) {
+        System.err.println(e.getMessage());
+    }
 }

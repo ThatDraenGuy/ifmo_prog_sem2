@@ -9,4 +9,8 @@ public class DragonCave {
     public int getDepth() {
         return depth;
     }
+    @Override
+    public String toString() {
+        return "is "+this.depth+" meters deep";
+    }
 }
