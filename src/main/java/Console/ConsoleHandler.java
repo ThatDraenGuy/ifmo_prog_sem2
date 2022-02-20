@@ -5,14 +5,16 @@ import Collection.CollectionHandler;
 import Exceptions.CmdArgsAmountException;
 import Exceptions.CommandExecutionException;
 import Exceptions.CommandNonExistentException;
+import annotations.UserAccessibleEnum;
+import annotations.UserAccessibleField;
+import annotations.UserAccessibleObject;
 import cmd.*;
 import common.CmdRequest;
-import common.CmdResponse;
 import common.Request;
 import common.Response;
 
+import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ConsoleHandler {
@@ -28,27 +30,30 @@ public class ConsoleHandler {
     public void loop() {
         while (true) {
             try {
-                String input = promptInput();
+                String input = promptInput("");
                 Request cmdRequest = parseInput(input);
                 Response response = executeCmd(cmdRequest);
                 handleResponse(response);
             } catch (CommandNonExistentException | CmdArgsAmountException | CommandExecutionException e) {
                 errorMessage(e);
                 continue;
+            } catch (ClassNotFoundException e) {
+                errorMessage(new Exception("A critical exception!"));
+                //TODO ???
             }
 
         }
     }
-    public String promptInput() {
-        System.out.println("Awaiting your input: ");
+    public String promptInput(String message) {
+        if (message.equals("")) {
+            System.out.println("Awaiting your input: ");
+        } else {
+            System.out.println(message);
+        }
         Scanner inputScanner = new Scanner(System.in);
         return inputScanner.nextLine();
     }
-    public String promptInput(String inputName) {
-        System.out.println("Input "+inputName+":");
-        Scanner inputScanner = new Scanner(System.in);
-        return inputScanner.nextLine();
-    }
+
     public Request parseInput(String input) throws CommandNonExistentException, CmdArgsAmountException {
         Command cmd;
         CmdArgs cmdArgs = new CmdArgs("");
@@ -75,26 +80,44 @@ public class ConsoleHandler {
         return args;
         // TODO think about this
     }
-    public Response executeCmd(Request request) throws CmdArgsAmountException {
+    public Response executeCmd(Request request) throws CmdArgsAmountException, ClassNotFoundException {
         CmdType type = request.getCmd().getCmdType();
-        return switch (type) {
-            case NO_ARGS, SIMPLE_ARG -> cmdHandler.executeCmd(request);
-            case COMPLEX_ARG -> promptComplexArgs(request);
-        };
-    }
-    public CmdResponse promptComplexArgs(Request request) throws CmdArgsAmountException {
-        Field[] dragonFields = Dragon.class.getDeclaredFields();
-        ArrayList<String> fieldNames = new ArrayList<>();
-        for (Field dragonField : dragonFields) {
-            fieldNames.add(dragonField.getName());
-        }
-        String args="";
-        for (String fieldName : fieldNames) {
-            args+=promptInput(fieldName)+" ";
-        }
-        request.setCmdArgs(new CmdArgs(args));
-        //TODO implement
+        if (type==CmdType.COMPLEX_ARG) {
+            request.setCmdArgs(new CmdArgs(promptComplexArgs(Dragon.class)));
+        } //TODO get more abstract from dragons
         return cmdHandler.executeCmd(request);
+    }
+    public String promptComplexArgs(Class targetClass) throws ClassNotFoundException {
+        //TODO change to Hashmap
+        Field[] fields = targetClass.getFields();
+        StringBuilder args= new StringBuilder();
+        for (Field field : fields) {
+            String res = null;
+            Annotation annField = field.getAnnotation(UserAccessibleField.class);
+            if (annField!=null) {
+                res=promptInput("Please enter " + field.getName() + ": ");
+            }
+            Annotation annEnum = field.getAnnotation(UserAccessibleEnum.class);
+            if (annEnum!=null) {
+                res=promptEnum(field.getType().getName());
+            }
+            Annotation annObject = field.getAnnotation(UserAccessibleObject.class);
+            if (annObject!=null) {
+                res=promptComplexArgs(field.getType());
+            }
+            args.append(field.getName()).append(":").append(res).append(";");
+        }
+        return args.toString();
+        //TODO implement
+    }
+    public String promptEnum(String enumName) throws ClassNotFoundException{
+        StringBuilder message = new StringBuilder("Please enter " + enumName + " (");
+        Field[] enums = Class.forName(enumName).getFields();
+        for (Field field: enums) {
+            message.append(field.getName()).append(";");
+        }
+        message.append("): ");
+        return promptInput(message.toString());
     }
     public void handleResponse(Response response) throws CommandExecutionException {
         ActionResult result = response.getActionResult();

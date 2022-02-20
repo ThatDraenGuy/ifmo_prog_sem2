@@ -1,6 +1,9 @@
 package Collection.Classes;
 
+import annotations.UserAccessibleField;
+
 public class DragonCave {
+    @UserAccessibleField
     private int depth;
     public DragonCave(int depth) {
         this.depth=depth;

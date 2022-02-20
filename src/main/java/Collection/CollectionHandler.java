@@ -21,6 +21,10 @@ public class CollectionHandler {
         collection.add(dragon);
     }
     public Dragon convertArgs(CmdArgs args) {
+        String[] pairs = args.getArgs().split(";");
+        for (String pair : pairs) {
+
+        }
         return null;
         //TODO implement
     }
