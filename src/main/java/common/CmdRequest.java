@@ -13,6 +13,11 @@ public class CmdRequest implements Request {
     }
 
     @Override
+    public void setCmdArgs(CmdArgs cmdArgs) {
+        this.cmdArgs = cmdArgs;
+    }
+
+    @Override
     public Command getCmd() {
         return cmd;
     }

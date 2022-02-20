@@ -25,17 +25,11 @@ public class StorageHandler {
         }
         return null;
     }
-    public void save(java.util.PriorityQueue<Dragon> collection) {
+    public void save(java.util.PriorityQueue<Dragon> collection) throws FileNotFoundException, IOException {
         String JSONString = JSONToCollection.saveDragons(collection);
-        try {
-            FileOutputStream fileOutputStream = new FileOutputStream(this.file);
-            BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
-            bufferedOutputStream.write(JSONString.getBytes());
-            bufferedOutputStream.close();
-        } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
-        } catch (IOException e) {
-            System.out.println(e.getMessage());
-        }
+        FileOutputStream fileOutputStream = new FileOutputStream(this.file);
+        BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
+        bufferedOutputStream.write(JSONString.getBytes());
+        bufferedOutputStream.close();
     }
 }

@@ -2,7 +2,10 @@ package Collection;
 
 import Collection.Classes.Dragon;
 import Exceptions.ElementIdException;
+import cmd.CmdArgs;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
 import java.util.NoSuchElementException;
 
 public class CollectionHandler {
@@ -14,15 +17,19 @@ public class CollectionHandler {
         this.storageHandler = storageHandler;
     }
 
-    public void add(Dragon labWork) {
-        collection.add(labWork);
+    public void add(Dragon dragon) {
+        collection.add(dragon);
+    }
+    public Dragon convertArgs(CmdArgs args) {
+        return null;
+        //TODO implement
     }
 
     public void load() {
         this.collection.addAll(this.storageHandler.load());
     }
 
-    public void save() {
+    public void save() throws FileNotFoundException, IOException {
         this.storageHandler.save(this.collection);
     }
 

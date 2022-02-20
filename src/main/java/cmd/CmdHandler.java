@@ -1,5 +1,6 @@
 package cmd;
 
+import Exceptions.CmdArgsAmountException;
 import common.CmdResponse;
 import common.Request;
 
@@ -28,8 +29,15 @@ public class CmdHandler {
     public HashMap<String, Command> getCmds() {
         return cmds;
     }
-    public CmdResponse executeCmd(Request request) {
-        ActionResult result = request.getCmd().action(request.getCmdArgs());
+    public CmdResponse executeCmd(Request request) throws CmdArgsAmountException {
+        Command cmd = request.getCmd();
+        CmdArgs cmdArgs = request.getCmdArgs();
+        if (cmd.getCmdType()==CmdType.NO_ARGS && cmdArgs.getArgs()!="") {
+            throw new CmdArgsAmountException("Command \""+cmd.getName()+"\" does not need arguments!");
+        } else if (cmd.getCmdType()==CmdType.SIMPLE_ARG && cmdArgs.getArgs()=="") {
+            throw new CmdArgsAmountException(cmd.getName()+" needs an argument!");
+        }
+        ActionResult result = cmd.action(cmdArgs);
         return new CmdResponse(result);
     }
 }

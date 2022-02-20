@@ -1,7 +1,8 @@
 package Console;
 
+import Collection.Classes.Dragon;
 import Collection.CollectionHandler;
-import Exceptions.CmdArgsOverflowException;
+import Exceptions.CmdArgsAmountException;
 import Exceptions.CommandExecutionException;
 import Exceptions.CommandNonExistentException;
 import cmd.*;
@@ -10,6 +11,8 @@ import common.CmdResponse;
 import common.Request;
 import common.Response;
 
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Scanner;
 
 public class ConsoleHandler {
@@ -26,10 +29,10 @@ public class ConsoleHandler {
         while (true) {
             try {
                 String input = promptInput();
-                CmdRequest cmdRequest = parseInput(input);
-                CmdResponse response = executeCmd(cmdRequest);
+                Request cmdRequest = parseInput(input);
+                Response response = executeCmd(cmdRequest);
                 handleResponse(response);
-            } catch (CommandNonExistentException | CmdArgsOverflowException | CommandExecutionException e) {
+            } catch (CommandNonExistentException | CmdArgsAmountException | CommandExecutionException e) {
                 errorMessage(e);
                 continue;
             }
@@ -41,15 +44,20 @@ public class ConsoleHandler {
         Scanner inputScanner = new Scanner(System.in);
         return inputScanner.nextLine();
     }
-    public CmdRequest parseInput(String input) throws CommandNonExistentException, CmdArgsOverflowException {
+    public String promptInput(String inputName) {
+        System.out.println("Input "+inputName+":");
+        Scanner inputScanner = new Scanner(System.in);
+        return inputScanner.nextLine();
+    }
+    public Request parseInput(String input) throws CommandNonExistentException, CmdArgsAmountException {
         Command cmd;
-        CmdArgs cmdArgs = null;
+        CmdArgs cmdArgs = new CmdArgs("");
         if (input.contains(" ")) {
             String[] str = input.split(" ");
             input = str[0];
             cmdArgs = parseArgs(str[1]);
             if (str.length>2) {
-                throw new CmdArgsOverflowException();
+                throw new CmdArgsAmountException();
             }
         }
         cmd = parseCommand(input);
@@ -67,15 +75,24 @@ public class ConsoleHandler {
         return args;
         // TODO think about this
     }
-    public CmdResponse executeCmd(Request request) {
+    public Response executeCmd(Request request) throws CmdArgsAmountException {
         CmdType type = request.getCmd().getCmdType();
         return switch (type) {
             case NO_ARGS, SIMPLE_ARG -> cmdHandler.executeCmd(request);
             case COMPLEX_ARG -> promptComplexArgs(request);
         };
     }
-    public CmdResponse promptComplexArgs(Request request) {
-
+    public CmdResponse promptComplexArgs(Request request) throws CmdArgsAmountException {
+        Field[] dragonFields = Dragon.class.getDeclaredFields();
+        ArrayList<String> fieldNames = new ArrayList<>();
+        for (Field dragonField : dragonFields) {
+            fieldNames.add(dragonField.getName());
+        }
+        String args="";
+        for (String fieldName : fieldNames) {
+            args+=promptInput(fieldName)+" ";
+        }
+        request.setCmdArgs(new CmdArgs(args));
         //TODO implement
         return cmdHandler.executeCmd(request);
     }

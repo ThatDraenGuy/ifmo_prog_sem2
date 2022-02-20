@@ -6,6 +6,8 @@ import cmd.CmdArgs;
 import cmd.CmdType;
 import cmd.AbstractCommand;
 
+import java.io.IOException;
+
 public class Save extends AbstractCommand {
     private CollectionHandler collectionHandler;
     public Save(CollectionHandler collectionHandler) {
@@ -15,8 +17,11 @@ public class Save extends AbstractCommand {
 
     @Override
     public ActionResult action(CmdArgs args) {
-        collectionHandler.save();
-        return new ActionResult(true, "Successfully saved collection");
-        //TODO a false result?
+        try {
+            collectionHandler.save();
+            return new ActionResult(true, "Successfully saved collection");
+        } catch (IOException e) {
+            return new ActionResult(false, "An exception occurred: "+e.getMessage());
+        }
     }
 }

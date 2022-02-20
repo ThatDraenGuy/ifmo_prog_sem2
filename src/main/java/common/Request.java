@@ -7,4 +7,5 @@ import cmd.Command;
 public interface Request {
     Command getCmd();
     CmdArgs getCmdArgs();
+    void setCmdArgs(CmdArgs args);
 }
