@@ -18,11 +18,11 @@ public class Add extends AbstractCommand {
     @Override
     public ActionResult action(CmdArgs args) {
         try {
-            collectionHandler.addDragon(args.getDeconstructedObject());
+            collectionHandler.add(args.getDeconstructedObject());
             return new ActionResult(true, "Successfully added new dragon to collection");
 
         } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
-            return new ActionResult(false, "A critical exception occurred while trying to add a dragon!");
+            return new ActionResult(false, e.toString());
         }
     }
 }

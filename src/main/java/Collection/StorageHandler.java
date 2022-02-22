@@ -1,8 +1,10 @@
 package Collection;
 
 import Collection.Classes.Dragon;
+import org.json.JSONException;
 
 import java.io.*;
+import java.util.PriorityQueue;
 
 public class StorageHandler {
     private File file;
@@ -18,14 +20,15 @@ public class StorageHandler {
             }
             scanner.close();
             return JSONToCollection.parseString(JSONString);
-        } catch (FileNotFoundException e) {
-            System.out.println(e.getMessage());
         } catch (IOException e) {
             System.out.println(e.getMessage());
+        } catch (JSONException e) {
+            System.out.println("An exception occurred while reading from JSON file, initializing an empty collection...");
         }
-        return null;
+        return new PriorityQueue<>();
     }
-    public void save(java.util.PriorityQueue<Dragon> collection) throws FileNotFoundException, IOException {
+    public void save(java.util.PriorityQueue<Dragon> collection) throws IOException {
+        //TODO fix?
         String JSONString = JSONToCollection.saveDragons(collection);
         FileOutputStream fileOutputStream = new FileOutputStream(this.file);
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);

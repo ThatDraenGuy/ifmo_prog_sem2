@@ -39,10 +39,12 @@ public class JSONToCollection {
         return new DragonCave(depth);
     }
     public static String saveDragons(java.util.PriorityQueue<Dragon> collection) {
+        java.util.PriorityQueue<Dragon> collectionCopy = new java.util.PriorityQueue<>();
+        collectionCopy.addAll(collection);
         String str = "{ \"dragonCollection\": [ ";
-        for (int i=0; i<=collection.size(); i++) {
-            str += dragontoJSON(collection.poll()).toString();
-            if (i< collection.size()) {
+        for (int i=0; i<=collectionCopy.size(); i++) {
+            str += dragontoJSON(collectionCopy.poll()).toString();
+            if (i< collectionCopy.size()) {
                 str += ",";
             }
         }

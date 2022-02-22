@@ -1,10 +1,10 @@
 package Console;
 
-import Collection.Classes.Dragon;
 import Collection.CollectionHandler;
 import Exceptions.CmdArgsAmountException;
 import Exceptions.CommandExecutionException;
 import Exceptions.CommandNonExistentException;
+import Exceptions.ValueNotValidException;
 import annotations.UserAccessibleEnum;
 import annotations.UserAccessibleField;
 import annotations.UserAccessibleObject;
@@ -15,11 +15,12 @@ import common.Response;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.HashMap;
 import java.util.Scanner;
 
 public class ConsoleHandler {
-    CollectionHandler collectionHandler;
-    CmdHandler cmdHandler;
+    private CollectionHandler collectionHandler;
+    private CmdHandler cmdHandler;
     public ConsoleHandler(CollectionHandler collectionHandler, CmdHandler cmdHandler) {
         this.collectionHandler = collectionHandler;
         this.cmdHandler = cmdHandler;
@@ -80,41 +81,62 @@ public class ConsoleHandler {
     }
     public Response executeCmd(Request request) throws CmdArgsAmountException, ClassNotFoundException {
         CmdType type = request.getCmd().getCmdType();
+        CmdArgs args = request.getCmdArgs();
         if (type==CmdType.COMPLEX_ARG) {
-            request.setCmdArgs(new CmdArgs(promptComplexArgs(Dragon.class)));
-        } //TODO get more abstract from dragons
+            HashMap<Field, Object> newArgs = promptComplexArgs(collectionHandler.getTargetClass());
+            request.setCmdArgs(new CmdArgs(newArgs));
+        } else if (type==CmdType.BOTH_ARG) {
+            if (args.getArgs() == "") {
+                throw new CmdArgsAmountException("This command needs an in-line argument!");
+            }
+            HashMap<Field, Object> complexArgs = promptComplexArgs(collectionHandler.getTargetClass());
+            args.setDeconstructedObject(complexArgs);
+        }
         return cmdHandler.executeCmd(request);
     }
-    public String promptComplexArgs(Class targetClass) throws ClassNotFoundException {
-        //TODO change to Hashmap
-        Field[] fields = targetClass.getFields();
-        StringBuilder args= new StringBuilder();
+    public HashMap<Field, Object> promptComplexArgs(Class targetClass) throws ClassNotFoundException {
+        HashMap<Field, Object> map = new HashMap<>();
+        Field[] fields = targetClass.getDeclaredFields();
         for (Field field : fields) {
-            String res = null;
-            Annotation annField = field.getAnnotation(UserAccessibleField.class);
-            if (annField!=null) {
-                res=promptInput("Please enter " + field.getName() + ": ");
+            if (field.isAnnotationPresent(UserAccessibleField.class)) {
+                Object obj = promptField(field);
+                map.put(field, obj);
             }
-            Annotation annEnum = field.getAnnotation(UserAccessibleEnum.class);
-            if (annEnum!=null) {
-                res=promptEnum(field.getType().getName());
+            if (field.isAnnotationPresent(UserAccessibleEnum.class)) {
+                Object obj = promptEnum(field);
+                map.put(field, obj);
             }
-            Annotation annObject = field.getAnnotation(UserAccessibleObject.class);
-            if (annObject!=null) {
-                res=promptComplexArgs(field.getType());
+            if (field.isAnnotationPresent(UserAccessibleObject.class)) {
+                Object obj = promptComplexArgs(field.getType());
+                map.put(field, obj);
             }
-            args.append(field.getName()).append(":").append(res).append(";");
         }
-        return args.toString();
+        return map;
     }
-    public String promptEnum(String enumName) throws ClassNotFoundException{
-        StringBuilder message = new StringBuilder("Please enter " + enumName + " (");
-        Field[] enums = Class.forName(enumName).getFields();
-        for (Field field: enums) {
+    public String promptWithValidation(Field field, String message) {
+        while (true) {
+            String result = promptInput(message);
+            try {
+                collectionHandler.validate(field, result);
+                return result;
+            } catch (ValueNotValidException e) {
+                errorMessage(e);
+                continue;
+            }
+        }
+    }
+    public String promptField(Field field) {
+        return promptWithValidation(field, "Please enter " + field.getName() + ": ");
+
+    }
+    public String promptEnum(Field enumField) throws ClassNotFoundException{
+        StringBuilder message = new StringBuilder("Please enter " + enumField.getName() + " (");
+        Field[] enums = enumField.getType().getFields();
+        for (Field field : enums) {
             message.append(field.getName()).append(";");
         }
         message.append("): ");
-        return promptInput(message.toString());
+        return promptWithValidation(enumField, message.toString());
     }
     public void handleResponse(Response response) throws CommandExecutionException {
         ActionResult result = response.getActionResult();

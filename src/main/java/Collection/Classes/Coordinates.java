@@ -1,11 +1,15 @@
 package Collection.Classes;
 
+import annotations.LowerBounded;
+import annotations.NotNull;
 import annotations.UserAccessibleField;
 
 public class Coordinates {
     @UserAccessibleField
     private int x;
     @UserAccessibleField
+    @NotNull
+    @LowerBounded(value = -255)
     private long y; //Значение поля должно быть больше -255, Поле не может быть null
     public Coordinates (int x, long y) {
         this.x=x;

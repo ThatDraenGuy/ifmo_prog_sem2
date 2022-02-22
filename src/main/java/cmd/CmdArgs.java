@@ -23,4 +23,8 @@ public class CmdArgs {
     public void setArgs(String args) {
         this.args=args;
     }
+
+    public void setDeconstructedObject(HashMap<Field, Object> deconstructedObject) {
+        this.deconstructedObject = deconstructedObject;
+    }
 }

@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 
 class StorageHandlerTest {
     @Test
-    public void correctFile() {
+    public void correctFile() throws IOException {
         File file = new File("./src/test/resources/testFile.json");
         StorageHandler testStorage = new StorageHandler(file);
         java.util.PriorityQueue<Dragon> collection = testStorage.load();
