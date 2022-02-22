@@ -36,7 +36,6 @@ public class ConsoleHandler {
                 handleResponse(response);
             } catch (CommandNonExistentException | CmdArgsAmountException | CommandExecutionException e) {
                 errorMessage(e);
-                continue;
             } catch (ClassNotFoundException e) {
                 errorMessage(new Exception("A critical exception!"));
                 //TODO ???
@@ -76,8 +75,7 @@ public class ConsoleHandler {
         }
     }
     public CmdArgs parseArgs(String input) {
-        CmdArgs args = new CmdArgs(input);
-        return args;
+        return new CmdArgs(input);
         // TODO think about this
     }
     public Response executeCmd(Request request) throws CmdArgsAmountException, ClassNotFoundException {
@@ -108,7 +106,6 @@ public class ConsoleHandler {
             args.append(field.getName()).append(":").append(res).append(";");
         }
         return args.toString();
-        //TODO implement
     }
     public String promptEnum(String enumName) throws ClassNotFoundException{
         StringBuilder message = new StringBuilder("Please enter " + enumName + " (");

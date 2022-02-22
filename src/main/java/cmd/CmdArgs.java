@@ -12,6 +12,11 @@ public class CmdArgs {
     public CmdArgs(HashMap<Field,Object> object) {
         this.deconstructedObject=object;
     }
+
+    public HashMap<Field, Object> getDeconstructedObject() {
+        return deconstructedObject;
+    }
+
     public String getArgs() {
         return args;
     }

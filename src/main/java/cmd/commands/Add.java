@@ -6,6 +6,8 @@ import cmd.ActionResult;
 import cmd.CmdArgs;
 import cmd.CmdType;
 
+import java.lang.reflect.InvocationTargetException;
+
 public class Add extends AbstractCommand {
     CollectionHandler collectionHandler;
     public Add(CollectionHandler collectionHandler) {
@@ -15,8 +17,12 @@ public class Add extends AbstractCommand {
 
     @Override
     public ActionResult action(CmdArgs args) {
-        collectionHandler.add(collectionHandler.convertArgs(args));
-        return new ActionResult(true, "Successfully added new dragon to collection");
-        //TODO exceptions and stuff
+        try {
+            collectionHandler.addDragon(args.getDeconstructedObject());
+            return new ActionResult(true, "Successfully added new dragon to collection");
+
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+            return new ActionResult(false, "A critical exception occurred while trying to add a dragon!");
+        }
     }
 }
