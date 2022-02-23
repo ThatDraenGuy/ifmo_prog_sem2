@@ -1,15 +1,24 @@
 package cmd;
 
+import Collection.CollectionHandler;
 import Exceptions.CmdArgsAmountException;
 import common.CmdResponse;
 import common.Request;
 
 import java.util.HashMap;
+import java.util.LinkedList;
 
 public class CmdHandler {
-    protected HashMap<String, Command> cmds;
-    public CmdHandler() {
+    private HashMap<String, Command> cmds;
+    private LinkedList<Command> cmdHistory;
+    private CollectionHandler collectionHandler;
+    public CmdHandler(CollectionHandler collectionHandler) {
         this.cmds=new HashMap<>();
+        this.collectionHandler=collectionHandler;
+        this.cmdHistory=new LinkedList<>();
+        for (int i=0; i<5; i++) {
+            cmdHistory.add(null);
+        }
     }
     public void addComm(Command c) {
         final String name = c.getName();
@@ -29,6 +38,15 @@ public class CmdHandler {
     public HashMap<String, Command> getCmds() {
         return cmds;
     }
+
+    public LinkedList<Command> getCmdHistory() {
+        return cmdHistory;
+    }
+
+    public CollectionHandler getCollectionHandler() {
+        return collectionHandler;
+    }
+
     public CmdResponse executeCmd(Request request) throws CmdArgsAmountException {
         Command cmd = request.getCmd();
         CmdArgs cmdArgs = request.getCmdArgs();
@@ -38,6 +56,8 @@ public class CmdHandler {
             throw new CmdArgsAmountException(cmd.getName()+" needs an argument!");
         }
         ActionResult result = cmd.action(cmdArgs);
+        cmdHistory.addLast(cmd);
+        cmdHistory.removeFirst();
         return new CmdResponse(result);
     }
 }

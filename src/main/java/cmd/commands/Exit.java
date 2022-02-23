@@ -10,8 +10,7 @@ public class Exit extends AbstractCommand {
         super("exit", "завершить программу (без сохранения в файл)", CmdType.NO_ARGS);
     }
     public ActionResult action(CmdArgs args) {
-        System.exit(0);
-        return new ActionResult(true, "exiting...");
+        return new ActionResult(true, "exit");
         //TODO implement a "are you sure" feature (ConsoleHandler?)
     }
 }

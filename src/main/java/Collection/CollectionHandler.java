@@ -1,19 +1,19 @@
 package Collection;
 
+import Collection.Classes.Color;
 import Collection.Classes.Dragon;
+import Collection.Classes.DragonType;
 import Exceptions.ElementIdException;
 import Exceptions.InvalidCollectionException;
 import Exceptions.ValueNotValidException;
-import annotations.LowerBounded;
-import annotations.NotNull;
-import annotations.UserAccessibleObject;
+import Annotations.LowerBounded;
+import Annotations.NotNull;
+import Annotations.UserAccessibleObject;
 
 import java.io.IOException;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
@@ -22,9 +22,9 @@ public class CollectionHandler {
     private java.util.PriorityQueue<Dragon> collection;
     private StorageHandler storageHandler;
     private DragonBuilder dragonBuilder;
-    private Class targetClass;
+    private Class<?> targetClass;
 
-    public CollectionHandler(StorageHandler storageHandler, Class targetClass) {
+    public CollectionHandler(StorageHandler storageHandler, Class<?> targetClass) {
         this.collection = new java.util.PriorityQueue<>();
         this.storageHandler = storageHandler;
         this.targetClass=targetClass;
@@ -33,13 +33,12 @@ public class CollectionHandler {
 
     public void add(HashMap<Field, Object> deconstructedObject) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         collection.add(constructDragon(deconstructedObject));
-        //TODO implement + not forget about objects!!!!! + refactor into add()
     }
     public void update(String arg, HashMap<Field, Object> deconstructedObject) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, ElementIdException {
         Dragon newObject = constructDragon(deconstructedObject);
         Long argLong = Long.parseLong(arg);
         newObject.setId(argLong);
-        boolean result = collection.removeIf(dragon -> dragon.getId()==argLong);
+        boolean result = collection.removeIf(dragon -> dragon.getId().equals(argLong));
         if (result) {
             collection.add(newObject);
         } else {
@@ -51,8 +50,11 @@ public class CollectionHandler {
             Method method;
             if (f.isAnnotationPresent(UserAccessibleObject.class)) {
                 method = DragonBuilder.class.getMethod(f.getName(), HashMap.class);
-                HashMap<Field,Object> obj = (HashMap<Field, Object>) deconstructedObject.get(f);
-                method.invoke(dragonBuilder, obj);
+                if (deconstructedObject.get(f).equals("")) {
+                    method.invoke(dragonBuilder, null);
+                } else {
+                    method.invoke(dragonBuilder, (HashMap<Field, Object>) deconstructedObject.get(f));
+                }
             } else {
                 method = DragonBuilder.class.getMethod(f.getName(), String.class);
                 method.invoke(dragonBuilder, deconstructedObject.get(f).toString());
@@ -78,6 +80,9 @@ public class CollectionHandler {
         //TODO think about giving this up
         this.storageHandler.save(this.collection);
     }
+    public void clear() {
+        collection.clear();
+    }
 
     @Override
     public String toString() {
@@ -101,14 +106,53 @@ public class CollectionHandler {
         }
 
     }
+    public void removeLower(HashMap<Field, Object> deconstructedObject) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
+        Dragon target = constructDragon(deconstructedObject);
+        collection.removeIf(dragon -> dragon.compareTo(target)>0);
+    }
+    public int countByColor(String arg) throws IllegalArgumentException{
+        Color target = Color.valueOf(arg);
+        //TODO normal validation?
+        int res=0;
+        for (Dragon dragon : collection) {
+            if (dragon.getColor().equals(target)) {
+                res++;
+            }
+        }
+        return res;
+    }
+    public String filterByType(String arg) throws IllegalArgumentException {
+        DragonType type = DragonType.valueOf(arg);
+        StringBuilder str = new StringBuilder();
+        for (Dragon dragon : collection) {
+            if (dragon.getType().equals(type)) {
+                str.append(dragon).append("\n");
+            }
+        }
+        return str.toString();
+    }
+    public String filterGreaterThanAge(String arg) {
+        long age = Long.parseLong(arg);
+        StringBuilder str = new StringBuilder();
+        for (Dragon dragon : collection) {
+            if (dragon.getAge()>age) {
+                str.append(dragon).append("\n");
+            }
+        }
+        return str.toString();
+    }
+    public String info() {
+        return "This collection's type is a "+collection.getClass().getName()+", it contains "+collection.size()+" elements.";
+        //TODO init date?
+    }
     public void validate(Field field, String value) throws ValueNotValidException {
-        if (field.isAnnotationPresent(NotNull.class) && value=="") {
+        if (field.isAnnotationPresent(NotNull.class) && value.equals("")) {
             throw new ValueNotValidException(field.getName()+" cannot be null!");
         }
         if (field.isAnnotationPresent(LowerBounded.class) && value!="") {
-            Double border = field.getAnnotation(LowerBounded.class).value();
+            double border = field.getAnnotation(LowerBounded.class).value();
             if (Double.parseDouble(value)<=border) {
-                throw new ValueNotValidException(field.getName()+" should be greater than "+border.longValue()+". Your input: "+value);
+                throw new ValueNotValidException(field.getName()+" should be greater than "+Double.doubleToLongBits(border)+". Your input: "+value);
                 //TODO fix longValue()
             }
         }
@@ -136,7 +180,7 @@ public class CollectionHandler {
         }
         return highestId;
     }
-    public Class getTargetClass() {
+    public Class<?> getTargetClass() {
         return targetClass;
     }
 }

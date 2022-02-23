@@ -1,6 +1,6 @@
 package Collection.Classes;
 
-import annotations.UserAccessibleField;
+import Annotations.UserAccessibleField;
 
 public class DragonCave {
     @UserAccessibleField

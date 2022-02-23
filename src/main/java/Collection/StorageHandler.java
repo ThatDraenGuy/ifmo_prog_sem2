@@ -13,7 +13,7 @@ public class StorageHandler {
     }
     public java.util.PriorityQueue<Dragon> load() {
         try (FileInputStream inputStream = new FileInputStream(file)) {
-            java.util.Scanner scanner = new java.util.Scanner(inputStream);
+            java.util.Scanner scanner = new java.util.Scanner(file);
             String JSONString = new String();
             while (scanner.hasNextLine()) {
                 JSONString += scanner.nextLine();

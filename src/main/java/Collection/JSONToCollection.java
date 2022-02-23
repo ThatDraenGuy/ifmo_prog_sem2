@@ -41,15 +41,13 @@ public class JSONToCollection {
     public static String saveDragons(java.util.PriorityQueue<Dragon> collection) {
         java.util.PriorityQueue<Dragon> collectionCopy = new java.util.PriorityQueue<>();
         collectionCopy.addAll(collection);
-        String str = "{ \"dragonCollection\": [ ";
-        for (int i=0; i<=collectionCopy.size(); i++) {
-            str += dragontoJSON(collectionCopy.poll()).toString();
-            if (i< collectionCopy.size()) {
-                str += ",";
-            }
+        StringBuilder str = new StringBuilder("{ \"dragonCollection\": [ ");
+        for (Dragon dragon : collection) {
+            str.append(dragontoJSON(dragon)).append(",");
         }
-        str+="]}";
-        return  str;
+        str.deleteCharAt(str.length()-1);
+        str.append("]}");
+        return str.toString();
     }
     public static JSONObject dragontoJSON(Dragon dragon) {
         JSONObject jsonDragon = new JSONObject();

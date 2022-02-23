@@ -45,7 +45,11 @@ public class DragonBuilder {
         return this;
     }
     public DragonBuilder age(String age) {
-        this.age=Long.parseLong(age);
+        if (age.equals("")) {
+            this.age=null;
+        } else {
+            this.age = Long.parseLong(age);
+        }
         return this;
     }
     public DragonBuilder color(String color) {
@@ -53,7 +57,11 @@ public class DragonBuilder {
         return this;
     }
     public DragonBuilder type(String type) {
-        this.type=DragonType.valueOf(type);
+        if (type.equals("")) {
+            this.type=null;
+        } else {
+            this.type = DragonType.valueOf(type);
+        }
         return this;
     }
     public DragonBuilder character(String character) {

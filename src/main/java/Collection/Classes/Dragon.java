@@ -1,7 +1,6 @@
 package Collection.Classes;
 
-import Collection.DragonBuilder;
-import annotations.*;
+import Annotations.*;
 
 public class Dragon implements Comparable<Dragon>{
     @NotNull

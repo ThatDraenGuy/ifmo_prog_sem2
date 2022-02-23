@@ -1,29 +1,36 @@
 package Console;
 
-import Collection.CollectionHandler;
 import Exceptions.CmdArgsAmountException;
 import Exceptions.CommandExecutionException;
 import Exceptions.CommandNonExistentException;
 import Exceptions.ValueNotValidException;
-import annotations.UserAccessibleEnum;
-import annotations.UserAccessibleField;
-import annotations.UserAccessibleObject;
+import Annotations.UserAccessibleEnum;
+import Annotations.UserAccessibleField;
+import Annotations.UserAccessibleObject;
 import cmd.*;
 import common.CmdRequest;
 import common.Request;
 import common.Response;
 
-import java.lang.annotation.Annotation;
+import java.io.InputStream;
+import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 import java.util.Scanner;
 
 public class ConsoleHandler {
-    private CollectionHandler collectionHandler;
     private CmdHandler cmdHandler;
-    public ConsoleHandler(CollectionHandler collectionHandler, CmdHandler cmdHandler) {
-        this.collectionHandler = collectionHandler;
+    private Class<?> targetClass;
+    //TODO think about above
+    private Scanner inputScanner;
+    private PrintStream out;
+    private PrintStream err;
+    public ConsoleHandler(CmdHandler cmdHandler, InputStream in, PrintStream out, PrintStream err) {
         this.cmdHandler = cmdHandler;
+        this.targetClass=cmdHandler.getCollectionHandler().getTargetClass();
+        inputScanner = new Scanner(in);
+        this.out=out;
+        this.err=err;
     }
     public void start() {
         loop();
@@ -34,7 +41,10 @@ public class ConsoleHandler {
                 String input = promptInput("");
                 Request cmdRequest = parseInput(input);
                 Response response = executeCmd(cmdRequest);
-                handleResponse(response);
+                boolean isCmdExit = handleResponse(response);
+                if (isCmdExit) {
+                    return;
+                }
             } catch (CommandNonExistentException | CmdArgsAmountException | CommandExecutionException e) {
                 errorMessage(e);
             } catch (ClassNotFoundException e) {
@@ -46,11 +56,10 @@ public class ConsoleHandler {
     }
     public String promptInput(String message) {
         if (message.equals("")) {
-            System.out.println("Awaiting your input: ");
+            out.println("Awaiting your input: ");
         } else {
-            System.out.println(message);
+            out.println(message);
         }
-        Scanner inputScanner = new Scanner(System.in);
         return inputScanner.nextLine();
     }
 
@@ -83,18 +92,18 @@ public class ConsoleHandler {
         CmdType type = request.getCmd().getCmdType();
         CmdArgs args = request.getCmdArgs();
         if (type==CmdType.COMPLEX_ARG) {
-            HashMap<Field, Object> newArgs = promptComplexArgs(collectionHandler.getTargetClass());
+            HashMap<Field, Object> newArgs = promptComplexArgs(targetClass);
             request.setCmdArgs(new CmdArgs(newArgs));
         } else if (type==CmdType.BOTH_ARG) {
-            if (args.getArgs() == "") {
+            if (args.getArgs().equals("")) {
                 throw new CmdArgsAmountException("This command needs an in-line argument!");
             }
-            HashMap<Field, Object> complexArgs = promptComplexArgs(collectionHandler.getTargetClass());
+            HashMap<Field, Object> complexArgs = promptComplexArgs(targetClass);
             args.setDeconstructedObject(complexArgs);
         }
         return cmdHandler.executeCmd(request);
     }
-    public HashMap<Field, Object> promptComplexArgs(Class targetClass) throws ClassNotFoundException {
+    public HashMap<Field, Object> promptComplexArgs(Class<?> targetClass) {
         HashMap<Field, Object> map = new HashMap<>();
         Field[] fields = targetClass.getDeclaredFields();
         for (Field field : fields) {
@@ -117,11 +126,10 @@ public class ConsoleHandler {
         while (true) {
             String result = promptInput(message);
             try {
-                collectionHandler.validate(field, result);
+                cmdHandler.getCollectionHandler().validate(field, result);
                 return result;
             } catch (ValueNotValidException e) {
                 errorMessage(e);
-                continue;
             }
         }
     }
@@ -129,25 +137,33 @@ public class ConsoleHandler {
         return promptWithValidation(field, "Please enter " + field.getName() + ": ");
 
     }
-    public String promptEnum(Field enumField) throws ClassNotFoundException{
+    public String promptEnum(Field enumField) {
         StringBuilder message = new StringBuilder("Please enter " + enumField.getName() + " (");
         Field[] enums = enumField.getType().getFields();
         for (Field field : enums) {
             message.append(field.getName()).append(";");
         }
+        message.deleteCharAt(message.length()-1);
         message.append("): ");
         return promptWithValidation(enumField, message.toString());
     }
-    public void handleResponse(Response response) throws CommandExecutionException {
+    public boolean handleResponse(Response response) throws CommandExecutionException {
+        //TODO think about exit
         ActionResult result = response.getActionResult();
         boolean isSuccess = result.isSuccess();
         if (isSuccess) {
-            System.out.println(result.getMessage());
+            String message = result.getMessage();
+            if (message.equals("exit")) {
+                return true;
+            }else {
+                out.println(result.getMessage());
+                return false;
+            }
         } else {
             throw new CommandExecutionException(result);
         }
     }
     public void errorMessage(Exception e) {
-        System.err.println(e.getMessage());
+        err.println(e.getMessage());
     }
 }

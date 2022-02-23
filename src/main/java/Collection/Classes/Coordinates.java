@@ -1,8 +1,8 @@
 package Collection.Classes;
 
-import annotations.LowerBounded;
-import annotations.NotNull;
-import annotations.UserAccessibleField;
+import Annotations.LowerBounded;
+import Annotations.NotNull;
+import Annotations.UserAccessibleField;
 
 public class Coordinates {
     @UserAccessibleField
