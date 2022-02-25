@@ -4,8 +4,6 @@ import Console.ConsoleHandler;
 import cmd.*;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
-import java.util.Arrays;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -22,11 +20,13 @@ public class ExecuteScript extends AbstractCommand {
 
     @Override
     public ActionResult action(CmdArgs args) {
+        //TODO normal log
         try {
             File scriptFile = new File(args.getArgs());
+            String path = scriptFile.getAbsolutePath();
             Scanner fileScanner = new Scanner(scriptFile);
-            if (!scriptHistory.add(scriptFile.getAbsolutePath())) {
-                return new ActionResult(false, "Script recursion detected!");
+            if (!scriptHistory.add(path)) {
+                return finishScript(false, "Script recursion detected!", path);
             }
             StringBuilder script = new StringBuilder();
             while (fileScanner.hasNextLine()) {
@@ -42,17 +42,21 @@ public class ExecuteScript extends AbstractCommand {
             try {
                 consoleHandler.start();
             } catch (NoSuchElementException e) {
-                return new ActionResult(false, "Reached end of the script in the process of executing command!");
+                return finishScript(false, "Reached end of the script in the process of executing command!", path);
             }
             String outRes = out.toString();
             String errRes = err.toString();
             if (errRes.equals("")) {
-                return new ActionResult(true, "Successfully executed script.");
+                return finishScript(true, "Successfully executed script.", path);
             } else {
-                return new ActionResult(false, "An exception(s) occurred while trying to execute the script. Here's a full exception log: \n"+errRes);
+                return finishScript(false, "An exception(s) occurred while trying to execute the script. Here's a full exception log: \n"+errRes, path);
             }
         }  catch (FileNotFoundException e) {
             return new ActionResult(false, "Cannot find file \""+args.getArgs()+"\"");
         }
+    }
+    public ActionResult finishScript(boolean res, String message, String path) {
+        scriptHistory.remove(path);
+        return new ActionResult(res,message);
     }
 }

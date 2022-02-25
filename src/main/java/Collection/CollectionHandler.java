@@ -1,5 +1,8 @@
 package Collection;
 
+import Collection.Classes.Builders.Builder;
+import Collection.Classes.Builders.DragonBuilder;
+import Collection.Classes.Collectible;
 import Collection.Classes.Color;
 import Collection.Classes.Dragon;
 import Collection.Classes.DragonType;
@@ -14,28 +17,29 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.time.format.DateTimeParseException;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.NoSuchElementException;
+import java.util.function.Function;
 
 public class CollectionHandler {
+    private Class<? extends Collectible> targetClass = Dragon.class;
     private java.util.PriorityQueue<Dragon> collection;
     private StorageHandler storageHandler;
     private DragonBuilder dragonBuilder;
-    private Class<?> targetClass;
 
-    public CollectionHandler(StorageHandler storageHandler, Class<?> targetClass) {
+    public CollectionHandler(StorageHandler storageHandler) {
         this.collection = new java.util.PriorityQueue<>();
         this.storageHandler = storageHandler;
-        this.targetClass=targetClass;
     }
 
 
     public void add(HashMap<Field, Object> deconstructedObject) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        collection.add(constructDragon(deconstructedObject));
+        collection.add(constructObject(deconstructedObject, Dragon.class));
     }
     public void update(String arg, HashMap<Field, Object> deconstructedObject) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, ElementIdException {
-        Dragon newObject = constructDragon(deconstructedObject);
+        Dragon newObject = constructObject(deconstructedObject, Dragon.class);
         Long argLong = Long.parseLong(arg);
         newObject.setId(argLong);
         boolean result = collection.removeIf(dragon -> dragon.getId().equals(argLong));
@@ -45,22 +49,20 @@ public class CollectionHandler {
             throw new ElementIdException(arg);
         }
     }
-    public Dragon constructDragon(HashMap<Field,Object> deconstructedObject) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public <T extends Collectible> T constructObject(HashMap<Field,Object> deconstructedObject, Class<T> target) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        Builder builder = (Builder) target.getDeclaredMethod("getBuilder", null).invoke(null, null);
         for (Field f : deconstructedObject.keySet()) {
             Method method;
             if (f.isAnnotationPresent(UserAccessibleObject.class)) {
-                method = DragonBuilder.class.getMethod(f.getName(), HashMap.class);
-                if (deconstructedObject.get(f).equals("")) {
-                    method.invoke(dragonBuilder, null);
-                } else {
-                    method.invoke(dragonBuilder, (HashMap<Field, Object>) deconstructedObject.get(f));
-                }
+                method = builder.getClass().getMethod(f.getName(), f.getType());
+                method.invoke(builder, constructObject((HashMap<Field, Object>) deconstructedObject.get(f), (Class<Collectible>) f.getType()));
             } else {
-                method = DragonBuilder.class.getMethod(f.getName(), String.class);
-                method.invoke(dragonBuilder, deconstructedObject.get(f).toString());
+                method = builder.getClass().getMethod(f.getName(), f.getType());
+                method.invoke(builder, deconstructedObject.get(f));
             }
+            //TODO think
         }
-        return dragonBuilder.build();
+        return builder.build();
     }
 
 
@@ -107,8 +109,9 @@ public class CollectionHandler {
 
     }
     public void removeLower(HashMap<Field, Object> deconstructedObject) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-        Dragon target = constructDragon(deconstructedObject);
-        collection.removeIf(dragon -> dragon.compareTo(target)>0);
+        Collectible target = constructObject(deconstructedObject, targetClass);
+        collection.removeIf(dragon -> dragon.compareTo((Dragon) target)>0);
+        //TODO fix?
     }
     public int countByColor(String arg) throws IllegalArgumentException{
         Color target = Color.valueOf(arg);
@@ -145,24 +148,50 @@ public class CollectionHandler {
         return "This collection's type is a "+collection.getClass().getName()+", it contains "+collection.size()+" elements.";
         //TODO init date?
     }
-    public void validate(Field field, String value) throws ValueNotValidException {
-        if (field.isAnnotationPresent(NotNull.class) && value.equals("")) {
+    public Object validate(Field field, String value) throws ValueNotValidException {
+        Object convertedValue = convert(field, value);
+        if (field.isAnnotationPresent(NotNull.class) && convertedValue==null) {
             throw new ValueNotValidException(field.getName()+" cannot be null!");
         }
-        if (field.isAnnotationPresent(LowerBounded.class) && value!="") {
+        if (field.isAnnotationPresent(LowerBounded.class) && convertedValue!=null) {
             double border = field.getAnnotation(LowerBounded.class).value();
             if (Double.parseDouble(value)<=border) {
-                throw new ValueNotValidException(field.getName()+" should be greater than "+Double.doubleToLongBits(border)+". Your input: "+value);
+                throw new ValueNotValidException(field.getName()+" should be greater than "+border+". Your input: "+value);
                 //TODO fix longValue()
             }
         }
-        if (field.getType().isEnum() && value!="") {
+        return convertedValue;
+    }
+    public Object convert(Field field, String value) throws ValueNotValidException {
+        if (value.equals("")) return null;
+
+        HashMap<Class<?>, Function<String,?>> variants = new HashMap<>();
+        variants.put(Long.class, Long::parseLong);
+        variants.put(long.class, Long::parseLong);
+        variants.put(int.class, Integer::parseInt);
+        variants.put(String.class, String::valueOf);
+        variants.put(double.class, Double::parseDouble);
+        variants.put(java.time.ZonedDateTime.class, java.time.ZonedDateTime::parse);
+
+        Function<String,?> convert = variants.get(field.getType());
+        if (convert!=null) {
             try {
-                @SuppressWarnings({"unchecked", "rawtypes"}) Object enumConstant = Enum.valueOf((Class<Enum>) field.getType(), value);
+                return convert.apply(value);
+            } catch (NumberFormatException | DateTimeParseException e) {
+                throw new ValueNotValidException(field.getName()+" should have a "+field.getType().getSimpleName()+" value. Your value was: "+value);
+                //TODO message
+            }
+        }
+        if (field.getType().isEnum()) {
+            try {
+                @SuppressWarnings({"unchecked", "rawtypes"}) Object enumValue = Enum.valueOf((Class<Enum>) field.getType(), value);
+                return enumValue;
             } catch (IllegalArgumentException e) {
                 throw new ValueNotValidException(field.getName()+" cannot have a value \""+value+"\"");
             }
         }
+        throw new ValueNotValidException(field.getName()+" should have a "+field.getType().getSimpleName()+" value. Your value was: "+value);
+
     }
     public Long checkIds(java.util.PriorityQueue<Dragon> collection) throws InvalidCollectionException {
         HashSet<Long> ids = new HashSet<>();

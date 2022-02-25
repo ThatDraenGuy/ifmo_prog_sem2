@@ -3,15 +3,19 @@ package Collection.Classes;
 import Annotations.LowerBounded;
 import Annotations.NotNull;
 import Annotations.UserAccessibleField;
+import Collection.Classes.Builders.Builder;
+import Collection.Classes.Builders.CoordinatesBuilder;
 
-public class Coordinates {
+public class Coordinates implements Collectible{
     @UserAccessibleField
+    @NotNull
     private int x;
     @UserAccessibleField
     @NotNull
     @LowerBounded(value = -255)
-    private long y; //Значение поля должно быть больше -255, Поле не может быть null
-    public Coordinates (int x, long y) {
+    private Long y; //Значение поля должно быть больше -255, Поле не может быть null
+    private static Builder builder = new CoordinatesBuilder();
+    public Coordinates (int x, Long y) {
         this.x=x;
         this.y=y;
     }
@@ -26,5 +30,8 @@ public class Coordinates {
     @Override
     public String toString() {
         return "{"+this.x+", "+this.y+"}";
+    }
+    public static Builder getBuilder() {
+        return builder;
     }
 }

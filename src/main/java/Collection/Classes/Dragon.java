@@ -1,8 +1,10 @@
 package Collection.Classes;
 
 import Annotations.*;
+import Collection.Classes.Builders.Builder;
+import Collection.Classes.Builders.DragonBuilder;
 
-public class Dragon implements Comparable<Dragon>{
+public class Dragon implements Comparable<Dragon>, Collectible{
     @NotNull
     @LowerBounded
     private Long id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
@@ -27,6 +29,7 @@ public class Dragon implements Comparable<Dragon>{
     private DragonCharacter character; //Поле не может быть null
     @UserAccessibleObject
     private DragonCave cave; //Поле может быть null
+    private static Builder builder = new DragonBuilder();
     public Dragon(Long id, String name, Coordinates coordinates, java.time.ZonedDateTime creationDate, Long age, Color color, DragonType type, DragonCharacter character, DragonCave cave) {
         this.id=id;
         this.name=name;
@@ -37,6 +40,7 @@ public class Dragon implements Comparable<Dragon>{
         this.type=type;
         this.character=character;
         this.cave=cave;
+
     }
 
     public String getName() {
@@ -83,7 +87,10 @@ public class Dragon implements Comparable<Dragon>{
     }
     @Override
     public String toString() {
+        //TODO rework
         return this.id+": "+this.name+", a "+this.age+" years old "+this.color+" "+this.type+" "+this.character+" dragon. He was created at "+this.creationDate.toString()+" and is currently at "+this.coordinates.toString()+". His cave is "+this.cave.toString();
     }
-
+    public static Builder getBuilder() {
+        return builder;
+    }
 }

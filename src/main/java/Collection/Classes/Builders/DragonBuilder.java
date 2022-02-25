@@ -1,4 +1,4 @@
-package Collection;
+package Collection.Classes.Builders;
 
 import Collection.Classes.*;
 
@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 
 
-public class DragonBuilder {
+public class DragonBuilder implements Builder{
     private Long nextId;
     //TODO think
     private Long id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
@@ -35,43 +35,28 @@ public class DragonBuilder {
         this.name=name;
         return this;
     }
-    public DragonBuilder coordinates(HashMap<Field, Object> map) {
-        //TODO fix this shit
-        ArrayList<String> coords = new ArrayList<>();
-        for (Field f : map.keySet()) {
-            coords.add(map.get(f).toString());
-        }
-        this.coordinates= new Coordinates(Integer.parseInt(coords.get(0)), Long.parseLong(coords.get(1)));
+    public DragonBuilder coordinates(Coordinates cords) {
+        this.coordinates=cords;
         return this;
     }
-    public DragonBuilder age(String age) {
-        if (age.equals("")) {
-            this.age=null;
-        } else {
-            this.age = Long.parseLong(age);
-        }
+    public DragonBuilder age(Long age) {
+        this.age=age;
         return this;
     }
-    public DragonBuilder color(String color) {
-        this.color=Color.valueOf(color);
+    public DragonBuilder color(Color color) {
+        this.color=color;
         return this;
     }
-    public DragonBuilder type(String type) {
-        if (type.equals("")) {
-            this.type=null;
-        } else {
-            this.type = DragonType.valueOf(type);
-        }
+    public DragonBuilder type(DragonType type) {
+        this.type=type;
         return this;
     }
-    public DragonBuilder character(String character) {
-        this.character=DragonCharacter.valueOf(character);
+    public DragonBuilder character(DragonCharacter character) {
+        this.character=character;
         return this;
     }
-    public DragonBuilder cave(HashMap<Field, Object> map) {
-        //TODO fix this shit too
-        int depth = Integer.parseInt(map.get(map.keySet().toArray()[0]).toString());
-        this.cave=new DragonCave(depth);
+    public DragonBuilder cave(DragonCave cave) {
+        this.cave=cave;
         return this;
     }
     public Dragon build() {

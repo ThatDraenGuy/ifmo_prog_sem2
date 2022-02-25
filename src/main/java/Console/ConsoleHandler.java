@@ -1,5 +1,6 @@
 package Console;
 
+import Annotations.NotNull;
 import Exceptions.CmdArgsAmountException;
 import Exceptions.CommandExecutionException;
 import Exceptions.CommandNonExistentException;
@@ -116,28 +117,36 @@ public class ConsoleHandler {
                 map.put(field, obj);
             }
             if (field.isAnnotationPresent(UserAccessibleObject.class)) {
-                Object obj = promptComplexArgs(field.getType());
-                map.put(field, obj);
+                if (!field.isAnnotationPresent(NotNull.class)) {
+                    boolean answer = promptAgreement("Field \""+ field.getName()+"\" can be null. Are you gonna input it?");
+                    if (answer) {
+                        Object obj = promptComplexArgs(field.getType());
+                        map.put(field, obj);
+                    }
+                } else {
+                    Object obj = promptComplexArgs(field.getType());
+                    map.put(field, obj);
+                }
+
             }
         }
         return map;
     }
-    public String promptWithValidation(Field field, String message) {
+    public Object promptWithValidation(Field field, String message) {
         while (true) {
             String result = promptInput(message);
             try {
-                cmdHandler.getCollectionHandler().validate(field, result);
-                return result;
+                return cmdHandler.getCollectionHandler().validate(field, result);
             } catch (ValueNotValidException e) {
                 errorMessage(e);
             }
         }
     }
-    public String promptField(Field field) {
+    public Object promptField(Field field) {
         return promptWithValidation(field, "Please enter " + field.getName() + ": ");
 
     }
-    public String promptEnum(Field enumField) {
+    public Object promptEnum(Field enumField) {
         StringBuilder message = new StringBuilder("Please enter " + enumField.getName() + " (");
         Field[] enums = enumField.getType().getFields();
         for (Field field : enums) {
@@ -146,6 +155,16 @@ public class ConsoleHandler {
         message.deleteCharAt(message.length()-1);
         message.append("): ");
         return promptWithValidation(enumField, message.toString());
+    }
+    public boolean promptAgreement(String message) {
+        while (true) {
+            String answer = promptInput(message+"(Y/N)");
+            switch (answer) {
+                case "Y": return true;
+                case "N": return false;
+                default: out.println("Please input \"Y\" or \"N\"");
+            }
+        }
     }
     public boolean handleResponse(Response response) throws CommandExecutionException {
         //TODO think about exit

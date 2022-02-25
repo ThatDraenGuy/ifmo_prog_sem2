@@ -26,7 +26,8 @@ public class Main {
         }
         final Class<?> target = Dragon.class;
         StorageHandler storageHandler = new StorageHandler(collectionFile);
-        CollectionHandler collectionHandler = new CollectionHandler(storageHandler, target);
+        CollectionHandler collectionHandler = new CollectionHandler(storageHandler);
+        //TODO target?
         collectionHandler.load();
         CmdHandler cmdHandler = new CmdHandler(collectionHandler);
         //TODO think about above
