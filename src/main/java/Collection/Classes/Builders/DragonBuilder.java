@@ -3,6 +3,8 @@ package Collection.Classes.Builders;
 import Collection.Classes.*;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -23,6 +25,7 @@ public class DragonBuilder implements Builder{
         this.nextId=1L;
         clear();
     }
+
     public DragonBuilder(Long nextId) {
         this.nextId=nextId;
         clear();

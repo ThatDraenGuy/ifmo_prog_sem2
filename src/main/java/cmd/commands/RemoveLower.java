@@ -20,7 +20,7 @@ public class RemoveLower extends AbstractCommand {
         try {
             collectionHandler.removeLower(args.getDeconstructedObject());
             return new ActionResult(true, "Successfully removed all lower objects");
-        } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+        } catch (InvocationTargetException | NoSuchMethodException | IllegalAccessException | NoSuchFieldException e) {
             return new ActionResult(false, e.toString());
         }
     }

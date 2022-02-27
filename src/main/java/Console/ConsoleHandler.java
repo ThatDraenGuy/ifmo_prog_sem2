@@ -118,7 +118,7 @@ public class ConsoleHandler {
             }
             if (field.isAnnotationPresent(UserAccessibleObject.class)) {
                 if (!field.isAnnotationPresent(NotNull.class)) {
-                    boolean answer = promptAgreement("Field \""+ field.getName()+"\" can be null. Are you gonna input it?");
+                    boolean answer = promptAgreement("Object \""+ field.getName()+"\" can be null. Are you gonna input it?");
                     if (answer) {
                         Object obj = promptComplexArgs(field.getType());
                         map.put(field, obj);

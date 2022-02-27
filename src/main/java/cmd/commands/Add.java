@@ -21,7 +21,7 @@ public class Add extends AbstractCommand {
             collectionHandler.add(args.getDeconstructedObject());
             return new ActionResult(true, "Successfully added new dragon to collection");
 
-        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException e) {
+        } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | NoSuchFieldException e) {
             return new ActionResult(false, e.toString());
         }
     }

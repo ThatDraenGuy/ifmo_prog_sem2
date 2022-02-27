@@ -4,7 +4,7 @@ import Annotations.*;
 import Collection.Classes.Builders.Builder;
 import Collection.Classes.Builders.DragonBuilder;
 
-public class Dragon implements Comparable<Dragon>, Collectible{
+public class Dragon implements MainCollectible<Dragon>{
     @NotNull
     @LowerBounded
     private Long id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически

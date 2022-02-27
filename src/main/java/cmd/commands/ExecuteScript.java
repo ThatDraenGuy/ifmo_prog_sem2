@@ -55,7 +55,7 @@ public class ExecuteScript extends AbstractCommand {
             return new ActionResult(false, "Cannot find file \""+args.getArgs()+"\"");
         }
     }
-    public ActionResult finishScript(boolean res, String message, String path) {
+    private ActionResult finishScript(boolean res, String message, String path) {
         scriptHistory.remove(path);
         return new ActionResult(res,message);
     }

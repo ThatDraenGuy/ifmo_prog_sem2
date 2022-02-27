@@ -1,11 +1,8 @@
 package Collection;
 
+import Collection.Classes.*;
 import Collection.Classes.Builders.Builder;
 import Collection.Classes.Builders.DragonBuilder;
-import Collection.Classes.Collectible;
-import Collection.Classes.Color;
-import Collection.Classes.Dragon;
-import Collection.Classes.DragonType;
 import Exceptions.ElementIdException;
 import Exceptions.InvalidCollectionException;
 import Exceptions.ValueNotValidException;
@@ -24,8 +21,8 @@ import java.util.NoSuchElementException;
 import java.util.function.Function;
 
 public class CollectionHandler {
-    private Class<? extends Collectible> targetClass = Dragon.class;
-    private java.util.PriorityQueue<Dragon> collection;
+    private Class<? extends MainCollectible<?>> targetClass = Dragon.class;
+    private java.util.PriorityQueue<MainCollectible> collection;
     private StorageHandler storageHandler;
     private DragonBuilder dragonBuilder;
 
@@ -35,11 +32,11 @@ public class CollectionHandler {
     }
 
 
-    public void add(HashMap<Field, Object> deconstructedObject) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
-        collection.add(constructObject(deconstructedObject, Dragon.class));
+    public void add(HashMap<Field, Object> deconstructedObject) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
+        collection.add(constructObject(deconstructedObject, targetClass));
     }
-    public void update(String arg, HashMap<Field, Object> deconstructedObject) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, ElementIdException {
-        Dragon newObject = constructObject(deconstructedObject, Dragon.class);
+    public void update(String arg, HashMap<Field, Object> deconstructedObject) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, ElementIdException, NoSuchFieldException {
+        MainCollectible<?> newObject = constructObject(deconstructedObject, targetClass);
         Long argLong = Long.parseLong(arg);
         newObject.setId(argLong);
         boolean result = collection.removeIf(dragon -> dragon.getId().equals(argLong));
@@ -49,16 +46,13 @@ public class CollectionHandler {
             throw new ElementIdException(arg);
         }
     }
-    public <T extends Collectible> T constructObject(HashMap<Field,Object> deconstructedObject, Class<T> target) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+    public <T extends Collectible> T constructObject(HashMap<Field,Object> deconstructedObject, Class<T> target) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
         Builder builder = (Builder) target.getDeclaredMethod("getBuilder", null).invoke(null, null);
         for (Field f : deconstructedObject.keySet()) {
-            Method method;
             if (f.isAnnotationPresent(UserAccessibleObject.class)) {
-                method = builder.getClass().getMethod(f.getName(), f.getType());
-                method.invoke(builder, constructObject((HashMap<Field, Object>) deconstructedObject.get(f), (Class<Collectible>) f.getType()));
+                builder.put(f, constructObject((HashMap<Field, Object>) deconstructedObject.get(f), (Class<Collectible>) f.getType()));
             } else {
-                method = builder.getClass().getMethod(f.getName(), f.getType());
-                method.invoke(builder, deconstructedObject.get(f));
+                builder.put(f, deconstructedObject.get(f));
             }
             //TODO think
         }
@@ -67,7 +61,7 @@ public class CollectionHandler {
 
 
     public void load() {
-        java.util.PriorityQueue<Dragon> loadedCollection = this.storageHandler.load();
+        java.util.PriorityQueue<MainCollectible> loadedCollection = this.storageHandler.load(targetClass);
         try {
             long id = checkIds(loadedCollection);
             this.collection.addAll(loadedCollection);
@@ -89,7 +83,7 @@ public class CollectionHandler {
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
-        for (Dragon dragon : collection) {
+        for (MainCollectible<?> dragon : collection) {
             str.append(dragon.toString()).append("\n");
         }
         return str.toString();
@@ -108,16 +102,16 @@ public class CollectionHandler {
         }
 
     }
-    public void removeLower(HashMap<Field, Object> deconstructedObject) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException {
-        Collectible target = constructObject(deconstructedObject, targetClass);
-        collection.removeIf(dragon -> dragon.compareTo((Dragon) target)>0);
+    public void removeLower(HashMap<Field, Object> deconstructedObject) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, NoSuchFieldException {
+        MainCollectible<?> target = constructObject(deconstructedObject, targetClass);
+        collection.removeIf(dragon -> dragon.compareTo(target)>0);
         //TODO fix?
     }
     public int countByColor(String arg) throws IllegalArgumentException{
         Color target = Color.valueOf(arg);
         //TODO normal validation?
         int res=0;
-        for (Dragon dragon : collection) {
+        for (MainCollectible<?> dragon : collection) {
             if (dragon.getColor().equals(target)) {
                 res++;
             }
@@ -127,7 +121,7 @@ public class CollectionHandler {
     public String filterByType(String arg) throws IllegalArgumentException {
         DragonType type = DragonType.valueOf(arg);
         StringBuilder str = new StringBuilder();
-        for (Dragon dragon : collection) {
+        for (MainCollectible<?> dragon : collection) {
             if (dragon.getType().equals(type)) {
                 str.append(dragon).append("\n");
             }
@@ -137,7 +131,7 @@ public class CollectionHandler {
     public String filterGreaterThanAge(String arg) {
         long age = Long.parseLong(arg);
         StringBuilder str = new StringBuilder();
-        for (Dragon dragon : collection) {
+        for (MainCollectible<?> dragon : collection) {
             if (dragon.getAge()>age) {
                 str.append(dragon).append("\n");
             }
@@ -193,9 +187,9 @@ public class CollectionHandler {
         throw new ValueNotValidException(field.getName()+" should have a "+field.getType().getSimpleName()+" value. Your value was: "+value);
 
     }
-    public Long checkIds(java.util.PriorityQueue<Dragon> collection) throws InvalidCollectionException {
+    public Long checkIds(java.util.PriorityQueue<MainCollectible> collection) throws InvalidCollectionException {
         HashSet<Long> ids = new HashSet<>();
-        for (Dragon dragon : collection) {
+        for (MainCollectible<?> dragon : collection) {
             boolean res = ids.add(dragon.getId());
             if (!res) {
                 throw new InvalidCollectionException();

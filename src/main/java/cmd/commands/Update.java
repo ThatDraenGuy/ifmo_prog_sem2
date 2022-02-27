@@ -21,7 +21,7 @@ public class Update extends AbstractCommand {
         try {
             collectionHandler.update(args.getArgs(), args.getDeconstructedObject());
             return new ActionResult(true, "Successfully updated element with id " + args.getArgs());
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | NoSuchFieldException e) {
             return new ActionResult(false, e.toString());
         } catch (ElementIdException e) {
             return new ActionResult(false, e.getMessage());
