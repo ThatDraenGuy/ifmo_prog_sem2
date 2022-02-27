@@ -83,12 +83,19 @@ public class Dragon implements MainCollectible<Dragon>{
     }
 
     public int compareTo(Dragon dragon) {
-        return dragon.getName().length()-this.name.length();
+        return dragon.name.length()-this.name.length();
     }
     @Override
     public String toString() {
         //TODO rework
-        return this.id+": "+this.name+", a "+this.age+" years old "+this.color+" "+this.type+" "+this.character+" dragon. He was created at "+this.creationDate.toString()+" and is currently at "+this.coordinates.toString()+". His cave is "+this.cave.toString();
+        StringBuilder str = new StringBuilder();
+        str.append(id).append(": ").append(name).append(", a ");
+        if (age!=null) str.append(age).append(" years old ");
+        str.append(color).append(" ");
+        if (type!=null) str.append(type).append(" ");
+        str.append(character).append(" dragon. He was created at ").append(creationDate).append(" and is currently at ").append(coordinates);
+        if (cave!=null) str.append(". His cave is ").append(cave);
+        return str.toString();
     }
     public static Builder getBuilder() {
         return builder;

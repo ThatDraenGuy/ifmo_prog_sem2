@@ -7,6 +7,7 @@ import cmd.CmdType;
 import cmd.AbstractCommand;
 
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 
 public class Save extends AbstractCommand {
     private CollectionHandler collectionHandler;
@@ -20,7 +21,7 @@ public class Save extends AbstractCommand {
         try {
             collectionHandler.save();
             return new ActionResult(true, "Successfully saved collection");
-        } catch (IOException e) {
+        } catch (IOException | InvocationTargetException |NoSuchMethodException |IllegalAccessException e) {
             return new ActionResult(false, "An exception occurred: "+e.getMessage());
         }
     }

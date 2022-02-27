@@ -9,15 +9,14 @@ import Exceptions.ValueNotValidException;
 import Annotations.LowerBounded;
 import Annotations.NotNull;
 import Annotations.UserAccessibleObject;
+import com.sun.tools.javac.Main;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.time.format.DateTimeParseException;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.function.Function;
 
 public class CollectionHandler {
@@ -48,8 +47,9 @@ public class CollectionHandler {
     }
     public <T extends Collectible> T constructObject(HashMap<Field,Object> deconstructedObject, Class<T> target) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
         Builder builder = (Builder) target.getDeclaredMethod("getBuilder", null).invoke(null, null);
+        //TODO a better way?
         for (Field f : deconstructedObject.keySet()) {
-            if (f.isAnnotationPresent(UserAccessibleObject.class)) {
+            if (f.isAnnotationPresent(UserAccessibleObject.class) && deconstructedObject.get(f)!=null) {
                 builder.put(f, constructObject((HashMap<Field, Object>) deconstructedObject.get(f), (Class<Collectible>) f.getType()));
             } else {
                 builder.put(f, deconstructedObject.get(f));
@@ -58,23 +58,58 @@ public class CollectionHandler {
         }
         return builder.build();
     }
+    public HashMap<Field,Object>  deconstructObject(Object object, Class<?> target) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+        HashMap<Field, Object> deconstructedObject = new HashMap<>();
+        Field[] fields = target.getDeclaredFields();
+        for (Field field : fields) {
+            if (!field.getType().equals(Builder.class)) {
+                String name = field.getName();
+                String methodName = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
+                Method method = target.getMethod(methodName, null);
+                Object obj = method.invoke(object, null);
+                //TODO maybe check Collectible instead?
+                if (field.isAnnotationPresent(UserAccessibleObject.class)) {
+                    if (obj==null) {
+                        deconstructedObject.put(field, null);
+                    } else {
+                        deconstructedObject.put(field, deconstructObject(obj, field.getType()));
+                    }
+                } else {
+                    deconstructedObject.put(field, obj);
+                }
+            }
+        }
+        return deconstructedObject;
+    }
 
 
-    public void load() {
-        java.util.PriorityQueue<MainCollectible> loadedCollection = this.storageHandler.load(targetClass);
+    public void load(){
         try {
+            ArrayList<HashMap<Field, Object>> deconstructedCollection = this.storageHandler.load(targetClass);
+            PriorityQueue<MainCollectible> loadedCollection = new PriorityQueue<>();
+            for (HashMap<Field, Object> deconstructedObject : deconstructedCollection) {
+                HashMap<Field, Object> validatedObject = validate(deconstructedObject);
+                loadedCollection.add(constructObject(validatedObject, targetClass));
+            }
             long id = checkIds(loadedCollection);
             this.collection.addAll(loadedCollection);
-            dragonBuilder = new DragonBuilder(id+1);
-        } catch (InvalidCollectionException e) {
+            dragonBuilder = new DragonBuilder(id + 1);
+
+        } catch (NoSuchMethodException | NoSuchFieldException | InvocationTargetException | IllegalAccessException e) {
+            System.out.println(e);
+        } catch (InvalidCollectionException | ValueNotValidException e) {
             System.out.println("Loaded collection is invalid, initializing an empty collection...");
         }
         //TODO system.out??
     }
 
-    public void save() throws IOException {
+    public void save() throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         //TODO think about giving this up
-        this.storageHandler.save(this.collection);
+        ArrayList<HashMap<Field, Object>> deconstructedCollection = new ArrayList<>();
+        for (MainCollectible collectable : collection) {
+            deconstructedCollection.add(deconstructObject(collectable, targetClass));
+        }
+        storageHandler.save(deconstructedCollection, targetClass);
     }
     public void clear() {
         collection.clear();
@@ -141,6 +176,18 @@ public class CollectionHandler {
     public String info() {
         return "This collection's type is a "+collection.getClass().getName()+", it contains "+collection.size()+" elements.";
         //TODO init date?
+    }
+    public HashMap<Field, Object> validate(HashMap<Field, Object> deconstructedObject) throws ValueNotValidException {
+        HashMap<Field, Object> validatedObject = new HashMap<>();
+        for (Field field : deconstructedObject.keySet()) {
+            //TODO Collectible?
+            if (field.isAnnotationPresent(UserAccessibleObject.class) && !deconstructedObject.get(field).equals("")) {
+                validatedObject.put(field, validate((HashMap<Field, Object>) deconstructedObject.get(field)));
+            } else {
+                validatedObject.put(field, validate(field, deconstructedObject.get(field).toString()));
+            }
+        }
+        return validatedObject;
     }
     public Object validate(Field field, String value) throws ValueNotValidException {
         Object convertedValue = convert(field, value);
