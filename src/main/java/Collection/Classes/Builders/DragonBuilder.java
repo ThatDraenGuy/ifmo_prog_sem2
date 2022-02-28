@@ -3,15 +3,9 @@ package Collection.Classes.Builders;
 import Collection.Classes.*;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-
 
 public class DragonBuilder implements Builder{
     private Long nextId;
-    //TODO think
     private Long id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     private String name; //Поле не может быть null, Строка не может быть пустой
     private Coordinates coordinates; //Поле не может быть null
@@ -25,6 +19,11 @@ public class DragonBuilder implements Builder{
         this.nextId=1L;
         clear();
     }
+
+    public DragonBuilder(Long nextId) {
+        this.nextId=nextId;
+        clear();
+    }
     @Override
     public Builder put(Field field, Object value) throws IllegalAccessException, NoSuchFieldException {
         Field[] myFields = this.getClass().getDeclaredFields();
@@ -35,42 +34,6 @@ public class DragonBuilder implements Builder{
             }
         }
         throw new NoSuchFieldException("Couldn't find field "+field.getName());
-    }
-    public DragonBuilder(Long nextId) {
-        this.nextId=nextId;
-        clear();
-    }
-    public DragonBuilder id(Long id) {
-        this.id=id;
-        return this;
-    }
-    public DragonBuilder name(String name) {
-        this.name=name;
-        return this;
-    }
-    public DragonBuilder coordinates(Coordinates cords) {
-        this.coordinates=cords;
-        return this;
-    }
-    public DragonBuilder age(Long age) {
-        this.age=age;
-        return this;
-    }
-    public DragonBuilder color(Color color) {
-        this.color=color;
-        return this;
-    }
-    public DragonBuilder type(DragonType type) {
-        this.type=type;
-        return this;
-    }
-    public DragonBuilder character(DragonCharacter character) {
-        this.character=character;
-        return this;
-    }
-    public DragonBuilder cave(DragonCave cave) {
-        this.cave=cave;
-        return this;
     }
     public Dragon build() {
         nextId++;

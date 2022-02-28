@@ -10,5 +10,4 @@ public interface MainCollectible<T> extends Collectible, Comparable<T> {
 
     Long getAge();
 
-    void setId(Long argLong);
 }

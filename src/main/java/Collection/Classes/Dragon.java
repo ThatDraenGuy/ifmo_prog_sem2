@@ -74,20 +74,16 @@ public class Dragon implements MainCollectible<Dragon>{
     public Long getId() {
         return id;
     }
-    public void setId(Long id) {
-        this.id=id;
-        //TODO think
-    }
+
     public java.time.ZonedDateTime getCreationDate() {
         return  creationDate;
     }
 
     public int compareTo(Dragon dragon) {
-        return dragon.name.length()-this.name.length();
+        return this.name.length()-dragon.name.length();
     }
     @Override
     public String toString() {
-        //TODO rework
         StringBuilder str = new StringBuilder();
         str.append(id).append(": ").append(name).append(", a ");
         if (age!=null) str.append(age).append(" years old ");

@@ -1,6 +1,7 @@
 package Console;
 
 import Annotations.NotNull;
+import Collection.Classes.MainCollectible;
 import Exceptions.CmdArgsAmountException;
 import Exceptions.CommandExecutionException;
 import Exceptions.CommandNonExistentException;
@@ -17,15 +18,15 @@ import java.io.InputStream;
 import java.io.PrintStream;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class ConsoleHandler {
-    private CmdHandler cmdHandler;
-    private Class<?> targetClass;
-    //TODO think about above
-    private Scanner inputScanner;
-    private PrintStream out;
-    private PrintStream err;
+    final private CmdHandler cmdHandler;
+    final private Class<? extends MainCollectible> targetClass;
+    final private Scanner inputScanner;
+    final private PrintStream out;
+    final private PrintStream err;
     public ConsoleHandler(CmdHandler cmdHandler, InputStream in, PrintStream out, PrintStream err) {
         this.cmdHandler = cmdHandler;
         this.targetClass=cmdHandler.getCollectionHandler().getTargetClass();
@@ -36,7 +37,7 @@ public class ConsoleHandler {
     public void start() {
         loop();
     }
-    public void loop() {
+    private void loop() {
         while (true) {
             try {
                 String input = promptInput("");
@@ -44,27 +45,30 @@ public class ConsoleHandler {
                 Response response = executeCmd(cmdRequest);
                 boolean isCmdExit = handleResponse(response);
                 if (isCmdExit) {
-                    return;
+                    if (promptAgreement("Are you sure you want to exit? Any unsaved changes will be gone!")) return;
                 }
             } catch (CommandNonExistentException | CmdArgsAmountException | CommandExecutionException e) {
                 errorMessage(e);
             } catch (ClassNotFoundException e) {
                 errorMessage(new Exception("A critical exception!"));
-                //TODO ???
+            } catch (NoSuchElementException e) {
+                errorMessage(new NoSuchElementException("InputStream ran out of lines while the program was working"));
+                return;
             }
 
         }
     }
-    public String promptInput(String message) {
+    private String promptInput(String message) {
         if (message.equals("")) {
             out.println("Awaiting your input: ");
         } else {
             out.println(message);
         }
         return inputScanner.nextLine();
+
     }
 
-    public Request parseInput(String input) throws CommandNonExistentException, CmdArgsAmountException {
+    private Request parseInput(String input) throws CommandNonExistentException, CmdArgsAmountException {
         Command cmd;
         CmdArgs cmdArgs = new CmdArgs("");
         if (input.contains(" ")) {
@@ -78,18 +82,17 @@ public class ConsoleHandler {
         cmd = parseCommand(input);
         return (new CmdRequest(cmd, cmdArgs));
     }
-    public Command parseCommand(String input) throws CommandNonExistentException {
+    private Command parseCommand(String input) throws CommandNonExistentException {
         if (cmdHandler.isInCmds(input)) {
             return cmdHandler.getCmds().get(input);
         } else {
             throw new CommandNonExistentException(input);
         }
     }
-    public CmdArgs parseArgs(String input) {
+    private CmdArgs parseArgs(String input) {
         return new CmdArgs(input);
-        // TODO think about this
     }
-    public Response executeCmd(Request request) throws CmdArgsAmountException, ClassNotFoundException {
+    private Response executeCmd(Request request) throws CmdArgsAmountException, ClassNotFoundException {
         CmdType type = request.getCmd().getCmdType();
         CmdArgs args = request.getCmdArgs();
         if (type==CmdType.COMPLEX_ARG) {
@@ -104,7 +107,7 @@ public class ConsoleHandler {
         }
         return cmdHandler.executeCmd(request);
     }
-    public HashMap<Field, Object> promptComplexArgs(Class<?> targetClass) {
+    private HashMap<Field, Object> promptComplexArgs(Class<?> targetClass) {
         HashMap<Field, Object> map = new HashMap<>();
         Field[] fields = targetClass.getDeclaredFields();
         for (Field field : fields) {
@@ -132,7 +135,7 @@ public class ConsoleHandler {
         }
         return map;
     }
-    public Object promptWithValidation(Field field, String message) {
+    private Object promptWithValidation(Field field, String message) {
         while (true) {
             String result = promptInput(message);
             try {
@@ -142,11 +145,11 @@ public class ConsoleHandler {
             }
         }
     }
-    public Object promptField(Field field) {
+    private Object promptField(Field field) {
         return promptWithValidation(field, "Please enter " + field.getName() + ": ");
 
     }
-    public Object promptEnum(Field enumField) {
+    private Object promptEnum(Field enumField) {
         StringBuilder message = new StringBuilder("Please enter " + enumField.getName() + " (");
         Field[] enums = enumField.getType().getFields();
         for (Field field : enums) {
@@ -156,9 +159,9 @@ public class ConsoleHandler {
         message.append("): ");
         return promptWithValidation(enumField, message.toString());
     }
-    public boolean promptAgreement(String message) {
+    private boolean promptAgreement(String message) {
         while (true) {
-            String answer = promptInput(message+"(Y/N)");
+            String answer = promptInput(message+" (Y/N)");
             switch (answer) {
                 case "Y": return true;
                 case "N": return false;
@@ -166,8 +169,7 @@ public class ConsoleHandler {
             }
         }
     }
-    public boolean handleResponse(Response response) throws CommandExecutionException {
-        //TODO think about exit
+    private boolean handleResponse(Response response) throws CommandExecutionException {
         ActionResult result = response.getActionResult();
         boolean isSuccess = result.isSuccess();
         if (isSuccess) {
@@ -182,7 +184,7 @@ public class ConsoleHandler {
             throw new CommandExecutionException(result);
         }
     }
-    public void errorMessage(Exception e) {
+    private void errorMessage(Exception e) {
         err.println(e.getMessage());
     }
 }

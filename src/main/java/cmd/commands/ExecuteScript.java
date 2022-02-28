@@ -49,7 +49,7 @@ public class ExecuteScript extends AbstractCommand {
             if (errRes.equals("")) {
                 return finishScript(true, "Successfully executed script.", path);
             } else {
-                return finishScript(false, "An exception(s) occurred while trying to execute the script. Here's a full exception log: \n"+errRes, path);
+                return finishScript(false, "An exception(s) occurred while trying to execute the script. Here's a full exception log: \n"+errRes+outRes, path);
             }
         }  catch (FileNotFoundException e) {
             return new ActionResult(false, "Cannot find file \""+args.getArgs()+"\"");
