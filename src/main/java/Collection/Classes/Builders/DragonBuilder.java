@@ -41,7 +41,6 @@ public class DragonBuilder implements Builder{
         Dragon newDragon = new Dragon(id,name,coordinates,creationDate,age,color,type,character,cave);
         clear();
         return newDragon;
-        //TODO implement
     }
     private void clear() {
         id=nextId;

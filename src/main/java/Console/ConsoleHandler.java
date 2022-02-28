@@ -49,8 +49,6 @@ public class ConsoleHandler {
                 }
             } catch (CommandNonExistentException | CmdArgsAmountException | CommandExecutionException e) {
                 errorMessage(e);
-            } catch (ClassNotFoundException e) {
-                errorMessage(new Exception("A critical exception!"));
             } catch (NoSuchElementException e) {
                 errorMessage(new NoSuchElementException("InputStream ran out of lines while the program was working"));
                 return;
@@ -69,6 +67,7 @@ public class ConsoleHandler {
     }
 
     private Request parseInput(String input) throws CommandNonExistentException, CmdArgsAmountException {
+        input = input.strip();
         Command cmd;
         CmdArgs cmdArgs = new CmdArgs("");
         if (input.contains(" ")) {
@@ -92,7 +91,7 @@ public class ConsoleHandler {
     private CmdArgs parseArgs(String input) {
         return new CmdArgs(input);
     }
-    private Response executeCmd(Request request) throws CmdArgsAmountException, ClassNotFoundException {
+    private Response executeCmd(Request request) throws CmdArgsAmountException {
         CmdType type = request.getCmd().getCmdType();
         CmdArgs args = request.getCmdArgs();
         if (type==CmdType.COMPLEX_ARG) {

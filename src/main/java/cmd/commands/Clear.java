@@ -17,6 +17,5 @@ public class Clear extends AbstractCommand {
     public ActionResult action(CmdArgs args) {
         collectionHandler.clear();
         return new ActionResult(true, "Successfully cleared collection");
-        //TODO a "are you sure" prompt
     }
 }

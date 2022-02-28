@@ -14,7 +14,6 @@ public class CoordinatesBuilder implements Builder{
     private void clear() {
         x= null;
         y= null;
-        //TODO think?? wtf
     }
     @Override
     public Builder put(Field field, Object value) throws IllegalAccessException, NoSuchFieldException {

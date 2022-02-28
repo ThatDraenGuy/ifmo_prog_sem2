@@ -20,7 +20,7 @@ test {
 }
 jar {
     archiveBaseName="lab5"
-    archiveVersion="0.2.0"
+    archiveVersion="1.5.0"
     manifest {
         attributes "Main-Class": "Main"
     }

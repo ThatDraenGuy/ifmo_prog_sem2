@@ -4,14 +4,20 @@ import Collection.CollectionHandler;
 import Exceptions.CmdArgsAmountException;
 import common.CmdResponse;
 import common.Request;
+import common.Response;
 
 import java.util.HashMap;
 import java.util.LinkedList;
 
+/**
+ * A class needed to handle all the commands. Stores all commands and provides access to them. Stores command history.
+ * Accepts {@link common.Request} from {@link Console.ConsoleHandler} and returns a {@link common.Response} after performing command's action.
+ * Also works as a link between commands and {@link Collection.CollectionHandler};
+ */
 public class CmdHandler {
-    private HashMap<String, Command> cmds;
-    private LinkedList<Command> cmdHistory;
-    private CollectionHandler collectionHandler;
+    private final HashMap<String, Command> cmds;
+    private final LinkedList<Command> cmdHistory;
+    private final CollectionHandler collectionHandler;
     public CmdHandler(CollectionHandler collectionHandler) {
         this.cmds=new HashMap<>();
         this.collectionHandler=collectionHandler;
@@ -47,7 +53,13 @@ public class CmdHandler {
         return collectionHandler;
     }
 
-    public CmdResponse executeCmd(Request request) throws CmdArgsAmountException {
+    /**
+     *
+     * @param request Accepts a request from {@link Console.ConsoleHandler}
+     * @return a response containing result of command's action.
+     * @throws CmdArgsAmountException if arguments form a request don't match {@link cmd.CmdType} of the command
+     */
+    public Response executeCmd(Request request) throws CmdArgsAmountException {
         Command cmd = request.getCmd();
         CmdArgs cmdArgs = request.getCmdArgs();
         if (cmd.getCmdType()==CmdType.NO_ARGS && cmdArgs.getArgs()!="") {

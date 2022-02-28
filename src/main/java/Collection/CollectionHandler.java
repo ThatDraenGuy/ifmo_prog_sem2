@@ -19,15 +19,16 @@ import java.util.*;
 import java.util.function.Function;
 
 public class CollectionHandler {
-    final private Class<? extends MainCollectible<?>> targetClass = Dragon.class;
+    final private Class<? extends MainCollectible<?>> targetClass;
     final private java.util.PriorityQueue<MainCollectible> collection;
     final private StorageHandler storageHandler;
     private DragonBuilder builder;
 
-    public CollectionHandler(StorageHandler storageHandler) {
+    public CollectionHandler(StorageHandler storageHandler, Class<? extends MainCollectible<?>> target)  {
         this.collection = new java.util.PriorityQueue<>();
         this.storageHandler = storageHandler;
         this.builder=new DragonBuilder();
+        this.targetClass=target;
     }
 
 
@@ -155,7 +156,8 @@ public class CollectionHandler {
         DragonType type = DragonType.valueOf(arg);
         StringBuilder str = new StringBuilder();
         for (MainCollectible<?> dragon : collection) {
-            if (dragon.getType().equals(type)) {
+            DragonType collectibleType = dragon.getType();
+            if (collectibleType!=null && collectibleType.equals(type)) {
                 str.append(dragon).append("\n");
             }
         }
@@ -165,7 +167,8 @@ public class CollectionHandler {
         long age = Long.parseLong(arg);
         StringBuilder str = new StringBuilder();
         for (MainCollectible<?> dragon : collection) {
-            if (dragon.getAge()>age) {
+            Long collectibleAge = dragon.getAge();
+            if (collectibleAge!=null && collectibleAge>age) {
                 str.append(dragon).append("\n");
             }
         }

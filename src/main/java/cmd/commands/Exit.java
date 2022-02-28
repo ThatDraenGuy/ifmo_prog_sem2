@@ -11,6 +11,5 @@ public class Exit extends AbstractCommand {
     }
     public ActionResult action(CmdArgs args) {
         return new ActionResult(true, "exit");
-        //TODO implement a "are you sure" feature (ConsoleHandler?)
     }
 }

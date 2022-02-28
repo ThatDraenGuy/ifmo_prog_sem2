@@ -46,11 +46,11 @@ public class Dragon implements MainCollectible<Dragon>{
     public String getName() {
         return name;
     }
-
+    @Override
     public Long getAge() {
         return age;
     }
-
+    @Override
     public Color getColor() {
         return color;
     }
@@ -66,11 +66,11 @@ public class Dragon implements MainCollectible<Dragon>{
     public DragonCharacter getCharacter() {
         return character;
     }
-
+    @Override
     public DragonType getType() {
         return type;
     }
-
+    @Override
     public Long getId() {
         return id;
     }

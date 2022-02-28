@@ -30,7 +30,6 @@ public class StorageHandler {
         return new ArrayList<>();
     }
     public void save(ArrayList<HashMap<Field, Object>> collection, Class<?> target) throws IOException {
-        //TODO fix?
         String JSONString = JSONToCollection.serializeCollection(collection, target);
         FileOutputStream fileOutputStream = new FileOutputStream(this.file);
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);

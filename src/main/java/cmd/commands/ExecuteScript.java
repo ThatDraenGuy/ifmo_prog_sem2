@@ -32,7 +32,7 @@ public class ExecuteScript extends AbstractCommand {
             while (fileScanner.hasNextLine()) {
                 script.append(fileScanner.nextLine()).append("\n");
             }
-            script.append("exit");
+            script.append("exit\nY");
             InputStream in = new ByteArrayInputStream(script.toString().getBytes());
             OutputStream out = new ByteArrayOutputStream();
             PrintStream outPrint = new PrintStream(out);
@@ -49,7 +49,7 @@ public class ExecuteScript extends AbstractCommand {
             if (errRes.equals("")) {
                 return finishScript(true, "Successfully executed script.", path);
             } else {
-                return finishScript(false, "An exception(s) occurred while trying to execute the script. Here's a full exception log: \n"+errRes+outRes, path);
+                return finishScript(false, "An exception(s) occurred while trying to execute the script. Here's a full exception log: \n"+errRes, path);
             }
         }  catch (FileNotFoundException e) {
             return new ActionResult(false, "Cannot find file \""+args.getArgs()+"\"");
