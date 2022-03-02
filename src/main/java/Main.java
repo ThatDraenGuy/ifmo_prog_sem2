@@ -11,7 +11,7 @@ import java.io.File;
 public class Main {
     public static void main(String ... args) {
         String filePath;
-        final String defaultFilePath = "./src/main/java/resources/DefaultCollection.json";
+        final String defaultFilePath = "./src/main/resources/DefaultCollection.json";
         final Class<? extends MainCollectible<?>> target = Dragon.class;
         if (args.length!=1) {
             System.out.println("Input a filepath as jar's argument! Starting up with default collection...");
