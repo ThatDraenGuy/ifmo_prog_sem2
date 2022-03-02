@@ -4,13 +4,9 @@ import Annotations.UserAccessibleObject;
 import Collection.Classes.*;
 import Collection.Classes.Builders.Builder;
 import org.json.*;
-
 import java.lang.reflect.Field;
-import java.time.ZonedDateTime;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.function.Function;
 
 public class JSONToCollection {
     public static <T extends MainCollectible> ArrayList<HashMap<Field, Object>> parseCollection(String collection, Class<T> target) {
@@ -37,33 +33,6 @@ public class JSONToCollection {
             }
         }
         return deconstructedCollectible;
-    }
-    private static Object getField(Field field, JSONObject source) {
-        String key = field.getName();
-        Class<?> type = field.getType();
-        HashMap<Class<?>, Function<JSONObject,?>> getters = new HashMap<>();
-        getters.put(int.class, x->x.getInt(key));
-        getters.put(long.class, x->x.getLong(key));
-        getters.put(String.class, x->x.getString(key));
-        getters.put(Long.class, x->x.getLong(key));
-        getters.put(ZonedDateTime.class, x-> ZonedDateTime.parse(x.getString(key)));
-        Function<JSONObject,?> getter = getters.get(type);
-        if (getter!=null) {
-            try {
-                return getter.apply(source);
-            } catch (NumberFormatException | DateTimeParseException e) {
-                throw new JSONException(e.getMessage());
-            }
-        }
-        if (field.getType().isEnum()) {
-            try {
-                @SuppressWarnings({"unchecked", "rawtypes"}) Object enumValue = Enum.valueOf((Class<Enum>) field.getType(), source.getString(key));
-                return enumValue;
-            } catch (IllegalArgumentException e) {
-                throw new JSONException(e.getMessage());
-            }
-        }
-        throw new JSONException("Couldn't parse a field");
     }
     public static String serializeCollection(ArrayList<HashMap<Field, Object>> collection, Class<?> target) {
         StringBuilder builder = new StringBuilder("{ \""+target.getName()+"\": [");
