@@ -1,8 +1,8 @@
-import Collection.Classes.Dragon;
-import Collection.Classes.MainCollectible;
-import Collection.CollectionHandler;
-import Collection.StorageHandler;
-import Console.ConsoleHandler;
+import collection.classes.Dragon;
+import collection.classes.MainCollectible;
+import collection.CollectionHandler;
+import collection.StorageHandler;
+import console.ConsoleHandler;
 import cmd.CmdHandler;
 import cmd.commands.*;
 

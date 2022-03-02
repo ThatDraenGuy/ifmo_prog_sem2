@@ -1,7 +1,7 @@
 package cmd;
 
-import Collection.CollectionHandler;
-import Exceptions.CmdArgsAmountException;
+import collection.CollectionHandler;
+import exceptions.CmdArgsAmountException;
 import common.CmdResponse;
 import common.Request;
 import common.Response;
@@ -11,8 +11,8 @@ import java.util.LinkedList;
 
 /**
  * A class needed to handle all the commands. Stores all commands and provides access to them. Stores command history.
- * Accepts {@link common.Request} from {@link Console.ConsoleHandler} and returns a {@link common.Response} after performing command's action.
- * Also works as a link between commands and {@link Collection.CollectionHandler};
+ * Accepts {@link common.Request} from {@link console.ConsoleHandler} and returns a {@link common.Response} after performing command's action.
+ * Also works as a link between commands and {@link collection.CollectionHandler};
  */
 public class CmdHandler {
     private final HashMap<String, Command> cmds;
@@ -54,8 +54,7 @@ public class CmdHandler {
     }
 
     /**
-     *
-     * @param request Accepts a request from {@link Console.ConsoleHandler}
+     * @param request Accepts a request from {@link console.ConsoleHandler}
      * @return a response containing result of command's action.
      * @throws CmdArgsAmountException if arguments form a request don't match {@link cmd.CmdType} of the command
      */

@@ -1,7 +1,7 @@
 package cmd.commands;
 
-import Collection.CollectionHandler;
-import Exceptions.ElementIdException;
+import collection.CollectionHandler;
+import exceptions.ElementIdException;
 import cmd.ActionResult;
 import cmd.CmdArgs;
 import cmd.CmdType;

@@ -1,6 +1,6 @@
 package cmd.commands;
 
-import Collection.CollectionHandler;
+import collection.CollectionHandler;
 import cmd.AbstractCommand;
 import cmd.ActionResult;
 import cmd.CmdArgs;

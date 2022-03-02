@@ -1,6 +1,6 @@
 package cmd.commands;
 
-import Console.ConsoleHandler;
+import console.ConsoleHandler;
 import cmd.*;
 
 import java.io.*;
