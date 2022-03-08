@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Diagram>
+  <ID>JAVA</ID>
+  <OriginalElement>/home/draen/Documents/ifmo/progLab5/src/main/java</OriginalElement>
+  <nodes>
+    <node x="2942.527064069296" y="1703.0753170586931">Annotations.UserAccessibleObject</node>
+    <node x="2214.160337706955" y="1382.0507382786777">common.Response</node>
+    <node x="922.5" y="140.0">Collection.Classes.Collectible</node>
+    <node x="773.1603377069548" y="1526.0507382786777">Collection.Classes.Builders.CoordinatesBuilder</node>
+    <node x="929.0263513760458" y="997.5139157941198">cmd.commands.Exit</node>
+    <node x="725.4999999999999" y="588.5139157941198">Collection.Classes.Dragon</node>
+    <node x="1011.1603377069548" y="1382.0507382786777">Collection.Classes.Builders.Builder</node>
+    <node x="2586.396805672308" y="1255.7823270363988">cmd.commands.FilterByType</node>
+    <node x="2214.160337706955" y="1490.0507382786777">common.CmdResponse</node>
+    <node x="1843.1603377069548" y="1640.5753170586931">cmd.CmdType</node>
+    <node x="663.0" y="233.5">Collection.Classes.MainCollectible</node>
+    <node x="2942.527064069296" y="1877.1490533987394">Annotations.NotNull</node>
+    <node x="901.0" y="221.0">Collection.Classes.Coordinates</node>
+    <node x="1512.1603377069548" y="1538.0507382786777">common.CmdRequest</node>
+    <node x="2545.160337706955" y="1946.6490533987394">Exceptions.CmdArgsAmountException</node>
+    <node x="1348.1744453784577" y="1243.7823270363988">cmd.commands.History</node>
+    <node x="2985.2069121554023" y="384.0">Collection.JSONToCollection</node>
+    <node x="2985.2069121554023" y="245.0">Collection.StorageHandler</node>
+    <node x="1891.0" y="1231.7823270363988">cmd.commands.ExecuteScript</node>
+    <node x="2425.63575892694" y="997.5139157941198">cmd.commands.RemoveLower</node>
+    <node x="1124.0" y="233.0">Collection.Classes.DragonCave</node>
+    <node x="2515.160337706955" y="1382.0507382786777">cmd.CmdArgs</node>
+    <node x="1397.310346730095" y="471.55755221230555">Collection.Classes.Color</node>
+    <node x="2731.3992909615877" y="997.5139157941198">cmd.commands.Show</node>
+    <node x="2131.5" y="600.5139157941198">cmd.Command</node>
+    <node x="1480.331055151493" y="997.5139157941198">cmd.commands.Save</node>
+    <node x="2942.527064069296" y="1618.0507382786777">Annotations.LowerBounded</node>
+    <node x="1537.1603377069548" y="1382.0507382786777">common.Request</node>
+    <node x="1204.6787032637694" y="997.5139157941198">cmd.commands.Update</node>
+    <node x="2545.160337706955" y="1875.124474618724">Exceptions.ElementIdException</node>
+    <node x="3010.1628229962353" y="997.5139157941198">cmd.commands.CountByColor</node>
+    <node x="2284.412777310771" y="1255.7823270363988">cmd.commands.Clear</node>
+    <node x="3169.59219326779" y="1255.7823270363988">cmd.commands.RemoveById</node>
+    <node x="2545.160337706955" y="1732.0753170586931">Exceptions.InvalidCollectionException</node>
+    <node x="2545.160337706955" y="1660.5507382786777">Exceptions.CommandNonExistentException</node>
+    <node x="2942.527064069296" y="1761.0998958387086">Annotations.UserAccessibleEnum</node>
+    <node x="1011.1603377069548" y="1526.0507382786777">Collection.Classes.Builders.DragonCaveBuilder</node>
+    <node x="2545.160337706955" y="1803.5998958387086">Exceptions.ValueNotValidException</node>
+    <node x="1815.4275063045939" y="997.5139157941198">cmd.commands.Add</node>
+    <node x="2545.160337706955" y="1589.0261594986623">Exceptions.CommandExecutionException</node>
+    <node x="2437.3793065398104" y="245.0">Console.ConsoleHandler</node>
+    <node x="1843.1603377069548" y="1382.0507382786777">cmd.CmdHandler</node>
+    <node x="2084.0" y="780.5139157941198">cmd.AbstractCommand</node>
+    <node x="3312.926355030883" y="997.5139157941198">cmd.commands.FilterGreaterThanAge</node>
+    <node x="1619.5872226892288" y="1231.7823270363988">cmd.commands.Help</node>
+    <node x="1249.1603377069548" y="1514.0507382786777">Collection.Classes.Builders.DragonBuilder</node>
+    <node x="1603.62069346019" y="245.0">Collection.CollectionHandler</node>
+    <node x="1838.1603377069548" y="1779.0998958387086">cmd.ActionResult</node>
+    <node x="2867.527064069296" y="1255.7823270363988">cmd.commands.RemoveFirst</node>
+    <node x="1319.310346730095" y="344.4210539221694">Collection.Classes.DragonCharacter</node>
+    <node x="2942.527064069296" y="1819.124474618724">Annotations.UserAccessibleField</node>
+    <node x="1061.757318811447" y="1243.7823270363988">cmd.commands.Info</node>
+    <node x="1353.310346730095" y="221.0">Collection.Classes.DragonType</node>
+    <node x="2170.5" y="245.0">Main</node>
+  </nodes>
+  <notes />
+  <edges>
+    <edge source="Collection.Classes.Builders.DragonCaveBuilder" target="Collection.Classes.Builders.Builder" relationship="REALIZATION">
+      <point x="0.0" y="-65.5" />
+      <point x="0.0" y="41.0" />
+    </edge>
+    <edge source="cmd.AbstractCommand" target="cmd.Command" relationship="REALIZATION">
+      <point x="0.0" y="-77.5" />
+      <point x="0.0" y="65.0" />
+    </edge>
+    <edge source="cmd.commands.History" target="cmd.AbstractCommand" relationship="GENERALIZATION">
+      <point x="0.0" y="-41.5" />
+      <point x="1474.1744453784577" y="960.5139157941198" />
+      <point x="2257.5" y="960.5139157941198" />
+      <point x="0.0" y="77.5" />
+    </edge>
+    <edge source="cmd.commands.RemoveById" target="cmd.AbstractCommand" relationship="GENERALIZATION">
+      <point x="0.0" y="-41.5" />
+      <point x="3302.59219326779" y="960.5139157941198" />
+      <point x="2257.5" y="960.5139157941198" />
+      <point x="0.0" y="77.5" />
+    </edge>
+    <edge source="cmd.commands.Update" target="cmd.AbstractCommand" relationship="GENERALIZATION">
+      <point x="0.0" y="-41.5" />
+      <point x="1330.6787032637694" y="960.5139157941198" />
+      <point x="2257.5" y="960.5139157941198" />
+      <point x="0.0" y="77.5" />
+    </edge>
+    <edge source="common.CmdResponse" target="common.Response" relationship="REALIZATION">
+      <point x="0.0" y="-41.5" />
+      <point x="0.0" y="29.0" />
+    </edge>
+    <edge source="Collection.Classes.MainCollectible" target="Collection.Classes.Collectible" relationship="INTERFACE_GENERALIZATION">
+      <point x="0.0" y="-65.0" />
+      <point x="772.0" y="201.0" />
+      <point x="957.75" y="201.0" />
+      <point x="-35.25" y="15.5" />
+    </edge>
+    <edge source="Collection.Classes.Builders.CoordinatesBuilder" target="Collection.Classes.Builders.Builder" relationship="REALIZATION">
+      <point x="0.0" y="-65.5" />
+      <point x="882.1603377069548" y="1489.0507382786777" />
+      <point x="1120.1603377069548" y="1489.0507382786777" />
+      <point x="0.0" y="41.0" />
+    </edge>
+    <edge source="cmd.commands.RemoveFirst" target="cmd.AbstractCommand" relationship="GENERALIZATION">
+      <point x="0.0" y="-41.5" />
+      <point x="3001.527064069296" y="960.5139157941198" />
+      <point x="2257.5" y="960.5139157941198" />
+      <point x="0.0" y="77.5" />
+    </edge>
+    <edge source="cmd.commands.Help" target="cmd.AbstractCommand" relationship="GENERALIZATION">
+      <point x="0.0" y="-53.5" />
+      <point x="1745.5872226892288" y="960.5139157941198" />
+      <point x="2257.5" y="960.5139157941198" />
+      <point x="0.0" y="77.5" />
+    </edge>
+    <edge source="cmd.commands.Save" target="cmd.AbstractCommand" relationship="GENERALIZATION">
+      <point x="0.0" y="-41.5" />
+      <point x="1606.331055151493" y="960.5139157941198" />
+      <point x="2257.5" y="960.5139157941198" />
+      <point x="0.0" y="77.5" />
+    </edge>
+    <edge source="cmd.commands.Show" target="cmd.AbstractCommand" relationship="GENERALIZATION">
+      <point x="0.0" y="-41.5" />
+      <point x="2857.3992909615877" y="960.5139157941198" />
+      <point x="2257.5" y="960.5139157941198" />
+      <point x="0.0" y="77.5" />
+    </edge>
+    <edge source="Collection.Classes.Dragon" target="Collection.Classes.MainCollectible" relationship="REALIZATION">
+      <point x="0.0" y="-173.5" />
+      <point x="1114.0" y="394.75" />
+      <point x="772.0" y="394.75" />
+      <point x="0.0" y="65.0" />
+    </edge>
+    <edge source="cmd.commands.Info" target="cmd.AbstractCommand" relationship="GENERALIZATION">
+      <point x="0.0" y="-41.5" />
+      <point x="1187.757318811447" y="960.5139157941198" />
+      <point x="2257.5" y="960.5139157941198" />
+      <point x="0.0" y="77.5" />
+    </edge>
+    <edge source="cmd.commands.CountByColor" target="cmd.AbstractCommand" relationship="GENERALIZATION">
+      <point x="0.0" y="-41.5" />
+      <point x="3148.1628229962353" y="960.5139157941198" />
+      <point x="2257.5" y="960.5139157941198" />
+      <point x="0.0" y="77.5" />
+    </edge>
+    <edge source="Collection.Classes.DragonCave" target="Collection.Classes.Collectible" relationship="REALIZATION">
+      <point x="0.0" y="-65.5" />
+      <point x="1214.0" y="201.0" />
+      <point x="1108.25" y="201.0" />
+      <point x="1108.25" y="191.0" />
+      <point x="1028.25" y="191.0" />
+      <point x="35.25" y="15.5" />
+    </edge>
+    <edge source="cmd.commands.ExecuteScript" target="cmd.AbstractCommand" relationship="GENERALIZATION">
+      <point x="0.0" y="-53.5" />
+      <point x="2078.0" y="960.5139157941198" />
+      <point x="2257.5" y="960.5139157941198" />
+      <point x="0.0" y="77.5" />
+    </edge>
+    <edge source="cmd.commands.RemoveLower" target="cmd.AbstractCommand" relationship="GENERALIZATION">
+      <point x="0.0" y="-41.5" />
+      <point x="2565.13575892694" y="960.5139157941198" />
+      <point x="2257.5" y="960.5139157941198" />
+      <point x="0.0" y="77.5" />
+    </edge>
+    <edge source="cmd.commands.Clear" target="cmd.AbstractCommand" relationship="GENERALIZATION">
+      <point x="0.0" y="-41.5" />
+      <point x="2410.412777310771" y="960.5139157941198" />
+      <point x="2257.5" y="960.5139157941198" />
+      <point x="0.0" y="77.5" />
+    </edge>
+    <edge source="cmd.commands.Add" target="cmd.AbstractCommand" relationship="GENERALIZATION">
+      <point x="0.0" y="-41.5" />
+      <point x="1941.4275063045939" y="960.5139157941198" />
+      <point x="2257.5" y="960.5139157941198" />
+      <point x="0.0" y="77.5" />
+    </edge>
+    <edge source="Collection.Classes.Builders.DragonBuilder" target="Collection.Classes.Builders.Builder" relationship="REALIZATION">
+      <point x="0.0" y="-77.5" />
+      <point x="1358.1603377069548" y="1489.0507382786777" />
+      <point x="1120.1603377069548" y="1489.0507382786777" />
+      <point x="0.0" y="41.0" />
+    </edge>
+    <edge source="cmd.commands.Exit" target="cmd.AbstractCommand" relationship="GENERALIZATION">
+      <point x="0.0" y="-41.5" />
+      <point x="1055.0263513760458" y="960.5139157941198" />
+      <point x="2257.5" y="960.5139157941198" />
+      <point x="0.0" y="77.5" />
+    </edge>
+    <edge source="cmd.commands.FilterGreaterThanAge" target="cmd.AbstractCommand" relationship="GENERALIZATION">
+      <point x="0.0" y="-41.5" />
+      <point x="3477.426355030883" y="960.5139157941198" />
+      <point x="2257.5" y="960.5139157941198" />
+      <point x="0.0" y="77.5" />
+    </edge>
+    <edge source="Collection.Classes.Coordinates" target="Collection.Classes.Collectible" relationship="REALIZATION">
+      <point x="0.0" y="-77.5" />
+      <point x="1002.5" y="201.0" />
+      <point x="1108.25" y="201.0" />
+      <point x="1108.25" y="191.0" />
+      <point x="1028.25" y="191.0" />
+      <point x="35.25" y="15.5" />
+    </edge>
+    <edge source="common.CmdRequest" target="common.Request" relationship="REALIZATION">
+      <point x="0.0" y="-65.5" />
+      <point x="0.0" y="53.0" />
+    </edge>
+    <edge source="cmd.commands.FilterByType" target="cmd.AbstractCommand" relationship="GENERALIZATION">
+      <point x="0.0" y="-41.5" />
+      <point x="2719.896805672308" y="960.5139157941198" />
+      <point x="2257.5" y="960.5139157941198" />
+      <point x="0.0" y="77.5" />
+    </edge>
+  </edges>
+  <settings layout="Hierarchic" zoom="0.43878846567678065" showDependencies="false" x="2155.210661827812" y="1084.9475736249726" />
+  <SelectedNodes />
+  <Categories>
+    <Category>Constructors</Category>
+    <Category>Methods</Category>
+  </Categories>
+  <SCOPE>All</SCOPE>
+  <VISIBILITY>private</VISIBILITY>
+</Diagram>
+
