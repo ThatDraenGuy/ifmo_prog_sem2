@@ -17,24 +17,38 @@ import java.lang.reflect.Method;
 import java.time.format.DateTimeParseException;
 import java.util.*;
 import java.util.function.Function;
-
+/**
+ * A class that manages a collection. Has methods for all interactions with it and also handles collection's construction/deconstruction.
+ */
 public class CollectionHandler {
     final private Class<? extends MainCollectible<?>> targetClass;
     final private java.util.PriorityQueue<MainCollectible> collection;
     final private StorageHandler storageHandler;
     private DragonBuilder builder;
 
-    public CollectionHandler(StorageHandler storageHandler, Class<? extends MainCollectible<?>> target)  {
+    public CollectionHandler(StorageHandler storageHandler, Class<? extends MainCollectible<?>> target) {
         this.collection = new java.util.PriorityQueue<>();
         this.storageHandler = storageHandler;
-        this.builder=new DragonBuilder();
-        this.targetClass=target;
+        this.builder = new DragonBuilder();
+        this.targetClass = target;
     }
 
-
+    /**
+     * A method for adding an object to collection
+     *
+     * @param deconstructedObject a deconstructed version of an object to be added
+     */
     public void add(HashMap<Field, Object> deconstructedObject) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
         collection.add(constructObject(deconstructedObject, targetClass, builder));
     }
+
+    /**
+     * A method for updating an element in the collection
+     *
+     * @param arg                 id of an object to be replaced
+     * @param deconstructedObject a deconstructed version of a new object
+     * @throws ElementIdException if there is no element with the specified id.
+     */
     public void update(String arg, HashMap<Field, Object> deconstructedObject) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, ElementIdException, NoSuchFieldException {
         Long argLong = Long.parseLong(arg);
         Field id = targetClass.getDeclaredField("id");
@@ -47,9 +61,18 @@ public class CollectionHandler {
             throw new ElementIdException(arg);
         }
     }
-    public <T extends Collectible> T constructObject(HashMap<Field,Object> deconstructedObject, Class<T> target, Builder builder) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
+
+    /**
+     * A method to construct an object from HashMap form.
+     *
+     * @param deconstructedObject deconstructed version of an object
+     * @param builder             object's builder
+     * @param <T>                 class of an object
+     * @return constructed version of an object
+     */
+    public <T extends Collectible> T constructObject(HashMap<Field, Object> deconstructedObject, Class<T> target, Builder builder) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
         for (Field f : deconstructedObject.keySet()) {
-            if (f.isAnnotationPresent(UserAccessibleObject.class) && deconstructedObject.get(f)!=null) {
+            if (f.isAnnotationPresent(UserAccessibleObject.class) && deconstructedObject.get(f) != null) {
                 builder.put(f, constructObject((HashMap<Field, Object>) deconstructedObject.get(f), (Class<Collectible>) f.getType()));
             } else {
                 builder.put(f, deconstructedObject.get(f));
@@ -57,11 +80,20 @@ public class CollectionHandler {
         }
         return builder.build();
     }
-    public <T extends Collectible> T constructObject(HashMap<Field,Object> deconstructedObject, Class<T> target) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
+
+    public <T extends Collectible> T constructObject(HashMap<Field, Object> deconstructedObject, Class<T> target) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
         Builder builder = (Builder) target.getDeclaredMethod("getBuilder", null).invoke(null, null);
-        return constructObject(deconstructedObject,target,builder);
+        return constructObject(deconstructedObject, target, builder);
     }
-    public HashMap<Field,Object>  deconstructObject(Object object, Class<?> target) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
+
+    /**
+     * A method to deconstruct object into the HashMap form. Used when saving collection
+     *
+     * @param object object to be deconstructed
+     * @param target class of an object
+     * @return deconstructed object
+     */
+    public HashMap<Field, Object> deconstructObject(Object object, Class<?> target) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException {
         HashMap<Field, Object> deconstructedObject = new HashMap<>();
         Field[] fields = target.getDeclaredFields();
         for (Field field : fields) {
@@ -72,7 +104,7 @@ public class CollectionHandler {
                 Object obj = method.invoke(object, null);
                 //TODO maybe check Collectible instead?
                 if (field.isAnnotationPresent(UserAccessibleObject.class)) {
-                    if (obj==null) {
+                    if (obj == null) {
                         deconstructedObject.put(field, null);
                     } else {
                         deconstructedObject.put(field, deconstructObject(obj, field.getType()));
@@ -85,8 +117,11 @@ public class CollectionHandler {
         return deconstructedObject;
     }
 
-
-    public void load(){
+    /**
+     * A method to load collection from a file. Invokes {@link StorageHandler#load(Class)} and constructs collection. Afterwards it
+     * invokes {@link #checkIds(PriorityQueue)}.
+     */
+    public void load() {
         try {
             ArrayList<HashMap<Field, Object>> deconstructedCollection = this.storageHandler.load(targetClass);
             PriorityQueue<MainCollectible> loadedCollection = new PriorityQueue<>();
@@ -105,6 +140,11 @@ public class CollectionHandler {
         }
     }
 
+    /**
+     * A method for saving collection in a file. Invokes {@link StorageHandler#save(ArrayList, Class)}
+     *
+     * @throws IOException if there was an exception writing info in file
+     */
     public void save() throws IOException, InvocationTargetException, NoSuchMethodException, IllegalAccessException {
         ArrayList<HashMap<Field, Object>> deconstructedCollection = new ArrayList<>();
         for (MainCollectible collectable : collection) {
@@ -112,6 +152,10 @@ public class CollectionHandler {
         }
         storageHandler.save(deconstructedCollection, targetClass);
     }
+
+    /**
+     * Clears collection
+     */
     public void clear() {
         collection.clear();
     }
@@ -124,13 +168,24 @@ public class CollectionHandler {
         }
         return str.toString();
     }
-    public void removeFirst() throws NoSuchElementException{
-            this.collection.remove();
+
+    /**
+     * Removes first element from collection
+     */
+    public void removeFirst() throws NoSuchElementException {
+        this.collection.remove();
     }
+
+    /**
+     * Removes element with a specified id from collection.
+     *
+     * @param strId id of element to be removed
+     * @throws ElementIdException if there is no element with such id
+     */
     public void removeById(String strId) throws ElementIdException {
         try {
             long id = Long.parseLong(strId);
-            if (!collection.removeIf(dragon -> dragon.getId()==id)) {
+            if (!collection.removeIf(dragon -> dragon.getId() == id)) {
                 throw new ElementIdException(strId);
             }
         } catch (NumberFormatException e) {
@@ -138,13 +193,27 @@ public class CollectionHandler {
         }
 
     }
+
+    /**
+     * Removes all elements that are lower than specified from collection
+     *
+     * @param deconstructedObject deconstructed version of the "target" element
+     */
     public void removeLower(HashMap<Field, Object> deconstructedObject) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, NoSuchFieldException {
         MainCollectible<?> target = constructObject(deconstructedObject, targetClass, builder);
-        collection.removeIf(dragon -> dragon.compareTo(target)<0);
+        collection.removeIf(dragon -> dragon.compareTo(target) < 0);
     }
-    public int countByColor(String arg) throws IllegalArgumentException{
+
+    /**
+     * Returns the number of elements that have the specified color.
+     *
+     * @param arg a color
+     * @return number of elements with that color
+     * @throws IllegalArgumentException if there is no such color
+     */
+    public int countByColor(String arg) throws IllegalArgumentException {
         Color target = Color.valueOf(arg);
-        int res=0;
+        int res = 0;
         for (MainCollectible<?> dragon : collection) {
             if (dragon.getColor().equals(target)) {
                 res++;
@@ -152,32 +221,59 @@ public class CollectionHandler {
         }
         return res;
     }
+
+    /**
+     * Filters only elements with the specified type
+     *
+     * @param arg a type
+     * @return result of #toString of all filtered elements
+     * @throws IllegalArgumentException if there is no such type
+     */
     public String filterByType(String arg) throws IllegalArgumentException {
         DragonType type = DragonType.valueOf(arg);
         StringBuilder str = new StringBuilder();
         for (MainCollectible<?> dragon : collection) {
             DragonType collectibleType = dragon.getType();
-            if (collectibleType!=null && collectibleType.equals(type)) {
+            if (collectibleType != null && collectibleType.equals(type)) {
                 str.append(dragon).append("\n");
             }
         }
         return str.toString();
     }
+
+    /**
+     * Filters only elements with age greater than specified
+     *
+     * @param arg an age
+     * @return result of #toString of all filtered elements
+     */
     public String filterGreaterThanAge(String arg) {
         long age = Long.parseLong(arg);
         StringBuilder str = new StringBuilder();
         for (MainCollectible<?> dragon : collection) {
             Long collectibleAge = dragon.getAge();
-            if (collectibleAge!=null && collectibleAge>age) {
+            if (collectibleAge != null && collectibleAge > age) {
                 str.append(dragon).append("\n");
             }
         }
         return str.toString();
     }
+
+    /**
+     * @return information about collection
+     */
     public String info() {
-        return "This collection's type is a "+collection.getClass().getName()+", it contains "+collection.size()+" elements.";
+        return "This collection's type is a " + collection.getClass().getName() + ", it contains " + collection.size() + " elements.";
         //TODO init date?
     }
+
+    /**
+     * Method for validating and converting a deconstructed version of an object. Invokes {@link #validate(Field, String)} for each field
+     *
+     * @param deconstructedObject an object to be verified
+     * @return validated and converted deconstructed version of an object
+     * @throws ValueNotValidException if validation was failed
+     */
     public HashMap<Field, Object> validate(HashMap<Field, Object> deconstructedObject) throws ValueNotValidException {
         HashMap<Field, Object> validatedObject = new HashMap<>();
         for (Field field : deconstructedObject.keySet()) {
@@ -190,23 +286,41 @@ public class CollectionHandler {
         }
         return validatedObject;
     }
+
+    /**
+     * Validates and converts a field. Invokes {@link #convert(Field, String)}
+     *
+     * @param field a field that inputted value will go in
+     * @param value a value to be validated
+     * @return validated and converted value
+     * @throws ValueNotValidException if validation was failed
+     */
     public Object validate(Field field, String value) throws ValueNotValidException {
         Object convertedValue = convert(field, value);
-        if (field.isAnnotationPresent(NotNull.class) && convertedValue==null) {
-            throw new ValueNotValidException(field.getName()+" cannot be null!");
+        if (field.isAnnotationPresent(NotNull.class) && convertedValue == null) {
+            throw new ValueNotValidException(field.getName() + " cannot be null!");
         }
-        if (field.isAnnotationPresent(LowerBounded.class) && convertedValue!=null) {
+        if (field.isAnnotationPresent(LowerBounded.class) && convertedValue != null) {
             double border = field.getAnnotation(LowerBounded.class).value();
-            if (Double.parseDouble(value)<=border) {
-                throw new ValueNotValidException(field.getName()+" should be greater than "+border+". Your input: "+value);
+            if (Double.parseDouble(value) <= border) {
+                throw new ValueNotValidException(field.getName() + " should be greater than " + border + ". Your input: " + value);
             }
         }
         return convertedValue;
     }
+
+    /**
+     * Converts a value from String to the needed type
+     *
+     * @param field a field that value will go in
+     * @param value a value to be converted
+     * @return converted value
+     * @throws ValueNotValidException if value couldn't be converted to fit the specified field
+     */
     public Object convert(Field field, String value) throws ValueNotValidException {
         if (value.equals("")) return null;
 
-        HashMap<Class<?>, Function<String,?>> variants = new HashMap<>();
+        HashMap<Class<?>, Function<String, ?>> variants = new HashMap<>();
         variants.put(Long.class, Long::parseLong);
         variants.put(long.class, Long::parseLong);
         variants.put(int.class, Integer::parseInt);
@@ -214,12 +328,12 @@ public class CollectionHandler {
         variants.put(double.class, Double::parseDouble);
         variants.put(java.time.ZonedDateTime.class, java.time.ZonedDateTime::parse);
 
-        Function<String,?> convert = variants.get(field.getType());
-        if (convert!=null) {
+        Function<String, ?> convert = variants.get(field.getType());
+        if (convert != null) {
             try {
                 return convert.apply(value);
             } catch (NumberFormatException | DateTimeParseException e) {
-                throw new ValueNotValidException(field.getName()+" should have a "+field.getType().getSimpleName()+" value. Your value was: "+value);
+                throw new ValueNotValidException(field.getName() + " should have a " + field.getType().getSimpleName() + " value. Your value was: " + value);
             }
         }
         if (field.getType().isEnum()) {
@@ -227,12 +341,20 @@ public class CollectionHandler {
                 @SuppressWarnings({"unchecked", "rawtypes"}) Object enumValue = Enum.valueOf((Class<Enum>) field.getType(), value);
                 return enumValue;
             } catch (IllegalArgumentException e) {
-                throw new ValueNotValidException(field.getName()+" cannot have a value \""+value+"\"");
+                throw new ValueNotValidException(field.getName() + " cannot have a value \"" + value + "\"");
             }
         }
-        throw new ValueNotValidException(field.getName()+" should have a "+field.getType().getSimpleName()+" value. Your value was: "+value);
+        throw new ValueNotValidException(field.getName() + " should have a " + field.getType().getSimpleName() + " value. Your value was: " + value);
 
     }
+
+    /**
+     * Checks ids of collection to make sure there aren't any duplicates
+     *
+     * @param collection collection which ids need to be checked
+     * @return the highest id
+     * @throws InvalidCollectionException if there were duplicate ids
+     */
     public Long checkIds(java.util.PriorityQueue<MainCollectible> collection) throws InvalidCollectionException {
         HashSet<Long> ids = new HashSet<>();
         for (MainCollectible<?> dragon : collection) {
@@ -241,14 +363,15 @@ public class CollectionHandler {
                 throw new InvalidCollectionException();
             }
         }
-        long highestId=0L;
+        long highestId = 0L;
         for (long id : ids) {
-            if (id>highestId) {
-                highestId=id;
+            if (id > highestId) {
+                highestId = id;
             }
         }
         return highestId;
     }
+
     public Class<? extends MainCollectible> getTargetClass() {
         return targetClass;
     }

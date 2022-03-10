@@ -7,9 +7,14 @@ import cmd.CmdArgs;
 import cmd.CmdType;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 
+/**
+ * A command for removing elements lower than specified from collection. Invokes {@link CollectionHandler#removeLower(HashMap)}
+ */
 public class RemoveLower extends AbstractCommand {
     private CollectionHandler collectionHandler;
+
     public RemoveLower(CollectionHandler collectionHandler) {
         super("remove_lower", "удалить из коллекции все элементы, меньшие, чем заданный", CmdType.COMPLEX_ARG);
         this.collectionHandler=collectionHandler;

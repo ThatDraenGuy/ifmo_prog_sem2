@@ -13,14 +13,15 @@ dependencies {
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     implementation 'org.json:json:20211205'
+    annotationProcessor "org.projectlombok:lombok:1.18.22"
 }
 
 test {
     useJUnitPlatform()
 }
 jar {
-    archiveBaseName="lab5"
-    archiveVersion="1.5.0"
+    archiveBaseName = "lab"
+    archiveVersion = "5"
     manifest {
         attributes "Main-Class": "Main"
     }

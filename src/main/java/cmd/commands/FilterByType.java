@@ -6,8 +6,12 @@ import cmd.ActionResult;
 import cmd.CmdArgs;
 import cmd.CmdType;
 
+/**
+ * A command to filter elements by type. Invokes {@link CollectionHandler#filterByType(String)}
+ */
 public class FilterByType extends AbstractCommand {
     private CollectionHandler collectionHandler;
+
     public FilterByType(CollectionHandler collectionHandler) {
         super("filter_by_type", "вывести элементы, значение поля type которых равно заданному", CmdType.SIMPLE_ARG);
         this.collectionHandler=collectionHandler;

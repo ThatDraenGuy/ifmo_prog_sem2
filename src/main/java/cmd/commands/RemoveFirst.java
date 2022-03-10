@@ -8,8 +8,12 @@ import cmd.AbstractCommand;
 
 import java.util.NoSuchElementException;
 
+/**
+ * A command for removing first element from collection. Invokes {@link CollectionHandler#removeFirst()}
+ */
 public class RemoveFirst extends AbstractCommand {
     CollectionHandler collectionHandler;
+
     public  RemoveFirst(CollectionHandler collectionHandler) {
         super("remove_first", "удалить первый элемент из коллекции", CmdType.NO_ARGS);
         this.collectionHandler=collectionHandler;

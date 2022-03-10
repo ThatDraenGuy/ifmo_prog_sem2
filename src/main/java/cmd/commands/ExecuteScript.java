@@ -8,7 +8,9 @@ import java.util.HashSet;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
 
-
+/**
+ * A command for executing scripts.
+ */
 public class ExecuteScript extends AbstractCommand {
     private CmdHandler cmdHandler;
     private HashSet<String> scriptHistory;

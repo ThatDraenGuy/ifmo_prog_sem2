@@ -6,8 +6,12 @@ import cmd.ActionResult;
 import cmd.CmdArgs;
 import cmd.CmdType;
 
+/**
+ * A command for displaying information about collection. Invokes {@link CollectionHandler#info()}
+ */
 public class Info extends AbstractCommand {
     private CollectionHandler collectionHandler;
+
     public Info(CollectionHandler collectionHandler) {
         super("info", "вывести информацию о коллекции", CmdType.NO_ARGS);
 

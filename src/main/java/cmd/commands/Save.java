@@ -9,11 +9,15 @@ import cmd.AbstractCommand;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
+/**
+ * A command for saving collection. Invokes {@link CollectionHandler#save()}
+ */
 public class Save extends AbstractCommand {
     private CollectionHandler collectionHandler;
+
     public Save(CollectionHandler collectionHandler) {
-       super("save", "сохранить коллекцию в файл", CmdType.NO_ARGS);
-       this.collectionHandler=collectionHandler;
+        super("save", "сохранить коллекцию в файл", CmdType.NO_ARGS);
+        this.collectionHandler=collectionHandler;
     }
 
     @Override

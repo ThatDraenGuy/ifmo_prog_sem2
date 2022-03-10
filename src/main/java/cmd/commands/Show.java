@@ -6,8 +6,12 @@ import cmd.CmdArgs;
 import cmd.CmdType;
 import cmd.AbstractCommand;
 
+/**
+ * A command for showing collection's elements. Invokes {@link CollectionHandler#toString()}
+ */
 public class Show extends AbstractCommand {
     private CollectionHandler collectionHandler;
+
     public Show(CollectionHandler collectionHandler) {
         super("show", "вывести все элементы коллекции в строковом представлении", CmdType.NO_ARGS);
         this.collectionHandler=collectionHandler;

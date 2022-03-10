@@ -6,8 +6,12 @@ import cmd.ActionResult;
 import cmd.CmdArgs;
 import cmd.CmdType;
 
+/**
+ * A command for clearing the collection. Invokes {@link CollectionHandler#clear()}
+ */
 public class Clear extends AbstractCommand {
     private CollectionHandler collectionHandler;
+
     public Clear(CollectionHandler collectionHandler) {
         super("clear", "очистить коллекцию", CmdType.NO_ARGS);
         this.collectionHandler=collectionHandler;

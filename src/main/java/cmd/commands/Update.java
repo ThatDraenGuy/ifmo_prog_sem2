@@ -8,9 +8,14 @@ import cmd.CmdArgs;
 import cmd.CmdType;
 
 import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
 
+/**
+ * A command for updating element in collection. Invokes {@link CollectionHandler#update(String, HashMap)}
+ */
 public class Update extends AbstractCommand {
     private CollectionHandler collectionHandler;
+
     public Update(CollectionHandler collectionHandler) {
         super("update", "обновить значение элемента коллекции, id которого равен заданному", CmdType.BOTH_ARG);
         this.collectionHandler=collectionHandler;
