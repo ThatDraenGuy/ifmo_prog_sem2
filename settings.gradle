@@ -1,2 +1,5 @@
 rootProject.name = 'progLab5'
+include 'Client'
+include 'Server'
+include 'common'
 
