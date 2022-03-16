@@ -19,6 +19,12 @@ public class CommandArgs {
         this.deconstructedObject = object;
     }
 
+    public CommandArgs(HashMap<Field, Object> object, String args) {
+        this.deconstructedObject = object;
+        this.args = args;
+    }
+
+
     public HashMap<Field, Object> getDeconstructedObject() {
         return deconstructedObject;
     }
@@ -31,7 +37,4 @@ public class CommandArgs {
         this.args = args;
     }
 
-    public void setDeconstructedObject(HashMap<Field, Object> deconstructedObject) {
-        this.deconstructedObject = deconstructedObject;
-    }
 }

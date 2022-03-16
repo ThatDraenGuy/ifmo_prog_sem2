@@ -12,10 +12,10 @@ import java.util.Scanner;
  * A command for executing scripts.
  */
 public class ExecuteScript extends AbstractCommand {
-    private ServerCommandsHandler cmdHandler;
+    private CommandsHandler cmdHandler;
     private HashSet<String> scriptHistory;
 
-    public ExecuteScript(ServerCommandsHandler cmdHandler) {
+    public ExecuteScript(CommandsHandler cmdHandler) {
         super("execute_script", "считать и исполнить скрипт из указанного файла", CommandType.SIMPLE_ARG);
         this.cmdHandler = cmdHandler;
         this.scriptHistory = new HashSet<>();

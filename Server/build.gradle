@@ -15,7 +15,17 @@ dependencies {
     implementation project(':common')
     implementation 'org.json:json:20211205'
 }
-//
-//test {
-//    useJUnitPlatform()
-//}
+
+test {
+    useJUnitPlatform()
+}
+jar {
+    archiveBaseName = "server"
+    manifest {
+        attributes "Main-Class": "Main"
+    }
+
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+}

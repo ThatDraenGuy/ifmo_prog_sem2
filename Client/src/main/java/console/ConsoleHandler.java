@@ -4,10 +4,11 @@ import annotations.NotNull;
 import annotations.UserAccessibleEnum;
 import annotations.UserAccessibleField;
 import annotations.UserAccessibleObject;
+import client.ConnectionHandler;
 import collection.Validator;
 import message.*;
 
-import exceptions.CmdArgsAmountException;
+import exceptions.CommandArgsAmountException;
 import exceptions.CommandExecutionException;
 import exceptions.CommandNonExistentException;
 import exceptions.ValueNotValidException;
@@ -25,15 +26,17 @@ import java.util.Scanner;
  * Gets and handles its response.
  */
 public class ConsoleHandler {
+    final private ConnectionHandler connectionHandler;
     final private HashMap<String, Command> commands;
     final private Class<?> targetClass;
     final private Scanner inputScanner;
     final private PrintStream out;
     final private PrintStream err;
 
-    public ConsoleHandler(HashMap<String, Command> commands, Class<?> targetClass, InputStream in, PrintStream out, PrintStream err) {
-        this.commands = commands;
-        this.targetClass = targetClass;
+    public ConsoleHandler(ConnectionHandler connectionHandler, InputStream in, PrintStream out, PrintStream err) {
+        this.connectionHandler = connectionHandler;
+        this.commands = connectionHandler.getServerData().getServerCommands();
+        this.targetClass = connectionHandler.getServerData().getTargetClass();
         inputScanner = new Scanner(in);
         this.out = out;
         this.err = err;
@@ -55,12 +58,12 @@ public class ConsoleHandler {
             try {
                 String input = promptInput("");
                 Request cmdRequest = parseInput(input);
-                Response response = executeCmd(cmdRequest);
+                Response response = executeCommand(cmdRequest);
                 boolean isCmdExit = handleResponse(response);
                 if (isCmdExit) {
                     if (promptAgreement("Are you sure you want to exit? Any unsaved changes will be gone!")) return;
                 }
-            } catch (CommandNonExistentException | CmdArgsAmountException | CommandExecutionException e) {
+            } catch (CommandNonExistentException | CommandArgsAmountException | CommandExecutionException e) {
                 errorMessage(e);
             } catch (NoSuchElementException e) {
                 errorMessage(new NoSuchElementException("InputStream ran out of lines while the program was working"));
@@ -91,9 +94,9 @@ public class ConsoleHandler {
      * @param input user's input
      * @return A request created from the input
      * @throws CommandNonExistentException if inputted command cannot be found in the command list {@link #parseCommand(String)}
-     * @throws CmdArgsAmountException      if user's input has more than 2 words separated by a space.
+     * @throws CommandArgsAmountException  if user's input has more than 2 words separated by a space.
      */
-    private Request parseInput(String input) throws CommandNonExistentException, CmdArgsAmountException {
+    private Request parseInput(String input) throws CommandNonExistentException, CommandArgsAmountException {
         input = input.strip();
         Command cmd;
         CommandArgs cmdArgs = new CommandArgs("");
@@ -102,11 +105,46 @@ public class ConsoleHandler {
             input = str[0];
             cmdArgs = parseArgs(str[1]);
             if (str.length > 2) {
-                throw new CmdArgsAmountException();
+                throw new CommandArgsAmountException();
             }
         }
         cmd = parseCommand(input);
-        return (new CommandRequest(cmd, cmdArgs));
+        return (createRequest(cmd, cmdArgs));
+    }
+
+    private Request createRequest(Command command, CommandArgs arguments) throws CommandArgsAmountException {
+        CommandType type = command.getCommandType();
+        String argumentString = arguments.getArgs();
+        boolean isEmpty = argumentString.equals("");
+        switch (type) {
+            case NO_ARGS:
+                if (!isEmpty) {
+                    throw new CommandArgsAmountException("Command \"" + command.getName() + "\" does not need arguments!");
+                }
+                break;
+            case COMPLEX_ARG:
+                if (!isEmpty) {
+                    throw new CommandArgsAmountException("Command \"" + command.getName() + "\" needs a complex argument, not a simple one!");
+                } else {
+                    HashMap<Field, Object> newArgs = promptComplexArgs(targetClass);
+                    arguments = new CommandArgs(newArgs);
+                }
+                break;
+            case SIMPLE_ARG:
+                if (isEmpty) {
+                    throw new CommandArgsAmountException(command.getName() + " needs an argument!");
+                }
+                break;
+            case BOTH_ARG:
+                if (isEmpty) {
+                    throw new CommandArgsAmountException("Command \"" + command.getName() + "\" needs an in-line (simple) argument!");
+                } else {
+                    HashMap<Field, Object> complexArgs = promptComplexArgs(targetClass);
+                    arguments = new CommandArgs(complexArgs, argumentString);
+                }
+
+        }
+        return new CommandRequest(command, arguments);
     }
 
     /**
@@ -137,22 +175,10 @@ public class ConsoleHandler {
      *
      * @param request a request for a command execution
      * @return response gotten from command's execution
-     * @throws CmdArgsAmountException if command requires both a simple and a complex argument and a simple one wasn't provided
+     * @throws CommandArgsAmountException if command requires both a simple and a complex argument and a simple one wasn't provided
      */
-    private Response executeCmd(Request request) throws CmdArgsAmountException {
-        CommandType type = request.getCommand().getCommandType();
-        CommandArgs args = request.getCommandArgs();
-        if (type == CommandType.COMPLEX_ARG) {
-            HashMap<Field, Object> newArgs = promptComplexArgs(targetClass);
-            request.setCommandArgs(new CommandArgs(newArgs));
-        } else if (type == CommandType.BOTH_ARG) {
-            if (args.getArgs().equals("")) {
-                throw new CmdArgsAmountException("This command needs an in-line argument!");
-            }
-            HashMap<Field, Object> complexArgs = promptComplexArgs(targetClass);
-            args.setDeconstructedObject(complexArgs);
-        }
-        return cmdHandler.executeCmd(request);
+    private Response executeCommand(Request request) throws CommandArgsAmountException {
+        return connectionHandler.sendRequest(request);
     }
 
     /**

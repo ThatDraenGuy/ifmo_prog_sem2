@@ -1,3 +1,4 @@
+import collection.classes.MainCollectible;
 import commands.ServerCommandsHandler;
 import commands.instances.*;
 import collection.CollectionHandler;
