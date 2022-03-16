@@ -1,8 +1,9 @@
 package collection;
 
 import annotations.UserAccessibleObject;
+import collection.builders.Builder;
 import collection.classes.MainCollectible;
-import collection.classes.builders.Builder;
+import org.json.JSONArray;
 import org.json.JSONObject;
 
 import java.lang.reflect.Field;

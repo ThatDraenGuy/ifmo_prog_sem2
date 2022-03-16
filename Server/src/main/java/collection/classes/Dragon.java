@@ -1,7 +1,7 @@
 package collection.classes;
 
-import collection.classes.builders.Builder;
-import collection.classes.builders.DragonBuilder;
+import collection.builders.DragonBuilder;
+import collection.builders.Builder;
 
 public class Dragon implements MainCollectible<Dragon> {
     @NotNull

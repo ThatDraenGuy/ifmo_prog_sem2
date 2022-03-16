@@ -1,9 +1,8 @@
-import cmd.CmdHandler;
-import cmd.commands.*;
+import commands.ServerCommandsHandler;
+import commands.instances.*;
 import collection.CollectionHandler;
 import collection.StorageHandler;
 import collection.classes.Dragon;
-import collection.classes.MainCollectible;
 
 import java.io.File;
 
@@ -32,8 +31,8 @@ public class Main {
         StorageHandler storageHandler = new StorageHandler(new File(filePath));
         CollectionHandler collectionHandler = new CollectionHandler(storageHandler, target);
         if (!filePath.equals(defaultPath)) collectionHandler.load();
-        CmdHandler cmdHandler = new CmdHandler(collectionHandler);
-        cmdHandler.addCmds(new Help(cmdHandler),
+        ServerCommandsHandler cmdHandler = new ServerCommandsHandler(collectionHandler);
+        cmdHandler.addCommands(new Help(cmdHandler),
                 new Exit(),
                 new Save(collectionHandler),
                 new Show(collectionHandler),

@@ -1,6 +1,6 @@
 package exceptions;
 
-import cmd.ActionResult;
+import commands.ActionResult;
 
 public class CommandExecutionException extends Exception {
     public CommandExecutionException(ActionResult result) {

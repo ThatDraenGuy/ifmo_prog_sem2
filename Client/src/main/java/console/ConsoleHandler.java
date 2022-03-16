@@ -4,15 +4,14 @@ import annotations.NotNull;
 import annotations.UserAccessibleEnum;
 import annotations.UserAccessibleField;
 import annotations.UserAccessibleObject;
-import collection.classes.MainCollectible;
-import common.CmdRequest;
-import common.Request;
-import common.Response;
+import collection.Validator;
+import message.*;
+
 import exceptions.CmdArgsAmountException;
 import exceptions.CommandExecutionException;
 import exceptions.CommandNonExistentException;
 import exceptions.ValueNotValidException;
-import cmd.*;
+import commands.*;
 
 import java.io.InputStream;
 import java.io.PrintStream;
@@ -22,22 +21,23 @@ import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 /**
- * A class for managing interactions with user. Prompts user's input, parses it, creates a request and sends it to {@link cmd.CmdHandler}.
+ * A class for managing interactions with user. Prompts user's input, parses it, creates a request and sends it to .
  * Gets and handles its response.
  */
 public class ConsoleHandler {
-    final private CmdHandler cmdHandler;
-    final private Class<? extends MainCollectible> targetClass;
+    final private HashMap<String, Command> commands;
+    final private Class<?> targetClass;
     final private Scanner inputScanner;
     final private PrintStream out;
     final private PrintStream err;
 
-    public ConsoleHandler(CmdHandler cmdHandler, InputStream in, PrintStream out, PrintStream err) {
-        this.cmdHandler = cmdHandler;
-        this.targetClass = cmdHandler.getCollectionHandler().getTargetClass();
+    public ConsoleHandler(HashMap<String, Command> commands, Class<?> targetClass, InputStream in, PrintStream out, PrintStream err) {
+        this.commands = commands;
+        this.targetClass = targetClass;
         inputScanner = new Scanner(in);
         this.out = out;
         this.err = err;
+
     }
 
     /**
@@ -66,7 +66,6 @@ public class ConsoleHandler {
                 errorMessage(new NoSuchElementException("InputStream ran out of lines while the program was working"));
                 return;
             }
-
         }
     }
 
@@ -97,7 +96,7 @@ public class ConsoleHandler {
     private Request parseInput(String input) throws CommandNonExistentException, CmdArgsAmountException {
         input = input.strip();
         Command cmd;
-        CmdArgs cmdArgs = new CmdArgs("");
+        CommandArgs cmdArgs = new CommandArgs("");
         if (input.contains(" ")) {
             String[] str = input.split(" ");
             input = str[0];
@@ -107,7 +106,7 @@ public class ConsoleHandler {
             }
         }
         cmd = parseCommand(input);
-        return (new CmdRequest(cmd, cmdArgs));
+        return (new CommandRequest(cmd, cmdArgs));
     }
 
     /**
@@ -118,8 +117,8 @@ public class ConsoleHandler {
      * @throws CommandNonExistentException if inputted command cannot be found in the command list
      */
     private Command parseCommand(String input) throws CommandNonExistentException {
-        if (cmdHandler.isInCmds(input)) {
-            return cmdHandler.getCmds().get(input);
+        if (commands.containsKey(input)) {
+            return commands.get(input);
         } else {
             throw new CommandNonExistentException(input);
         }
@@ -128,12 +127,12 @@ public class ConsoleHandler {
     /**
      * A method that gets a String and returns a CmdArgs object created with it
      */
-    private CmdArgs parseArgs(String input) {
-        return new CmdArgs(input);
+    private CommandArgs parseArgs(String input) {
+        return new CommandArgs(input);
     }
 
     /**
-     * A method that gets a request and invokes {@link cmd.CmdHandler}'s {@link cmd.CmdHandler#executeCmd(Request)} method.
+     * A method that gets a request and invokes ... method.
      * Also checks if command needs a complex argument and invokes {@link #promptComplexArgs(Class)} if it does.
      *
      * @param request a request for a command execution
@@ -141,12 +140,12 @@ public class ConsoleHandler {
      * @throws CmdArgsAmountException if command requires both a simple and a complex argument and a simple one wasn't provided
      */
     private Response executeCmd(Request request) throws CmdArgsAmountException {
-        CmdType type = request.getCmd().getCmdType();
-        CmdArgs args = request.getCmdArgs();
-        if (type == CmdType.COMPLEX_ARG) {
+        CommandType type = request.getCommand().getCommandType();
+        CommandArgs args = request.getCommandArgs();
+        if (type == CommandType.COMPLEX_ARG) {
             HashMap<Field, Object> newArgs = promptComplexArgs(targetClass);
-            request.setCmdArgs(new CmdArgs(newArgs));
-        } else if (type == CmdType.BOTH_ARG) {
+            request.setCommandArgs(new CommandArgs(newArgs));
+        } else if (type == CommandType.BOTH_ARG) {
             if (args.getArgs().equals("")) {
                 throw new CmdArgsAmountException("This command needs an in-line argument!");
             }
@@ -196,7 +195,7 @@ public class ConsoleHandler {
 
     /**
      * A method that invokes {@link #promptInput(String)} and validates gotten user's input. Also converts it to a needed type.
-     * To do that it invokes {@link collection.CollectionHandler#validate(Field, String)} and catches a {@link exceptions.ValueNotValidException}
+     * To do that it invokes ... and catches a {@link exceptions.ValueNotValidException}
      * produced by it. The exception is than passed to the {@link #errorMessage(Exception)}, after what method asks user's input again.
      *
      * @param field   a field corresponding to the asked input. Validation requirements and type the input needs to be  cast to a gotten from it.
@@ -207,7 +206,7 @@ public class ConsoleHandler {
         while (true) {
             String result = promptInput(message);
             try {
-                return cmdHandler.getCollectionHandler().validate(field, result);
+                return Validator.validate(field, result);
             } catch (ValueNotValidException e) {
                 errorMessage(e);
             }
@@ -256,7 +255,7 @@ public class ConsoleHandler {
     /**
      * A method to handle command's execution's response. Gets ActionResult from it and displays it.
      *
-     * @param response a response gotten from {@link cmd.CmdHandler}
+     * @param response a response gotten from ...
      * @return a boolean value: if the response is from an "Exit" command it's true, otherwise it's false.
      * @throws CommandExecutionException if ActionResult isn't success
      */

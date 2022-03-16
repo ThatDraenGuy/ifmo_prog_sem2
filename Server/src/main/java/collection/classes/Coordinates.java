@@ -3,8 +3,8 @@ package collection.classes;
 import annotations.LowerBounded;
 import annotations.NotNull;
 import annotations.UserAccessibleField;
-import collection.classes.builders.Builder;
-import collection.classes.builders.CoordinatesBuilder;
+import collection.builders.Builder;
+import collection.builders.CoordinatesBuilder;
 
 public class Coordinates implements Collectible {
     @UserAccessibleField

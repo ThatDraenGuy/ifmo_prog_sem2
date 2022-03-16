@@ -2,8 +2,8 @@ package collection.classes;
 
 import annotations.NotNull;
 import annotations.UserAccessibleField;
-import collection.classes.builders.Builder;
-import collection.classes.builders.DragonCaveBuilder;
+import collection.builders.Builder;
+import collection.builders.DragonCaveBuilder;
 
 public class DragonCave implements Collectible {
     @UserAccessibleField

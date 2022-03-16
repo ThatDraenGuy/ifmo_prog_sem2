@@ -1,9 +1,8 @@
 plugins {
     id 'java'
+    id 'application'
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -15,6 +14,6 @@ dependencies {
     implementation project(':common')
 }
 
-test {
-    useJUnitPlatform()
-}
+//test {
+//    useJUnitPlatform()
+//}

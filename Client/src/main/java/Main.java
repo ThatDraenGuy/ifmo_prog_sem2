@@ -1,7 +1,3 @@
-import collection.CollectionHandler;
-import collection.StorageHandler;
-import collection.classes.Dragon;
-import collection.classes.MainCollectible;
 import console.ConsoleHandler;
 
 /**
