@@ -12,12 +12,14 @@ import java.util.HashMap;
  * A class to convert JSOn to deconstructed collection and vise versa
  */
 public class JSONToCollection {
-    /** A method to parse collection form a JSON String. Invokes {@link #parseCollectible(JSONObject, Class)} for each element in the JSON array. */
-    public static <T extends MainCollectible> ArrayList<HashMap<Field, Object>> parseCollection(String collection, Class<T> target) {
+    /**
+     * A method to parse collection form a JSON String. Invokes {@link #parseCollectible(JSONObject, Class)} for each element in the JSON array.
+     */
+    public static <T extends MainCollectible<?>> ArrayList<HashMap<Field, Object>> parseCollection(String collection, Class<T> target) {
         ArrayList<HashMap<Field, Object>> resultCollection = new ArrayList<>();
         JSONObject fullFile = new JSONObject(collection);
         JSONArray collectibleArray = fullFile.getJSONArray(target.getName());
-        for (int i=0; i<collectibleArray.length(); i++) {
+        for (int i = 0; i < collectibleArray.length(); i++) {
             JSONObject collectible = collectibleArray.getJSONObject(i);
             resultCollection.add(parseCollectible(collectible, target));
         }

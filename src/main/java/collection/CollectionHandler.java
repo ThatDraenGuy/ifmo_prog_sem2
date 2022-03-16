@@ -102,7 +102,6 @@ public class CollectionHandler {
                 String methodName = "get" + name.substring(0, 1).toUpperCase() + name.substring(1);
                 Method method = target.getMethod(methodName, null);
                 Object obj = method.invoke(object, null);
-                //TODO maybe check Collectible instead?
                 if (field.isAnnotationPresent(UserAccessibleObject.class)) {
                     if (obj == null) {
                         deconstructedObject.put(field, null);
@@ -264,7 +263,6 @@ public class CollectionHandler {
      */
     public String info() {
         return "This collection's type is a " + collection.getClass().getName() + ", it contains " + collection.size() + " elements.";
-        //TODO init date?
     }
 
     /**
@@ -277,7 +275,6 @@ public class CollectionHandler {
     public HashMap<Field, Object> validate(HashMap<Field, Object> deconstructedObject) throws ValueNotValidException {
         HashMap<Field, Object> validatedObject = new HashMap<>();
         for (Field field : deconstructedObject.keySet()) {
-            //TODO Collectible?
             if (field.isAnnotationPresent(UserAccessibleObject.class) && !deconstructedObject.get(field).equals("")) {
                 validatedObject.put(field, validate((HashMap<Field, Object>) deconstructedObject.get(field)));
             } else {
