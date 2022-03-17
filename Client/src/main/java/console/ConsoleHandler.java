@@ -57,8 +57,8 @@ public class ConsoleHandler {
         while (true) {
             try {
                 String input = promptInput("");
-                Request cmdRequest = parseInput(input);
-                Response response = executeCommand(cmdRequest);
+                CommandRequest cmdRequest = parseInput(input);
+                CommandResponse response = executeCommand(cmdRequest);
                 boolean isCmdExit = handleResponse(response);
                 if (isCmdExit) {
                     if (promptAgreement("Are you sure you want to exit? Any unsaved changes will be gone!")) return;
@@ -96,7 +96,7 @@ public class ConsoleHandler {
      * @throws CommandNonExistentException if inputted command cannot be found in the command list {@link #parseCommandData(String)}
      * @throws CommandArgsAmountException  if user's input has more than 2 words separated by a space.
      */
-    private Request parseInput(String input) throws CommandNonExistentException, CommandArgsAmountException {
+    private CommandRequest parseInput(String input) throws CommandNonExistentException, CommandArgsAmountException {
         input = input.strip();
         CommandData commandData;
         CommandArgs cmdArgs = new CommandArgs("");
@@ -112,7 +112,7 @@ public class ConsoleHandler {
         return (createRequest(commandData, cmdArgs));
     }
 
-    private Request createRequest(CommandData commandData, CommandArgs arguments) throws CommandArgsAmountException {
+    private CommandRequest createRequest(CommandData commandData, CommandArgs arguments) throws CommandArgsAmountException {
         CommandType type = commandData.getCommandType();
         String argumentString = arguments.getArgs();
         boolean isEmpty = argumentString.equals("");
@@ -177,8 +177,8 @@ public class ConsoleHandler {
      * @return response gotten from command's execution
      * @throws CommandArgsAmountException if command requires both a simple and a complex argument and a simple one wasn't provided
      */
-    private Response executeCommand(Request request) throws CommandArgsAmountException {
-        return connectionHandler.sendRequest(request);
+    private CommandResponse executeCommand(CommandRequest request) throws CommandArgsAmountException {
+        return connectionHandler.send(request);
     }
 
     /**
@@ -285,7 +285,7 @@ public class ConsoleHandler {
      * @return a boolean value: if the response is from an "Exit" command it's true, otherwise it's false.
      * @throws CommandExecutionException if ActionResult isn't success
      */
-    private boolean handleResponse(Response response) throws CommandExecutionException {
+    private boolean handleResponse(CommandResponse response) throws CommandExecutionException {
         ActionResult result = response.getActionResult();
         boolean isSuccess = result.isSuccess();
         if (isSuccess) {

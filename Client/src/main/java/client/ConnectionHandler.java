@@ -2,6 +2,7 @@ package client;
 
 
 import lombok.Getter;
+import message.Message;
 import message.Request;
 import message.Response;
 import message.ServerData;
@@ -30,6 +31,18 @@ public class ConnectionHandler {
         try {
             out.writeObject(request);
             return (Response) in.readObject();
+        } catch (IOException | ClassNotFoundException e) {
+            System.err.println(e);
+            return null;
+            //TODO normal check
+        }
+    }
+
+    public <T extends Response, E extends Request> T send(E data) {
+        try {
+            Message<E> message = new Message<>(data);
+            out.writeObject(message);
+            return (T) in.readObject();
         } catch (IOException | ClassNotFoundException e) {
             System.err.println(e);
             return null;

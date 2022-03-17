@@ -1,9 +1,7 @@
 package server;
 
 import commands.ServerCommandsHandler;
-import message.Request;
-import message.Response;
-import message.ServerData;
+import message.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,13 +36,27 @@ public class UserHandler extends Thread {
     public void run() {
         while (true) {
             try {
-                Request request = (Request) in.readObject();
-                logger.info("got a request");
-                Response response = commandsHandler.executeCommand(request);
+                Message<?> message = (Message<?>) in.readObject();
+                logger.info("got a message");
+                Response response = handleMessage(message);
                 out.writeObject(response);
                 logger.info("successfully sent response");
             } catch (IOException | ClassNotFoundException e) {
                 //TODO
+            }
+        }
+    }
+
+    public Response handleMessage(Message<?> message) {
+        Class<?>[] classes = Request.class.getClasses();
+        Class<?> dataType = message.getData().getClass();
+        for (Class<?> request : classes) {
+            try {
+                dataType.asSubclass(request);
+            } catch (ClassCastException ignored) {
+            }
+            if (dataType.isAssignableFrom(request)) {
+
             }
         }
     }

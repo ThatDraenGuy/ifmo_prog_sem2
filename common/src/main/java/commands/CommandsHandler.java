@@ -2,6 +2,7 @@ package commands;
 
 import exceptions.CommandNonExistentException;
 import lombok.Getter;
+import message.CommandRequest;
 import message.CommandResponse;
 import message.Request;
 import message.Response;
@@ -60,7 +61,7 @@ public class CommandsHandler {
         return res;
     }
 
-    public Response executeCommand(Request request) {
+    public CommandResponse executeCommand(CommandRequest request) {
         CommandData commandData = request.getCommandData();
         CommandArgs cmdArgs = request.getCommandArgs();
         try {

@@ -15,4 +15,8 @@ public class CommandRequest implements Request {
         this.commandArgs = cmdArgs;
     }
 
+    @Override
+    public Class<CommandResponse> getResponseType() {
+        return CommandResponse.class;
+    }
 }

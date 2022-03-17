@@ -9,7 +9,6 @@ public class CommandResponse implements Response {
         this.actionResult = actionResult;
     }
 
-    @Override
     public ActionResult getActionResult() {
         return actionResult;
     }

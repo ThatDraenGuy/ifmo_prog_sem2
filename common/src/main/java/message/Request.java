@@ -10,8 +10,6 @@ import java.io.Serializable;
  * A request for command's execution. Consists of a Command and arguments for it. Handled by a ...
  */
 public interface Request extends Serializable {
-    CommandData getCommandData();
-
-    CommandArgs getCommandArgs();
+    Class<? extends Response> getResponseType();
 
 }
