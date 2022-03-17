@@ -1,7 +1,5 @@
 package collection;
 
-import annotations.LowerBounded;
-import annotations.NotNull;
 import annotations.UserAccessibleObject;
 import collection.builders.Builder;
 import collection.builders.DragonBuilder;
@@ -17,9 +15,7 @@ import java.io.IOException;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.time.format.DateTimeParseException;
 import java.util.*;
-import java.util.function.Function;
 
 /**
  * A class that manages a collection. Has methods for all interactions with it and also handles collection's construction/deconstruction.

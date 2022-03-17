@@ -1,6 +1,7 @@
 package commands;
 
-import exceptions.CommandArgsAmountException;
+import exceptions.CommandNonExistentException;
+import lombok.Getter;
 import message.CommandResponse;
 import message.Request;
 import message.Response;
@@ -9,6 +10,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 
 public class CommandsHandler {
+    @Getter
     private final HashMap<String, Command> commands;
     private final LinkedList<Command> commandHistory;
 
@@ -21,7 +23,7 @@ public class CommandsHandler {
     }
 
     public void addCommand(Command c) {
-        final String name = c.getName();
+        final String name = c.getData().getName();
         if (!isInCommands(name)) {
             this.commands.put(name, c);
         }
@@ -37,20 +39,39 @@ public class CommandsHandler {
         return this.commands.containsKey(name);
     }
 
-    public HashMap<String, Command> getCommands() {
-        return commands;
-    }
 
     public LinkedList<Command> getCommandHistory() {
         return commandHistory;
     }
 
+    public Command getCommand(CommandData data) throws CommandNonExistentException {
+        String name = data.getName();
+        if (commands.containsKey(name)) {
+            return commands.get(name);
+        }
+        throw new CommandNonExistentException(name);
+    }
+
+    public HashMap<String, CommandData> getCommandsData() {
+        HashMap<String, CommandData> res = new HashMap<>();
+        for (String key : commands.keySet()) {
+            res.put(key, commands.get(key).getData());
+        }
+        return res;
+    }
+
     public Response executeCommand(Request request) {
-        Command cmd = request.getCommand();
+        CommandData commandData = request.getCommandData();
         CommandArgs cmdArgs = request.getCommandArgs();
-        ActionResult result = cmd.action(cmdArgs);
-        commandHistory.addLast(cmd);
-        commandHistory.removeFirst();
-        return new CommandResponse(result);
+        try {
+            Command command = getCommand(commandData);
+            ActionResult result = command.action(cmdArgs);
+            commandHistory.addLast(command);
+            commandHistory.removeFirst();
+            return new CommandResponse(result);
+        } catch (CommandNonExistentException e) {
+            return new CommandResponse(new ActionResult(false, e.getMessage()));
+        }
+
     }
 }

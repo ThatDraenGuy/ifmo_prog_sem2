@@ -20,6 +20,7 @@ test {
     useJUnitPlatform()
 }
 jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveBaseName = "client"
     manifest {
         attributes "Main-Class": "Main"

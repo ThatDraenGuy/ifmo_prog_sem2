@@ -1,29 +1,18 @@
 package message;
 
 import commands.CommandArgs;
-import commands.Command;
+import commands.CommandData;
+import lombok.Getter;
 
 public class CommandRequest implements Request {
-    private Command cmd;
-    private CommandArgs cmdArgs;
+    @Getter
+    private CommandData commandData;
+    @Getter
+    private CommandArgs commandArgs;
 
-    public CommandRequest(Command cmd, CommandArgs cmdArgs) {
-        this.cmd = cmd;
-        this.cmdArgs = cmdArgs;
+    public CommandRequest(CommandData cmdData, CommandArgs cmdArgs) {
+        this.commandData = cmdData;
+        this.commandArgs = cmdArgs;
     }
 
-    @Override
-    public void setCommandArgs(CommandArgs cmdArgs) {
-        this.cmdArgs = cmdArgs;
-    }
-
-    @Override
-    public Command getCommand() {
-        return cmd;
-    }
-
-    @Override
-    public CommandArgs getCommandArgs() {
-        return cmdArgs;
-    }
 }

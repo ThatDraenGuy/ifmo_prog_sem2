@@ -1,5 +1,6 @@
 package commands.instances;
 
+import client.ConnectionHandler;
 import commands.*;
 import console.ConsoleHandler;
 
@@ -12,12 +13,12 @@ import java.util.Scanner;
  * A command for executing scripts.
  */
 public class ExecuteScript extends AbstractCommand {
-    private CommandsHandler cmdHandler;
+    private ConnectionHandler connectionHandler;
     private HashSet<String> scriptHistory;
 
-    public ExecuteScript(CommandsHandler cmdHandler) {
+    public ExecuteScript(ConnectionHandler connectionHandler) {
         super("execute_script", "считать и исполнить скрипт из указанного файла", CommandType.SIMPLE_ARG);
-        this.cmdHandler = cmdHandler;
+        this.connectionHandler = connectionHandler;
         this.scriptHistory = new HashSet<>();
     }
 
@@ -41,7 +42,7 @@ public class ExecuteScript extends AbstractCommand {
             PrintStream outPrint = new PrintStream(out);
             OutputStream err = new ByteArrayOutputStream();
             PrintStream errPrint = new PrintStream(err);
-            ConsoleHandler consoleHandler = new ConsoleHandler(cmdHandler, in, outPrint, errPrint);
+            ConsoleHandler consoleHandler = new ConsoleHandler(connectionHandler, in, outPrint, errPrint);
             try {
                 consoleHandler.start();
             } catch (NoSuchElementException e) {

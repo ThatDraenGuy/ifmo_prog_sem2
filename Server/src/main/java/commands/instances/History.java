@@ -21,7 +21,7 @@ public class History extends AbstractCommand {
         StringBuilder str = new StringBuilder();
         for (Command cmd : cmds) {
             if (cmd != null) {
-                str.append(cmd.getName()).append("\n");
+                str.append(cmd.getData().getName()).append("\n");
             }
         }
         return new ActionResult(true, str.toString());

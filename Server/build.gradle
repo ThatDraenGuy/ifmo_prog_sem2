@@ -2,8 +2,6 @@ plugins {
     id 'java'
 }
 
-group 'org.example'
-version '1.0-SNAPSHOT'
 
 repositories {
     mavenCentral()
@@ -14,12 +12,15 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     implementation project(':common')
     implementation 'org.json:json:20211205'
+    implementation 'ch.qos.logback:logback-classic:1.2.11'
+
 }
 
 test {
     useJUnitPlatform()
 }
 jar {
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
     archiveBaseName = "server"
     manifest {
         attributes "Main-Class": "Main"

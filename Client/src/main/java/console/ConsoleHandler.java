@@ -27,7 +27,7 @@ import java.util.Scanner;
  */
 public class ConsoleHandler {
     final private ConnectionHandler connectionHandler;
-    final private HashMap<String, Command> commands;
+    final private HashMap<String, CommandData> commands;
     final private Class<?> targetClass;
     final private Scanner inputScanner;
     final private PrintStream out;
@@ -93,12 +93,12 @@ public class ConsoleHandler {
      *
      * @param input user's input
      * @return A request created from the input
-     * @throws CommandNonExistentException if inputted command cannot be found in the command list {@link #parseCommand(String)}
+     * @throws CommandNonExistentException if inputted command cannot be found in the command list {@link #parseCommandData(String)}
      * @throws CommandArgsAmountException  if user's input has more than 2 words separated by a space.
      */
     private Request parseInput(String input) throws CommandNonExistentException, CommandArgsAmountException {
         input = input.strip();
-        Command cmd;
+        CommandData commandData;
         CommandArgs cmdArgs = new CommandArgs("");
         if (input.contains(" ")) {
             String[] str = input.split(" ");
@@ -108,23 +108,23 @@ public class ConsoleHandler {
                 throw new CommandArgsAmountException();
             }
         }
-        cmd = parseCommand(input);
-        return (createRequest(cmd, cmdArgs));
+        commandData = parseCommandData(input);
+        return (createRequest(commandData, cmdArgs));
     }
 
-    private Request createRequest(Command command, CommandArgs arguments) throws CommandArgsAmountException {
-        CommandType type = command.getCommandType();
+    private Request createRequest(CommandData commandData, CommandArgs arguments) throws CommandArgsAmountException {
+        CommandType type = commandData.getCommandType();
         String argumentString = arguments.getArgs();
         boolean isEmpty = argumentString.equals("");
         switch (type) {
             case NO_ARGS:
                 if (!isEmpty) {
-                    throw new CommandArgsAmountException("Command \"" + command.getName() + "\" does not need arguments!");
+                    throw new CommandArgsAmountException("Command \"" + commandData.getName() + "\" does not need arguments!");
                 }
                 break;
             case COMPLEX_ARG:
                 if (!isEmpty) {
-                    throw new CommandArgsAmountException("Command \"" + command.getName() + "\" needs a complex argument, not a simple one!");
+                    throw new CommandArgsAmountException("Command \"" + commandData.getName() + "\" needs a complex argument, not a simple one!");
                 } else {
                     HashMap<Field, Object> newArgs = promptComplexArgs(targetClass);
                     arguments = new CommandArgs(newArgs);
@@ -132,19 +132,19 @@ public class ConsoleHandler {
                 break;
             case SIMPLE_ARG:
                 if (isEmpty) {
-                    throw new CommandArgsAmountException(command.getName() + " needs an argument!");
+                    throw new CommandArgsAmountException(commandData.getName() + " needs an argument!");
                 }
                 break;
             case BOTH_ARG:
                 if (isEmpty) {
-                    throw new CommandArgsAmountException("Command \"" + command.getName() + "\" needs an in-line (simple) argument!");
+                    throw new CommandArgsAmountException("Command \"" + commandData.getName() + "\" needs an in-line (simple) argument!");
                 } else {
                     HashMap<Field, Object> complexArgs = promptComplexArgs(targetClass);
                     arguments = new CommandArgs(complexArgs, argumentString);
                 }
 
         }
-        return new CommandRequest(command, arguments);
+        return new CommandRequest(commandData, arguments);
     }
 
     /**
@@ -154,7 +154,7 @@ public class ConsoleHandler {
      * @return The command with corresponding name
      * @throws CommandNonExistentException if inputted command cannot be found in the command list
      */
-    private Command parseCommand(String input) throws CommandNonExistentException {
+    private CommandData parseCommandData(String input) throws CommandNonExistentException {
         if (commands.containsKey(input)) {
             return commands.get(input);
         } else {

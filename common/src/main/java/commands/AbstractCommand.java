@@ -1,27 +1,16 @@
 package commands;
 
-public abstract class AbstractCommand implements Command {
-    protected String name;
-    protected String description;
-    protected CommandType cmdType;
+import lombok.Getter;
 
-    public AbstractCommand(String n, String d, CommandType t) {
-        this.name = n;
-        this.description = d;
-        this.cmdType = t;
+public abstract class AbstractCommand implements Command {
+    @Getter
+    private CommandData data;
+
+    public AbstractCommand(String name, String desc, CommandType type) {
+        this.data = new CommandData(name, desc, type);
     }
 
     public abstract ActionResult action(CommandArgs args);
 
-    public String getName() {
-        return name;
-    }
 
-    public String getDescription() {
-        return description;
-    }
-
-    public CommandType getCommandType() {
-        return cmdType;
-    }
 }

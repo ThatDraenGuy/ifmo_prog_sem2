@@ -1,8 +1,7 @@
 package commands;
 
-import java.io.Serializable;
 
-public interface Command extends Serializable {
+public interface Command {
     /**
      * Performs command's action
      *
@@ -11,9 +10,5 @@ public interface Command extends Serializable {
      */
     ActionResult action(CommandArgs args);
 
-    String getName();
-
-    String getDescription();
-
-    CommandType getCommandType();
+    CommandData getData();
 }

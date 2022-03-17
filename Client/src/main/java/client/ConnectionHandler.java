@@ -18,9 +18,12 @@ public class ConnectionHandler {
 
     public ConnectionHandler(String host, int port) throws IOException, ClassNotFoundException {
         socket = new Socket(host, port);
-        in = new ObjectInputStream(socket.getInputStream());
         out = new ObjectOutputStream(socket.getOutputStream());
+        out.flush();
+        in = new ObjectInputStream(socket.getInputStream());
         serverData = (ServerData) in.readObject();
+        //TODO remove
+        System.out.println(serverData.getTargetClass());
     }
 
     public Response sendRequest(Request request) {
