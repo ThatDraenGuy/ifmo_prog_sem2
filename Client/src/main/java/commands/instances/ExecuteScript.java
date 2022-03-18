@@ -13,12 +13,14 @@ import java.util.Scanner;
  * A command for executing scripts.
  */
 public class ExecuteScript extends AbstractCommand {
-    private ConnectionHandler connectionHandler;
-    private HashSet<String> scriptHistory;
+    private final ConnectionHandler connectionHandler;
+    private final CommandsHandler clientCommandsHandler;
+    private final HashSet<String> scriptHistory;
 
-    public ExecuteScript(ConnectionHandler connectionHandler) {
+    public ExecuteScript(ConnectionHandler connectionHandler, CommandsHandler clientCommandsHandler) {
         super("execute_script", "считать и исполнить скрипт из указанного файла", CommandType.SIMPLE_ARG);
         this.connectionHandler = connectionHandler;
+        this.clientCommandsHandler = clientCommandsHandler;
         this.scriptHistory = new HashSet<>();
     }
 
@@ -42,7 +44,7 @@ public class ExecuteScript extends AbstractCommand {
             PrintStream outPrint = new PrintStream(out);
             OutputStream err = new ByteArrayOutputStream();
             PrintStream errPrint = new PrintStream(err);
-            ConsoleHandler consoleHandler = new ConsoleHandler(connectionHandler, in, outPrint, errPrint);
+            ConsoleHandler consoleHandler = new ConsoleHandler(connectionHandler, clientCommandsHandler, in, outPrint, errPrint);
             try {
                 consoleHandler.start();
             } catch (NoSuchElementException e) {

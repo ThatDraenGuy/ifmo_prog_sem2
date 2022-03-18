@@ -6,6 +6,7 @@ import annotations.UserAccessibleField;
 import annotations.UserAccessibleObject;
 import client.ConnectionHandler;
 import collection.Validator;
+import lombok.Getter;
 import message.*;
 
 import exceptions.CommandArgsAmountException;
@@ -27,15 +28,19 @@ import java.util.Scanner;
  */
 public class ConsoleHandler {
     final private ConnectionHandler connectionHandler;
-    final private HashMap<String, CommandData> commands;
+    final private CommandsHandler clientCommandsHandler;
+    private HashMap<String, CommandData> clientCommands;
+    private HashMap<String, CommandData> serverCommands;
     final private Class<?> targetClass;
     final private Scanner inputScanner;
     final private PrintStream out;
     final private PrintStream err;
 
-    public ConsoleHandler(ConnectionHandler connectionHandler, InputStream in, PrintStream out, PrintStream err) {
+    public ConsoleHandler(ConnectionHandler connectionHandler, CommandsHandler clientCommandsHandler, InputStream in, PrintStream out, PrintStream err) {
         this.connectionHandler = connectionHandler;
-        this.commands = connectionHandler.getServerData().getServerCommands();
+        this.clientCommandsHandler = clientCommandsHandler;
+        this.clientCommands = clientCommandsHandler.getCommandsData();
+        this.serverCommands = connectionHandler.getServerData().getServerCommands();
         this.targetClass = connectionHandler.getServerData().getTargetClass();
         inputScanner = new Scanner(in);
         this.out = out;
@@ -155,11 +160,29 @@ public class ConsoleHandler {
      * @throws CommandNonExistentException if inputted command cannot be found in the command list
      */
     private CommandData parseCommandData(String input) throws CommandNonExistentException {
-        if (commands.containsKey(input)) {
-            return commands.get(input);
+        if (isInCommands(input)) {
+            if (isClientCommand(input)) {
+                return clientCommands.get(input);
+            } else {
+                return serverCommands.get(input);
+            }
         } else {
             throw new CommandNonExistentException(input);
         }
+    }
+
+    private boolean isInCommands(String name) {
+        return (serverCommands.containsKey(name) || clientCommands.containsKey(name));
+        //TODO wtf?
+    }
+
+    private boolean isClientCommand(String name) {
+        return clientCommands.containsKey(name);
+    }
+
+    private boolean isClientCommand(CommandRequest request) {
+        return isClientCommand(request.getCommandData().getName());
+        //TODO rework
     }
 
     /**
@@ -178,6 +201,9 @@ public class ConsoleHandler {
      * @throws CommandArgsAmountException if command requires both a simple and a complex argument and a simple one wasn't provided
      */
     private CommandResponse executeCommand(CommandRequest request) throws CommandArgsAmountException {
+        if (isClientCommand(request)) {
+            return clientCommandsHandler.executeCommand(request);
+        }
         return connectionHandler.send(request);
     }
 

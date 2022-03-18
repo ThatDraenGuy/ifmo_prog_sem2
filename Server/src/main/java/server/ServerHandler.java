@@ -1,7 +1,7 @@
 package server;
 
 import commands.ServerCommandsHandler;
-import message.ServerData;
+import message.ServerDataResponse;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -12,16 +12,16 @@ import java.util.ArrayList;
 import org.slf4j.Logger;
 
 public class ServerHandler {
-    private ArrayList<UserHandler> users;
-    private ServerCommandsHandler commandsHandler;
-    private ServerData serverData;
-    private ServerSocket server;
-    private Logger logger;
+    private final ArrayList<UserHandler> users;
+    private final RequestHandler requestHandler;
+    private ServerDataResponse serverData;
+    private final ServerSocket server;
+    private final Logger logger;
     final private int port = 2525;
 
-    public ServerHandler(ServerCommandsHandler commandsHandler, ServerData serverData) throws IOException {
+    public ServerHandler(ServerCommandsHandler commandsHandler, ServerDataResponse serverData) throws IOException {
         server = new ServerSocket(port);
-        this.commandsHandler = commandsHandler;
+        this.requestHandler = new RequestHandler(commandsHandler, serverData);
         this.serverData = serverData;
         this.users = new ArrayList<>();
         logger = LoggerFactory.getLogger("server");
@@ -32,7 +32,7 @@ public class ServerHandler {
             while (true) {
                 Socket user = server.accept();
                 logger.info(user.getInetAddress() + " started connecting...");
-                users.add(new UserHandler(user, serverData, commandsHandler));
+                users.add(new UserHandler(user, requestHandler, logger));
                 logger.info(user.getInetAddress() + " successfully connected");
             }
         } catch (IOException e) {

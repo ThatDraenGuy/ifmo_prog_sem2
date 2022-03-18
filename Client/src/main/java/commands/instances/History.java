@@ -8,9 +8,9 @@ import java.util.LinkedList;
  * A History command. Displays 5 last used commands.
  */
 public class History extends AbstractCommand {
-    private ServerCommandsHandler cmdHandler;
+    private CommandsHandler cmdHandler;
 
-    public History(ServerCommandsHandler cmdHandler) {
+    public History(CommandsHandler cmdHandler) {
         super("history", "вывести последние 5 команд", CommandType.NO_ARGS);
         this.cmdHandler = cmdHandler;
     }

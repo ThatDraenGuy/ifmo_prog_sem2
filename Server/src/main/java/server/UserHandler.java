@@ -1,34 +1,29 @@
 package server;
 
-import commands.ServerCommandsHandler;
 import message.*;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
 
+
 public class UserHandler extends Thread {
     private Socket user;
-    private ObjectInputStream in;
-    private ObjectOutputStream out;
-    private ServerData serverData;
-    private ServerCommandsHandler commandsHandler;
-    private Logger logger;
+    private final ObjectInputStream in;
+    private final ObjectOutputStream out;
+    private final Logger logger;
+    private final RequestHandler requestHandler;
 
-    public UserHandler(Socket user, ServerData serverData, ServerCommandsHandler commandsHandler) throws IOException {
+    public UserHandler(Socket user, RequestHandler requestHandler, Logger logger) throws IOException {
         super(user.getInetAddress().toString());
         this.user = user;
-        this.serverData = serverData;
-        this.commandsHandler = commandsHandler;
-        this.logger = LoggerFactory.getLogger("server." + user.getInetAddress());
+        this.requestHandler = requestHandler;
+        this.logger = logger;
         in = new ObjectInputStream(user.getInputStream());
         out = new ObjectOutputStream(user.getOutputStream());
         out.flush();
-        out.writeObject(serverData);
-        logger.info("successfully sent serverData");
         start();
     }
 
@@ -36,28 +31,28 @@ public class UserHandler extends Thread {
     public void run() {
         while (true) {
             try {
-                Message<?> message = (Message<?>) in.readObject();
-                logger.info("got a message");
-                Response response = handleMessage(message);
-                out.writeObject(response);
+                Message<? extends Request> requestMessage = readMessage();
+                Message<? extends Response> responseMessage = handleMessage(requestMessage, requestMessage.getData().getResponseType());
+                logger.info("created response");
+                out.writeObject(responseMessage);
                 logger.info("successfully sent response");
             } catch (IOException | ClassNotFoundException e) {
+                logger.error(e.toString());
                 //TODO
             }
         }
     }
 
-    public Response handleMessage(Message<?> message) {
-        Class<?>[] classes = Request.class.getClasses();
-        Class<?> dataType = message.getData().getClass();
-        for (Class<?> request : classes) {
-            try {
-                dataType.asSubclass(request);
-            } catch (ClassCastException ignored) {
-            }
-            if (dataType.isAssignableFrom(request)) {
-
-            }
-        }
+    public Message<? extends Request> readMessage() throws IOException, ClassNotFoundException {
+        return (Message<? extends Request>) in.readObject();
     }
+
+    public <T extends Request, E extends Response> Message<E> handleMessage(Message<T> message, Class<E> responseType) {
+        T request = message.getData();
+        logger.info("got a " + request.getClass().getSimpleName());
+        //TODO
+        return new Message<>(requestHandler.handle(request, responseType));
+
+    }
+
 }

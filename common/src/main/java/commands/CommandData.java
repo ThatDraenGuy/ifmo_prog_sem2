@@ -6,11 +6,11 @@ import java.io.Serializable;
 
 public class CommandData implements Serializable {
     @Getter
-    private String name;
+    private final String name;
     @Getter
-    private String description;
+    private final String description;
     @Getter
-    private CommandType commandType;
+    private final CommandType commandType;
 
     public CommandData(String name, String desc, CommandType type) {
         this.name = name;

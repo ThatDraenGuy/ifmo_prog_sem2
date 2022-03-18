@@ -6,9 +6,9 @@ import lombok.Getter;
 
 public class CommandRequest implements Request {
     @Getter
-    private CommandData commandData;
+    private final CommandData commandData;
     @Getter
-    private CommandArgs commandArgs;
+    private final CommandArgs commandArgs;
 
     public CommandRequest(CommandData cmdData, CommandArgs cmdArgs) {
         this.commandData = cmdData;

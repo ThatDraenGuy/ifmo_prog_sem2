@@ -4,7 +4,7 @@ import commands.instances.*;
 import collection.CollectionHandler;
 import collection.StorageHandler;
 import collection.classes.Dragon;
-import message.ServerData;
+import message.ServerDataResponse;
 import server.ServerHandler;
 
 import java.io.File;
@@ -34,8 +34,7 @@ public class Main {
         CollectionHandler collectionHandler = new CollectionHandler(storageHandler, target);
         if (!filePath.equals(defaultPath)) collectionHandler.load();
         ServerCommandsHandler cmdHandler = new ServerCommandsHandler(collectionHandler);
-        cmdHandler.addCommands(new Help(cmdHandler),
-                new Exit(),
+        cmdHandler.addCommands(
                 new Save(collectionHandler),
                 new Show(collectionHandler),
                 new RemoveFirst(collectionHandler),
@@ -47,9 +46,8 @@ public class Main {
                 new CountByColor(collectionHandler),
                 new FilterByType(collectionHandler),
                 new FilterGreaterThanAge(collectionHandler),
-                new Info(collectionHandler),
-                new History(cmdHandler));
-        ServerData serverData = new ServerData(cmdHandler.getCommandsData(), target);
+                new Info(collectionHandler));
+        ServerDataResponse serverData = new ServerDataResponse(cmdHandler.getCommandsData(), target);
         try {
             ServerHandler serverHandler = new ServerHandler(cmdHandler, serverData);
             serverHandler.listen();

@@ -2,10 +2,7 @@ package client;
 
 
 import lombok.Getter;
-import message.Message;
-import message.Request;
-import message.Response;
-import message.ServerData;
+import message.*;
 
 import java.io.*;
 import java.net.Socket;
@@ -15,15 +12,14 @@ public class ConnectionHandler {
     private ObjectInputStream in;
     private ObjectOutputStream out;
     @Getter
-    private ServerData serverData;
+    private ServerDataResponse serverData;
 
     public ConnectionHandler(String host, int port) throws IOException, ClassNotFoundException {
         socket = new Socket(host, port);
         out = new ObjectOutputStream(socket.getOutputStream());
         out.flush();
         in = new ObjectInputStream(socket.getInputStream());
-        serverData = (ServerData) in.readObject();
-        //TODO remove
+        serverData = send(new ServerDataRequest());
         System.out.println(serverData.getTargetClass());
     }
 
@@ -42,7 +38,8 @@ public class ConnectionHandler {
         try {
             Message<E> message = new Message<>(data);
             out.writeObject(message);
-            return (T) in.readObject();
+            Message<T> responseMessage = (Message<T>) in.readObject();
+            return responseMessage.getData();
         } catch (IOException | ClassNotFoundException e) {
             System.err.println(e);
             return null;
