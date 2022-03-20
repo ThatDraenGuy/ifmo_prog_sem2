@@ -2,6 +2,8 @@ package server;
 
 import commands.ServerCommandsHandler;
 import message.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.HashMap;
 import java.util.function.Function;
@@ -10,13 +12,16 @@ public class RequestHandler {
     private final HashMap<Class<? extends Request>, Function<Request, ? extends Response>> functionHashMap;
     private final ServerCommandsHandler commandsHandler;
     private final ServerDataResponse serverDataResponse;
+    private final Logger logger;
 
     public RequestHandler(ServerCommandsHandler commandsHandler, ServerDataResponse serverDataResponse) {
         this.commandsHandler = commandsHandler;
         this.serverDataResponse = serverDataResponse;
+        this.logger = LoggerFactory.getLogger("RequestHandler");
         functionHashMap = new HashMap<>();
         functionHashMap.put(CommandRequest.class, this::handleCommandRequest);
         functionHashMap.put(ServerDataRequest.class, this::handleServerDataRequest);
+        functionHashMap.put(DisconnectRequest.class, this::handleDisconnectRequest);
     }
 
     public <T extends Request, E extends Response> E handle(T request, Class<E> ignoredClazz) {
@@ -28,13 +33,18 @@ public class RequestHandler {
         //TODO
     }
 
-    public CommandResponse handleCommandRequest(Request request) {
+    private CommandResponse handleCommandRequest(Request request) {
         CommandRequest commandRequest = (CommandRequest) request;
+        logger.debug("Request for executing command " + commandRequest.getCommandData().getName());
         return commandsHandler.executeCommand(commandRequest);
     }
 
-    public ServerDataResponse handleServerDataRequest(Request request) {
+    private ServerDataResponse handleServerDataRequest(Request request) {
         return serverDataResponse;
+    }
+
+    private DisconnectResponse handleDisconnectRequest(Request request) {
+        return new DisconnectResponse();
     }
 
 }

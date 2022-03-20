@@ -31,13 +31,30 @@ public class JSONToCollection {
     /**
      * A method to parse a single collectible from a JSON object to a deconstructed version
      */
-    private static HashMap<Field, Object> parseCollectible(JSONObject collectible, Class<?> target) {
+    public static HashMap<Field, Object> parseCollectible(JSONObject collectible, Class<?> target) {
         HashMap<Field, Object> deconstructedCollectible = new HashMap<>();
         Field[] fields = target.getDeclaredFields();
         for (Field field : fields) {
             if (field.getType() != Builder.class) {
                 if (field.isAnnotationPresent(UserAccessibleObject.class) && !collectible.get(field.getName()).equals("")) {
                     //TODO maybe check if collectible instead?
+                    deconstructedCollectible.put(field, parseCollectible(collectible.getJSONObject(field.getName()), field.getType()));
+                } else {
+                    deconstructedCollectible.put(field, collectible.getString(field.getName()));
+                }
+            }
+        }
+        return deconstructedCollectible;
+    }
+
+    //TODO think about below and rework this shit
+    public static HashMap<Field, Object> parseRawCollectible(JSONObject collectible, Class<?> target) {
+        HashMap<Field, Object> deconstructedCollectible = new HashMap<>();
+        Field[] fields = target.getDeclaredFields();
+        for (Field field : fields) {
+            if (field.getType() != Builder.class && !field.getName().equals("id") && !field.getName().equals("creationDate")) {
+                //TODO check userAccessible
+                if (field.isAnnotationPresent(UserAccessibleObject.class) && !collectible.get(field.getName()).equals("")) {
                     deconstructedCollectible.put(field, parseCollectible(collectible.getJSONObject(field.getName()), field.getType()));
                 } else {
                     deconstructedCollectible.put(field, collectible.getString(field.getName()));
@@ -63,7 +80,7 @@ public class JSONToCollection {
     /**
      * A method to serialize a single deconstructed collectible into a JSON object.
      */
-    private static JSONObject serializeCollectible(HashMap<Field, Object> collectible) {
+    public static JSONObject serializeCollectible(HashMap<Field, Object> collectible) {
         JSONObject object = new JSONObject();
         for (Field field : collectible.keySet()) {
             if (collectible.get(field) == null) {
@@ -79,4 +96,7 @@ public class JSONToCollection {
         return object;
     }
 
+    public static String serializeCollectibleToString(HashMap<Field, Object> collectible) {
+        return serializeCollectible(collectible).toString();
+    }
 }

@@ -38,7 +38,7 @@ public class ExecuteScript extends AbstractCommand {
             while (fileScanner.hasNextLine()) {
                 script.append(fileScanner.nextLine()).append("\n");
             }
-            script.append("exit\nY");
+            script.append("finish_script");
             InputStream in = new ByteArrayInputStream(script.toString().getBytes());
             OutputStream out = new ByteArrayOutputStream();
             PrintStream outPrint = new PrintStream(out);

@@ -10,6 +10,7 @@ import collection.classes.MainCollectible;
 import exceptions.ElementIdException;
 import exceptions.InvalidCollectionException;
 import exceptions.ValueNotValidException;
+import org.json.JSONObject;
 
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -42,6 +43,10 @@ public class CollectionHandler {
         collection.add(constructObject(deconstructedObject, targetClass, builder));
     }
 
+    public void add(String deconstructedObject) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
+        add(JSONToCollection.parseRawCollectible(new JSONObject(deconstructedObject), targetClass));
+    }
+
     /**
      * A method for updating an element in the collection
      *
@@ -62,6 +67,10 @@ public class CollectionHandler {
         }
     }
 
+    public void update(String arg, String deconstructedObject) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, ElementIdException, NoSuchFieldException {
+        update(arg, JSONToCollection.parseRawCollectible(new JSONObject(deconstructedObject), targetClass));
+    }
+
     /**
      * A method to construct an object from HashMap form.
      *
@@ -80,7 +89,6 @@ public class CollectionHandler {
         }
         return builder.build();
     }
-
     public <T extends Collectible> T constructObject(HashMap<Field, Object> deconstructedObject, Class<T> target) throws NoSuchMethodException, InvocationTargetException, IllegalAccessException, NoSuchFieldException {
         Builder builder = (Builder) target.getDeclaredMethod("getBuilder", null).invoke(null, null);
         return constructObject(deconstructedObject, target, builder);
@@ -202,6 +210,10 @@ public class CollectionHandler {
     public void removeLower(HashMap<Field, Object> deconstructedObject) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, NoSuchFieldException {
         MainCollectible<?> target = constructObject(deconstructedObject, targetClass, builder);
         collection.removeIf(dragon -> dragon.compareTo(target) < 0);
+    }
+
+    public void removeLower(String deconstructedObject) throws InvocationTargetException, NoSuchMethodException, IllegalAccessException, NoSuchFieldException {
+        removeLower(JSONToCollection.parseRawCollectible(new JSONObject(deconstructedObject), targetClass));
     }
 
     /**

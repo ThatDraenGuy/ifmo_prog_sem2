@@ -5,6 +5,7 @@ import annotations.UserAccessibleEnum;
 import annotations.UserAccessibleField;
 import annotations.UserAccessibleObject;
 import client.ConnectionHandler;
+import collection.JSONToCollection;
 import collection.Validator;
 import lombok.Getter;
 import message.*;
@@ -64,10 +65,8 @@ public class ConsoleHandler {
                 String input = promptInput("");
                 CommandRequest cmdRequest = parseInput(input);
                 CommandResponse response = executeCommand(cmdRequest);
-                boolean isCmdExit = handleResponse(response);
-                if (isCmdExit) {
-                    if (promptAgreement("Are you sure you want to exit? Any unsaved changes will be gone!")) return;
-                }
+                boolean isExitQueried = handleResponse(response);
+                if (isExitQueried) return;
             } catch (CommandNonExistentException | CommandArgsAmountException | CommandExecutionException e) {
                 errorMessage(e);
             } catch (NoSuchElementException e) {
@@ -132,7 +131,8 @@ public class ConsoleHandler {
                     throw new CommandArgsAmountException("Command \"" + commandData.getName() + "\" needs a complex argument, not a simple one!");
                 } else {
                     HashMap<Field, Object> newArgs = promptComplexArgs(targetClass);
-                    arguments = new CommandArgs(newArgs);
+                    String newArgsString = JSONToCollection.serializeCollectibleToString(newArgs);
+                    arguments = new CommandArgs("", newArgsString);
                 }
                 break;
             case SIMPLE_ARG:
@@ -145,7 +145,8 @@ public class ConsoleHandler {
                     throw new CommandArgsAmountException("Command \"" + commandData.getName() + "\" needs an in-line (simple) argument!");
                 } else {
                     HashMap<Field, Object> complexArgs = promptComplexArgs(targetClass);
-                    arguments = new CommandArgs(complexArgs, argumentString);
+                    String complexArgsString = JSONToCollection.serializeCollectibleToString(complexArgs);
+                    arguments = new CommandArgs(complexArgsString, argumentString);
                 }
 
         }
@@ -290,7 +291,7 @@ public class ConsoleHandler {
     /**
      * A method to ask user for agreement. Returns a boolean result: true if the answer is "yes" and false if the answer is "no".
      */
-    private boolean promptAgreement(String message) {
+    public boolean promptAgreement(String message) {
         while (true) {
             String answer = promptInput(message + " (Y/N)");
             switch (answer) {
@@ -316,12 +317,8 @@ public class ConsoleHandler {
         boolean isSuccess = result.isSuccess();
         if (isSuccess) {
             String message = result.getMessage();
-            if (message.equals("exit")) {
-                return true;
-            } else {
-                out.println(result.getMessage());
-                return false;
-            }
+            out.println(message);
+            return result.isConsoleExitQueried();
         } else {
             throw new CommandExecutionException(result);
         }

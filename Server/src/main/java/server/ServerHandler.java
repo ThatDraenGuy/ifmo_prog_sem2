@@ -14,7 +14,6 @@ import org.slf4j.Logger;
 public class ServerHandler {
     private final ArrayList<UserHandler> users;
     private final RequestHandler requestHandler;
-    private ServerDataResponse serverData;
     private final ServerSocket server;
     private final Logger logger;
     final private int port = 2525;
@@ -22,7 +21,6 @@ public class ServerHandler {
     public ServerHandler(ServerCommandsHandler commandsHandler, ServerDataResponse serverData) throws IOException {
         server = new ServerSocket(port);
         this.requestHandler = new RequestHandler(commandsHandler, serverData);
-        this.serverData = serverData;
         this.users = new ArrayList<>();
         logger = LoggerFactory.getLogger("server");
     }
@@ -32,14 +30,18 @@ public class ServerHandler {
             while (true) {
                 Socket user = server.accept();
                 logger.info(user.getInetAddress() + " started connecting...");
-                users.add(new UserHandler(user, requestHandler, logger));
+                users.add(new UserHandler(user, requestHandler, logger, this));
                 logger.info(user.getInetAddress() + " successfully connected");
             }
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error(e.toString());
             //TODO change
         } finally {
             server.close();
         }
+    }
+
+    public void disconnect(UserHandler userHandler) {
+        users.remove(userHandler);
     }
 }

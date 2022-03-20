@@ -20,19 +20,8 @@ public class ConnectionHandler {
         out.flush();
         in = new ObjectInputStream(socket.getInputStream());
         serverData = send(new ServerDataRequest());
-        System.out.println(serverData.getTargetClass());
     }
 
-    public Response sendRequest(Request request) {
-        try {
-            out.writeObject(request);
-            return (Response) in.readObject();
-        } catch (IOException | ClassNotFoundException e) {
-            System.err.println(e);
-            return null;
-            //TODO normal check
-        }
-    }
 
     public <T extends Response, E extends Request> T send(E data) {
         try {

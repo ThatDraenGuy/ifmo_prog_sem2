@@ -1,19 +1,25 @@
 package commands.instances;
 
+import client.ConnectionHandler;
 import commands.AbstractCommand;
 import commands.ActionResult;
 import commands.CommandArgs;
 import commands.CommandType;
+import message.DisconnectRequest;
 
 /**
  * A command to exit the program
  */
 public class Exit extends AbstractCommand {
-    public Exit() {
+    private final ConnectionHandler connectionHandler;
+
+    public Exit(ConnectionHandler connectionHandler) {
         super("exit", "завершить программу (без сохранения в файл)", CommandType.NO_ARGS);
+        this.connectionHandler = connectionHandler;
     }
 
     public ActionResult action(CommandArgs args) {
-        return new ActionResult(true, "exit");
+        connectionHandler.send(new DisconnectRequest());
+        return new ActionResult(true, "exit", true);
     }
 }

@@ -1,5 +1,7 @@
 package commands;
 
+import lombok.Getter;
+
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.HashMap;
@@ -9,33 +11,23 @@ import java.util.HashMap;
  * simple args and complex args but in near future it might change to a single String[] field
  */
 public class CommandArgs implements Serializable {
+    @Getter
     private String args;
-    private HashMap<Field, Object> deconstructedObject;
+    @Getter
+    private String deconstructedObject;
 
     public CommandArgs(String args) {
         this.args = args;
     }
 
-    public CommandArgs(HashMap<Field, Object> object) {
-        this.deconstructedObject = object;
-    }
 
-    public CommandArgs(HashMap<Field, Object> object, String args) {
+    public CommandArgs(String args, String object) {
         this.deconstructedObject = object;
         this.args = args;
     }
 
 
-    public HashMap<Field, Object> getDeconstructedObject() {
-        return deconstructedObject;
-    }
 
-    public String getArgs() {
-        return args;
-    }
 
-    public void setArgs(String args) {
-        this.args = args;
-    }
 
 }
