@@ -1,6 +1,7 @@
 package commands.instances;
 
 import client.ConnectionHandler;
+import collection.CollectionBuilder;
 import commands.*;
 import console.ConsoleHandler;
 
@@ -15,12 +16,14 @@ import java.util.Scanner;
 public class ExecuteScript extends AbstractCommand {
     private final ConnectionHandler connectionHandler;
     private final CommandsHandler clientCommandsHandler;
+    private final CollectionBuilder collectionBuilder;
     private final HashSet<String> scriptHistory;
 
-    public ExecuteScript(ConnectionHandler connectionHandler, CommandsHandler clientCommandsHandler) {
+    public ExecuteScript(ConnectionHandler connectionHandler, CommandsHandler clientCommandsHandler, CollectionBuilder collectionBuilder) {
         super("execute_script", "считать и исполнить скрипт из указанного файла", CommandType.SIMPLE_ARG);
         this.connectionHandler = connectionHandler;
         this.clientCommandsHandler = clientCommandsHandler;
+        this.collectionBuilder = collectionBuilder;
         this.scriptHistory = new HashSet<>();
     }
 
@@ -44,7 +47,7 @@ public class ExecuteScript extends AbstractCommand {
             PrintStream outPrint = new PrintStream(out);
             OutputStream err = new ByteArrayOutputStream();
             PrintStream errPrint = new PrintStream(err);
-            ConsoleHandler consoleHandler = new ConsoleHandler(connectionHandler, clientCommandsHandler, in, outPrint, errPrint);
+            ConsoleHandler consoleHandler = new ConsoleHandler(connectionHandler, clientCommandsHandler, collectionBuilder, in, outPrint, errPrint);
             try {
                 consoleHandler.start();
             } catch (NoSuchElementException e) {

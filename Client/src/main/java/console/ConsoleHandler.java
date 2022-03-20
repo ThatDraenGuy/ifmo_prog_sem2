@@ -5,8 +5,10 @@ import annotations.UserAccessibleEnum;
 import annotations.UserAccessibleField;
 import annotations.UserAccessibleObject;
 import client.ConnectionHandler;
+import collection.CollectionBuilder;
 import collection.JSONToCollection;
 import collection.Validator;
+import collection.classes.RawDragon;
 import lombok.Getter;
 import message.*;
 
@@ -18,7 +20,7 @@ import commands.*;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
@@ -30,6 +32,7 @@ import java.util.Scanner;
 public class ConsoleHandler {
     final private ConnectionHandler connectionHandler;
     final private CommandsHandler clientCommandsHandler;
+    final private CollectionBuilder collectionBuilder;
     private HashMap<String, CommandData> clientCommands;
     private HashMap<String, CommandData> serverCommands;
     final private Class<?> targetClass;
@@ -37,9 +40,10 @@ public class ConsoleHandler {
     final private PrintStream out;
     final private PrintStream err;
 
-    public ConsoleHandler(ConnectionHandler connectionHandler, CommandsHandler clientCommandsHandler, InputStream in, PrintStream out, PrintStream err) {
+    public ConsoleHandler(ConnectionHandler connectionHandler, CommandsHandler clientCommandsHandler, CollectionBuilder collectionBuilder, InputStream in, PrintStream out, PrintStream err) {
         this.connectionHandler = connectionHandler;
         this.clientCommandsHandler = clientCommandsHandler;
+        this.collectionBuilder = collectionBuilder;
         this.clientCommands = clientCommandsHandler.getCommandsData();
         this.serverCommands = connectionHandler.getServerData().getServerCommands();
         this.targetClass = connectionHandler.getServerData().getTargetClass();
@@ -130,9 +134,8 @@ public class ConsoleHandler {
                 if (!isEmpty) {
                     throw new CommandArgsAmountException("Command \"" + commandData.getName() + "\" needs a complex argument, not a simple one!");
                 } else {
-                    HashMap<Field, Object> newArgs = promptComplexArgs(targetClass);
-                    String newArgsString = JSONToCollection.serializeCollectibleToString(newArgs);
-                    arguments = new CommandArgs("", newArgsString);
+                    RawDragon newArgs = promptComplexArgs(targetClass);
+                    arguments = new CommandArgs("", newArgs);
                 }
                 break;
             case SIMPLE_ARG:
@@ -144,9 +147,8 @@ public class ConsoleHandler {
                 if (isEmpty) {
                     throw new CommandArgsAmountException("Command \"" + commandData.getName() + "\" needs an in-line (simple) argument!");
                 } else {
-                    HashMap<Field, Object> complexArgs = promptComplexArgs(targetClass);
-                    String complexArgsString = JSONToCollection.serializeCollectibleToString(complexArgs);
-                    arguments = new CommandArgs(complexArgsString, argumentString);
+                    RawDragon complexArgs = promptComplexArgs(targetClass);
+                    arguments = new CommandArgs(argumentString, complexArgs);
                 }
 
         }
@@ -208,85 +210,82 @@ public class ConsoleHandler {
         return connectionHandler.send(request);
     }
 
-    /**
-     * A method to prompt a complex argument from user. A complex argument is a deconstructed version of a Collectible object,
-     * created by asking user to input each of its user accessible fields. Invokes {@link #promptField(Field)} and
-     * {@link #promptEnum(Field)}.
-     * If any of class' fields is also a Collectible object, this method is invoked recursively for that field
-     *
-     * @param targetClass a Class object of a desired Collectible object
-     * @return a deconstructed version of a Collectible object
-     */
-    private HashMap<Field, Object> promptComplexArgs(Class<?> targetClass) {
-        HashMap<Field, Object> map = new HashMap<>();
-        Field[] fields = targetClass.getDeclaredFields();
-        for (Field field : fields) {
-            if (field.isAnnotationPresent(UserAccessibleField.class)) {
-                Object obj = promptField(field);
-                map.put(field, obj);
-            }
-            if (field.isAnnotationPresent(UserAccessibleEnum.class)) {
-                Object obj = promptEnum(field);
-                map.put(field, obj);
-            }
-            if (field.isAnnotationPresent(UserAccessibleObject.class)) {
-                if (!field.isAnnotationPresent(NotNull.class)) {
-                    boolean answer = promptAgreement("Object \"" + field.getName() + "\" can be null. Are you gonna input it?");
-                    if (answer) {
-                        Object obj = promptComplexArgs(field.getType());
-                        map.put(field, obj);
-                    }
-                } else {
-                    Object obj = promptComplexArgs(field.getType());
-                    map.put(field, obj);
-                }
-
-            }
+    private RawDragon promptComplexArgs(Class<?> targetClass) {
+        ArrayList<String> fieldNames = collectionBuilder.getFieldNames();
+        for (String field : fieldNames) {
+            promptField(field);
         }
-        return map;
+        return collectionBuilder.build();
+//        Method[] methods = RawDragon.builder().getClass().getDeclaredMethods();
+//        for (Method method : methods) {
+//            if (!method.getName().equals("build")) {
+//                method.invoke(null, promptField(method));
+//            }
+//        }
+//        Field[] fields = targetClass.getDeclaredFields();
+//        for (Field field : fields) {
+//            if (field.isAnnotationPresent(UserAccessibleField.class)) {
+//                Object obj = promptField(field);
+//                map.put(field, obj);
+//            }
+//            if (field.isAnnotationPresent(UserAccessibleEnum.class)) {
+//                Object obj = promptEnum(field);
+//                map.put(field, obj);
+//            }
+//            if (field.isAnnotationPresent(UserAccessibleObject.class)) {
+//                if (!field.isAnnotationPresent(NotNull.class)) {
+//                    boolean answer = promptAgreement("Object \"" + field.getName() + "\" can be null. Are you gonna input it?");
+//                    if (answer) {
+//                        Object obj = promptComplexArgs(field.getType());
+//                        map.put(field, obj);
+//                    }
+//                } else {
+//                    Object obj = promptComplexArgs(field.getType());
+//                    map.put(field, obj);
+//                }
+//
+//            }
+//        }
+//        return map;
     }
 
-    /**
-     * A method that invokes {@link #promptInput(String)} and validates gotten user's input. Also converts it to a needed type.
-     * To do that it invokes ... and catches a {@link exceptions.ValueNotValidException}
-     * produced by it. The exception is than passed to the {@link #errorMessage(Exception)}, after what method asks user's input again.
-     *
-     * @param field   a field corresponding to the asked input. Validation requirements and type the input needs to be  cast to a gotten from it.
-     * @param message a message to be passed down to the {@link #promptInput(String)}
-     * @return validated and converted version of user's input
-     */
-    private Object promptWithValidation(Field field, String message) {
+    private void promptField(String field) {
         while (true) {
-            String result = promptInput(message);
+            String result = promptInput("Please enter " + field + ": ");
             try {
-                return Validator.validate(field, result);
+                collectionBuilder.put(field, result);
+                return;
             } catch (ValueNotValidException e) {
                 errorMessage(e);
             }
         }
     }
-
-    /**
-     * A method to prompt a field. Simply invokes {@link #promptWithValidation(Field, String)} with a custom message
-     */
-    private Object promptField(Field field) {
-        return promptWithValidation(field, "Please enter " + field.getName() + ": ");
-
-    }
-
-    /**
-     * A method to prompt an enum-type field. Simply invokes {@link #promptWithValidation(Field, String)} with a custom message
-     */
-    private Object promptEnum(Field enumField) {
-        StringBuilder message = new StringBuilder("Please enter " + enumField.getName() + " (");
-        Field[] enums = enumField.getType().getFields();
-        for (Field field : enums) {
-            message.append(field.getName()).append(";");
-        }
-        message.deleteCharAt(message.length() - 1);
-        message.append("): ");
-        return promptWithValidation(enumField, message.toString());
-    }
+//    private <T> T promptWithValidation(Method field, String message) {
+//        while (true) {
+//            String result = promptInput(message);
+//            try {
+//                return (T) Validator.validate(field, result);
+//                //TODO change validator!!!!
+//            } catch (ValueNotValidException e) {
+//                errorMessage(e);
+//            }
+//        }
+//    }
+//
+//
+//    /**
+//     * A method to prompt an enum-type field. Simply invokes {@link #promptWithValidation(Field, String)} with a custom message
+//     */
+//    private Object promptEnum(Field enumField) {
+//        StringBuilder message = new StringBuilder("Please enter " + enumField.getName() + " (");
+//        Field[] enums = enumField.getType().getFields();
+//        for (Field field : enums) {
+//            message.append(field.getName()).append(";");
+//        }
+//        message.deleteCharAt(message.length() - 1);
+//        message.append("): ");
+//        return promptWithValidation(enumField, message.toString());
+//    }
 
     /**
      * A method to ask user for agreement. Returns a boolean result: true if the answer is "yes" and false if the answer is "no".

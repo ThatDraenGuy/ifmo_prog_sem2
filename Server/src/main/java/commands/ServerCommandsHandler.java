@@ -1,21 +1,22 @@
 package commands;
 
-import collection.CollectionHandler;
+import collection.DragonCollectionHandler;
+
 /**
  * A class needed to handle all the commands. Stores all commands and provides access to them. Stores command history.
  * Accepts ... after performing command's action.
- * Also works as a link between commands and {@link collection.CollectionHandler};
+ * Also works as a link between commands and {@link DragonCollectionHandler};
  */
 public class ServerCommandsHandler extends CommandsHandler {
-    private final CollectionHandler collectionHandler;
+    private final DragonCollectionHandler collectionHandler;
 
-    public ServerCommandsHandler(CollectionHandler collectionHandler) {
+    public ServerCommandsHandler(DragonCollectionHandler collectionHandler) {
         super();
         this.collectionHandler = collectionHandler;
     }
 
 
-    public CollectionHandler getCollectionHandler() {
+    public DragonCollectionHandler getCollectionHandler() {
         return collectionHandler;
     }
 

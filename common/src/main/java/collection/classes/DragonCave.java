@@ -2,29 +2,21 @@ package collection.classes;
 
 import annotations.NotNull;
 import annotations.UserAccessibleField;
-import collection.builders.Builder;
 import collection.builders.DragonCaveBuilder;
+import lombok.Builder;
+import lombok.Getter;
 
+@Builder
 public class DragonCave implements Collectible {
     @UserAccessibleField
     @NotNull
+    @Getter
     private int depth;
-    private static Builder builder = new DragonCaveBuilder();
 
-    public DragonCave(int depth) {
-        this.depth = depth;
-    }
-
-    public int getDepth() {
-        return depth;
-    }
 
     @Override
     public String toString() {
         return "is " + this.depth + " meters deep";
     }
 
-    public static Builder getBuilder() {
-        return builder;
-    }
 }

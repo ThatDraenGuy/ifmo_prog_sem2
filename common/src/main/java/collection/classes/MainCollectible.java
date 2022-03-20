@@ -10,4 +10,5 @@ public interface MainCollectible<T> extends Collectible, Comparable<T> {
 
     Long getAge();
 
+    int compareTo(RawCollectible rawCollectible);
 }

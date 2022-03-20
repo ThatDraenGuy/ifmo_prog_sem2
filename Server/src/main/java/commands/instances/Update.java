@@ -1,22 +1,19 @@
 package commands.instances;
 
 import commands.AbstractCommand;
-import collection.CollectionHandler;
+import collection.DragonCollectionHandler;
 import commands.ActionResult;
 import commands.CommandArgs;
 import commands.CommandType;
 import exceptions.ElementIdException;
 
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-
 /**
- * A command for updating element in collection. Invokes {@link CollectionHandler#update(String, HashMap)}
+ * A command for updating element in collection. Invokes
  */
 public class Update extends AbstractCommand {
-    private CollectionHandler collectionHandler;
+    private DragonCollectionHandler collectionHandler;
 
-    public Update(CollectionHandler collectionHandler) {
+    public Update(DragonCollectionHandler collectionHandler) {
         super("update", "обновить значение элемента коллекции, id которого равен заданному", CommandType.BOTH_ARG);
         this.collectionHandler = collectionHandler;
     }
@@ -24,10 +21,8 @@ public class Update extends AbstractCommand {
     @Override
     public ActionResult action(CommandArgs args) {
         try {
-            collectionHandler.update(args.getArgs(), args.getDeconstructedObject());
+            collectionHandler.update(args.getArgs(), args.getRawObject());
             return new ActionResult(true, "Successfully updated element with id " + args.getArgs());
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | NoSuchFieldException e) {
-            return new ActionResult(false, e.toString());
         } catch (ElementIdException e) {
             return new ActionResult(false, e.getMessage());
         }

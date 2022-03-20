@@ -4,16 +4,16 @@ import commands.AbstractCommand;
 import commands.ActionResult;
 import commands.CommandArgs;
 import commands.CommandType;
-import collection.CollectionHandler;
+import collection.DragonCollectionHandler;
 import exceptions.ElementIdException;
 
 /**
- * A command for removing element by its id. Invokes {@link CollectionHandler#removeById(String)}
+ * A command for removing element by its id. Invokes {@link DragonCollectionHandler#removeById(String)}
  */
 public class RemoveById extends AbstractCommand {
-    CollectionHandler collectionHandler;
+    DragonCollectionHandler collectionHandler;
 
-    public RemoveById(CollectionHandler collectionHandler) {
+    public RemoveById(DragonCollectionHandler collectionHandler) {
         super("remove_by_id", "удалить элемент из коллекции по его id", CommandType.SIMPLE_ARG);
         this.collectionHandler = collectionHandler;
     }

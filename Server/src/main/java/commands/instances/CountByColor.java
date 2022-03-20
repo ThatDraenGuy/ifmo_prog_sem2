@@ -4,15 +4,15 @@ import commands.AbstractCommand;
 import commands.ActionResult;
 import commands.CommandArgs;
 import commands.CommandType;
-import collection.CollectionHandler;
+import collection.DragonCollectionHandler;
 
 /**
- * A command for counting elements with specified color. Invokes {@link CollectionHandler#countByColor(String)}
+ * A command for counting elements with specified color. Invokes {@link DragonCollectionHandler#countByColor(String)}
  */
 public class CountByColor extends AbstractCommand {
-    private CollectionHandler collectionHandler;
+    private DragonCollectionHandler collectionHandler;
 
-    public CountByColor(CollectionHandler collectionHandler) {
+    public CountByColor(DragonCollectionHandler collectionHandler) {
         super("count_by_color", "вывести количество элементов, значение поля color которых равно заданному", CommandType.SIMPLE_ARG);
         this.collectionHandler = collectionHandler;
     }

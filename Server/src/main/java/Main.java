@@ -1,8 +1,8 @@
 import collection.classes.MainCollectible;
 import commands.ServerCommandsHandler;
 import commands.instances.*;
-import collection.CollectionHandler;
-import collection.StorageHandler;
+import collection.DragonCollectionHandler;
+import collection.FileStorageHandler;
 import collection.classes.Dragon;
 import message.ServerDataResponse;
 import server.ServerHandler;
@@ -30,8 +30,8 @@ public class Main {
             System.out.println("Can't find file \"" + filePath + "\". Starting up with default collection...");
             filePath = defaultPath;
         }
-        StorageHandler storageHandler = new StorageHandler(new File(filePath));
-        CollectionHandler collectionHandler = new CollectionHandler(storageHandler, target);
+        FileStorageHandler storageHandler = new FileStorageHandler(new File(filePath));
+        DragonCollectionHandler collectionHandler = new DragonCollectionHandler(storageHandler, target);
         if (!filePath.equals(defaultPath)) collectionHandler.load();
         ServerCommandsHandler cmdHandler = new ServerCommandsHandler(collectionHandler);
         cmdHandler.addCommands(

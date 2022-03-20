@@ -4,15 +4,15 @@ import commands.AbstractCommand;
 import commands.ActionResult;
 import commands.CommandArgs;
 import commands.CommandType;
-import collection.CollectionHandler;
+import collection.DragonCollectionHandler;
 
 /**
- * A command for clearing the collection. Invokes {@link CollectionHandler#clear()}
+ * A command for clearing the collection. Invokes {@link DragonCollectionHandler#clear()}
  */
 public class Clear extends AbstractCommand {
-    private CollectionHandler collectionHandler;
+    private DragonCollectionHandler collectionHandler;
 
-    public Clear(CollectionHandler collectionHandler) {
+    public Clear(DragonCollectionHandler collectionHandler) {
         super("clear", "очистить коллекцию", CommandType.NO_ARGS);
         this.collectionHandler = collectionHandler;
     }

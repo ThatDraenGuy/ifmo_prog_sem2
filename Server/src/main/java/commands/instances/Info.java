@@ -1,18 +1,18 @@
 package commands.instances;
 
 import commands.AbstractCommand;
-import collection.CollectionHandler;
+import collection.DragonCollectionHandler;
 import commands.ActionResult;
 import commands.CommandArgs;
 import commands.CommandType;
 
 /**
- * A command for displaying information about collection. Invokes {@link CollectionHandler#info()}
+ * A command for displaying information about collection. Invokes {@link DragonCollectionHandler#info()}
  */
 public class Info extends AbstractCommand {
-    private CollectionHandler collectionHandler;
+    private DragonCollectionHandler collectionHandler;
 
-    public Info(CollectionHandler collectionHandler) {
+    public Info(DragonCollectionHandler collectionHandler) {
         super("info", "вывести информацию о коллекции", CommandType.NO_ARGS);
 
         this.collectionHandler = collectionHandler;

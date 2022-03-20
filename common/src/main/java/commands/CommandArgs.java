@@ -1,5 +1,6 @@
 package commands;
 
+import collection.classes.RawDragon;
 import lombok.Getter;
 
 import java.io.Serializable;
@@ -14,20 +15,17 @@ public class CommandArgs implements Serializable {
     @Getter
     private String args;
     @Getter
-    private String deconstructedObject;
+    private RawDragon rawObject;
 
     public CommandArgs(String args) {
         this.args = args;
     }
 
 
-    public CommandArgs(String args, String object) {
-        this.deconstructedObject = object;
+    public CommandArgs(String args, RawDragon object) {
+        this.rawObject = object;
         this.args = args;
     }
-
-
-
 
 
 }

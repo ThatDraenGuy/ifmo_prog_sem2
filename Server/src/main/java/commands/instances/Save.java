@@ -4,18 +4,18 @@ import commands.AbstractCommand;
 import commands.ActionResult;
 import commands.CommandArgs;
 import commands.CommandType;
-import collection.CollectionHandler;
+import collection.DragonCollectionHandler;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 
 /**
- * A command for saving collection. Invokes {@link CollectionHandler#save()}
+ * A command for saving collection. Invokes {@link DragonCollectionHandler#save()}
  */
 public class Save extends AbstractCommand {
-    private CollectionHandler collectionHandler;
+    private DragonCollectionHandler collectionHandler;
 
-    public Save(CollectionHandler collectionHandler) {
+    public Save(DragonCollectionHandler collectionHandler) {
         super("save", "сохранить коллекцию в файл", CommandType.NO_ARGS);
         this.collectionHandler = collectionHandler;
     }

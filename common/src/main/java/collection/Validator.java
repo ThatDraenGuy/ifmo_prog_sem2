@@ -2,7 +2,6 @@ package collection;
 
 import annotations.LowerBounded;
 import annotations.NotNull;
-import annotations.UserAccessibleObject;
 import exceptions.ValueNotValidException;
 
 import java.lang.reflect.Field;
@@ -12,35 +11,32 @@ import java.util.function.Function;
 
 public class Validator {
     /**
-     * Method for validating and converting a deconstructed version of an object. Invokes {@link #validate(Field, String)} for each field
      *
      * @param deconstructedObject an object to be verified
      * @return validated and converted deconstructed version of an object
      * @throws ValueNotValidException if validation was failed
      */
-    public static HashMap<Field, Object> validate(HashMap<Field, Object> deconstructedObject) throws ValueNotValidException {
-        HashMap<Field, Object> validatedObject = new HashMap<>();
-        for (Field field : deconstructedObject.keySet()) {
-            //TODO Collectible?
-            if (field.isAnnotationPresent(UserAccessibleObject.class) && !deconstructedObject.get(field).equals("")) {
-                validatedObject.put(field, validate((HashMap<Field, Object>) deconstructedObject.get(field)));
-            } else {
-                validatedObject.put(field, validate(field, deconstructedObject.get(field).toString()));
-            }
-        }
-        return validatedObject;
-    }
+//    public static HashMap<Field, Object> validate(HashMap<Field, Object> deconstructedObject) throws ValueNotValidException {
+//        HashMap<Field, Object> validatedObject = new HashMap<>();
+//        for (Field field : deconstructedObject.keySet()) {
+//            //TODO Collectible?
+//            if (field.isAnnotationPresent(UserAccessibleObject.class) && !deconstructedObject.get(field).equals("")) {
+//                validatedObject.put(field, validate((HashMap<Field, Object>) deconstructedObject.get(field)));
+//            } else {
+//                validatedObject.put(field, validate(field, field.getType(), deconstructedObject.get(field).toString()));
+//            }
+//        }
+//        return validatedObject;
+//    }
 
     /**
-     * Validates and converts a field. Invokes {@link #convert(Field, String)}
-     *
      * @param field a field that inputted value will go in
      * @param value a value to be validated
      * @return validated and converted value
      * @throws ValueNotValidException if validation was failed
      */
-    public static Object validate(Field field, String value) throws ValueNotValidException {
-        Object convertedValue = convert(field, value);
+    public static <T> T validate(Field field, Class<T> fieldType, String value) throws ValueNotValidException {
+        T convertedValue = convert(field.getName(), fieldType, value);
         if (field.isAnnotationPresent(NotNull.class) && convertedValue == null) {
             throw new ValueNotValidException(field.getName() + " cannot be null!");
         }
@@ -56,12 +52,11 @@ public class Validator {
     /**
      * Converts a value from String to the needed type
      *
-     * @param field a field that value will go in
      * @param value a value to be converted
      * @return converted value
      * @throws ValueNotValidException if value couldn't be converted to fit the specified field
      */
-    public static Object convert(Field field, String value) throws ValueNotValidException {
+    public static <T> T convert(String fieldName, Class<T> fieldType, String value) throws ValueNotValidException {
         if (value.equals("")) return null;
 
         HashMap<Class<?>, Function<String, ?>> variants = new HashMap<>();
@@ -72,23 +67,24 @@ public class Validator {
         variants.put(double.class, Double::parseDouble);
         variants.put(java.time.ZonedDateTime.class, java.time.ZonedDateTime::parse);
 
-        Function<String, ?> convert = variants.get(field.getType());
+        Function<String, ?> convert = variants.get(fieldType);
         if (convert != null) {
             try {
-                return convert.apply(value);
+                @SuppressWarnings({"unchecked"}) T convertedValue = (T) convert.apply(value);
+                return convertedValue;
             } catch (NumberFormatException | DateTimeParseException e) {
-                throw new ValueNotValidException(field.getName() + " should have a " + field.getType().getSimpleName() + " value. Your value was: " + value);
+                throw new ValueNotValidException(fieldName + " should have a " + fieldType.getSimpleName() + " value. Your value was: " + value);
             }
         }
-        if (field.getType().isEnum()) {
+        if (fieldType.isEnum()) {
             try {
-                @SuppressWarnings({"unchecked", "rawtypes"}) Object enumValue = Enum.valueOf((Class<Enum>) field.getType(), value);
+                @SuppressWarnings({"unchecked", "rawtypes"}) T enumValue = (T) Enum.valueOf((Class<Enum>) fieldType, value);
                 return enumValue;
             } catch (IllegalArgumentException e) {
-                throw new ValueNotValidException(field.getName() + " cannot have a value \"" + value + "\"");
+                throw new ValueNotValidException(fieldName + " cannot have a value \"" + value + "\"");
             }
         }
-        throw new ValueNotValidException(field.getName() + " should have a " + field.getType().getSimpleName() + " value. Your value was: " + value);
+        throw new ValueNotValidException(fieldName + " should have a " + fieldType.getSimpleName() + " value. Your value was: " + value);
 
     }
 }

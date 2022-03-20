@@ -1,8 +1,9 @@
 package collection.classes;
 
 import annotations.*;
-import collection.builders.DragonBuilder;
-import collection.builders.Builder;
+
+
+import java.time.ZonedDateTime;
 
 public class Dragon implements MainCollectible<Dragon> {
     @NotNull
@@ -15,7 +16,7 @@ public class Dragon implements MainCollectible<Dragon> {
     @UserAccessibleObject
     private Coordinates coordinates; //Поле не может быть null
     @NotNull
-    private java.time.ZonedDateTime creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
+    private ZonedDateTime creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
     @UserAccessibleField
     @LowerBounded
     private Long age; //Значение поля должно быть больше 0, Поле может быть null
@@ -29,9 +30,8 @@ public class Dragon implements MainCollectible<Dragon> {
     private DragonCharacter character; //Поле не может быть null
     @UserAccessibleObject
     private DragonCave cave; //Поле может быть null
-    private static Builder builder = new DragonBuilder();
 
-    public Dragon(Long id, String name, Coordinates coordinates, java.time.ZonedDateTime creationDate, Long age, Color color, DragonType type, DragonCharacter character, DragonCave cave) {
+    Dragon(Long id, String name, Coordinates coordinates, ZonedDateTime creationDate, Long age, Color color, DragonType type, DragonCharacter character, DragonCave cave) {
         this.id = id;
         this.name = name;
         this.coordinates = coordinates;
@@ -88,6 +88,10 @@ public class Dragon implements MainCollectible<Dragon> {
         return this.name.length() - dragon.name.length();
     }
 
+    public int compareTo(RawCollectible rawDragon) {
+        return this.name.length() - rawDragon.getName().length();
+    }
+
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
@@ -100,7 +104,4 @@ public class Dragon implements MainCollectible<Dragon> {
         return str.toString();
     }
 
-    public static Builder getBuilder() {
-        return builder;
-    }
 }
