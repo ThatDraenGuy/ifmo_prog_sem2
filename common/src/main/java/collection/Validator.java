@@ -37,16 +37,20 @@ public class Validator {
      */
     public static <T> T validate(Field field, Class<T> fieldType, String value) throws ValueNotValidException {
         T convertedValue = convert(field.getName(), fieldType, value);
-        if (field.isAnnotationPresent(NotNull.class) && convertedValue == null) {
+        return validate(field, convertedValue);
+    }
+
+    public static <T> T validate(Field field, T value) throws ValueNotValidException {
+        if (field.isAnnotationPresent(NotNull.class) && value == null) {
             throw new ValueNotValidException(field.getName() + " cannot be null!");
         }
-        if (field.isAnnotationPresent(LowerBounded.class) && convertedValue != null) {
+        if (field.isAnnotationPresent(LowerBounded.class) && value != null) {
             double border = field.getAnnotation(LowerBounded.class).value();
-            if (Double.parseDouble(value) <= border) {
+            if ((Long) value <= border) {
                 throw new ValueNotValidException(field.getName() + " should be greater than " + border + ". Your input: " + value);
             }
         }
-        return convertedValue;
+        return value;
     }
 
     /**

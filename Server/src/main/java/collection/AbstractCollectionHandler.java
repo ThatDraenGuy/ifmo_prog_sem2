@@ -3,26 +3,23 @@ package collection;
 import collection.classes.*;
 import exceptions.ElementIdException;
 import exceptions.InvalidCollectionException;
-import exceptions.ValueNotValidException;
 
 import java.io.IOException;
-import java.lang.reflect.InvocationTargetException;
-import java.util.Collection;
-import java.util.HashSet;
-import java.util.NoSuchElementException;
-import java.util.Queue;
+import java.util.*;
 
-public abstract class AbstractCollectionHandler<T extends MainCollectible<T>> implements CollectionHandler<T> {
-    final private Class<? extends MainCollectible<T>> targetClass;
-    private final Queue<MainCollectible<T>> collection;
-    final private StorageHandler<MainCollectible<T>> storageHandler;
-    protected MainCollectibleFactory<T> factory;
+public class AbstractCollectionHandler<T extends MainCollectible<T>> implements CollectionHandler<T> {
+    final private Class<T> targetClass;
+    private final Queue<T> collection;
+    final private StorageHandler storageHandler;
+    private final MainCollectibleFactory<T> factory;
+    private final CollectionBuilder<T> collectionBuilder;
 
-    public AbstractCollectionHandler(StorageHandler<MainCollectible<T>> storageHandler, Queue<MainCollectible<T>> collection, MainCollectibleFactory<T> factory, Class<? extends MainCollectible<T>> targetClass) {
+    public AbstractCollectionHandler(StorageHandler storageHandler, Queue<T> collection, MainCollectibleFactory<T> factory, CollectionBuilder<T> collectionBuilder, Class<T> targetClass) {
         this.storageHandler = storageHandler;
         this.targetClass = targetClass;
         this.collection = collection;
         this.factory = factory;
+        this.collectionBuilder = collectionBuilder;
     }
 
     public void save() throws IOException {
@@ -31,14 +28,12 @@ public abstract class AbstractCollectionHandler<T extends MainCollectible<T>> im
 
     public void load() {
         try {
-            Collection<MainCollectible<T>> collection = this.storageHandler.load(targetClass);
-            Validator.validate(collection);
+            Collection<Map<String, Object>> loadedCollection = this.storageHandler.load(targetClass);
+            Collection<T> collection = collectionBuilder.build(loadedCollection);
             long id = checkIds(collection);
             this.collection.addAll(collection);
             factory.setNextId(id + 1);
-        } catch (NoSuchMethodException | NoSuchFieldException | InvocationTargetException | IllegalAccessException e) {
-            System.out.println(e);
-        } catch (InvalidCollectionException | ValueNotValidException e) {
+        } catch (InvalidCollectionException e) {
             System.out.println("Loaded collection is invalid, initializing an empty collection...");
         }
     }
@@ -53,7 +48,7 @@ public abstract class AbstractCollectionHandler<T extends MainCollectible<T>> im
 
     public void update(String arg, RawCollectible<T> rawCollectible) throws ElementIdException {
         long id = Long.parseLong(arg);
-        MainCollectible<T> newObject = handleRawCollectible(rawCollectible, id);
+        T newObject = handleRawCollectible(rawCollectible, id);
         boolean result = collection.removeIf(dragon -> dragon.getId().equals(id));
         if (result) {
             collection.add(newObject);
@@ -117,7 +112,7 @@ public abstract class AbstractCollectionHandler<T extends MainCollectible<T>> im
         return str.toString();
     }
 
-    public Long checkIds(Collection<MainCollectible<T>> collection) throws InvalidCollectionException {
+    public Long checkIds(Collection<T> collection) throws InvalidCollectionException {
         HashSet<Long> ids = new HashSet<>();
         for (MainCollectible<?> collectible : collection) {
             boolean res = ids.add(collectible.getId());
@@ -147,7 +142,12 @@ public abstract class AbstractCollectionHandler<T extends MainCollectible<T>> im
         return str.toString();
     }
 
-    public abstract T handleRawCollectible(RawCollectible<T> rawCollectible);
+    public T handleRawCollectible(RawCollectible<T> rawCollectible) {
+        return factory.getObject(rawCollectible);
+    }
 
-    public abstract T handleRawCollectible(RawCollectible<T> rawCollectible, long id);
+    public T handleRawCollectible(RawCollectible<T> rawCollectible, long id) {
+        return factory.getObject(rawCollectible, id);
+    }
+
 }

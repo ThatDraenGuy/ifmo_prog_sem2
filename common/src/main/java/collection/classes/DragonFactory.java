@@ -29,4 +29,10 @@ public class DragonFactory implements MainCollectibleFactory<Dragon> {
         return new Dragon(id, rawDragon.getName(), rawDragon.getCoordinates(), ZonedDateTime.now(),
                 rawDragon.getAge(), rawDragon.getColor(), rawDragon.getType(), rawDragon.getCharacter(), rawDragon.getCave());
     }
+
+    public Dragon getObject(RawCollectible<Dragon> rawCollectible, long id, ZonedDateTime creationDate) {
+        RawDragon rawDragon = (RawDragon) rawCollectible;
+        return new Dragon(id, rawDragon.getName(), rawDragon.getCoordinates(), creationDate,
+                rawDragon.getAge(), rawDragon.getColor(), rawDragon.getType(), rawDragon.getCharacter(), rawDragon.getCave());
+    }
 }

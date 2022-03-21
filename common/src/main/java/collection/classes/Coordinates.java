@@ -3,7 +3,6 @@ package collection.classes;
 import annotations.LowerBounded;
 import annotations.NotNull;
 import annotations.UserAccessibleField;
-import collection.builders.CoordinatesBuilder;
 import lombok.Builder;
 import lombok.Getter;
 

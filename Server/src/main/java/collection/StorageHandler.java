@@ -1,14 +1,15 @@
 package collection;
 
 import collection.classes.MainCollectible;
+import exceptions.InvalidCollectionException;
 
 import java.io.IOException;
 import java.util.Collection;
-import java.util.PriorityQueue;
+import java.util.Map;
 
-public interface StorageHandler<T extends MainCollectible<?>> {
-    void save(Collection<T> collection, Class<? extends T> target) throws IOException;
+public interface StorageHandler {
+    <T extends MainCollectible<T>> void save(Collection<T> collection, Class<T> target) throws IOException;
 
-    PriorityQueue<T> load(Class<? extends T> target);
+    <T extends MainCollectible<T>> Collection<Map<String, Object>> load(Class<T> target);
 
 }

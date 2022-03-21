@@ -1,7 +1,7 @@
 package commands.instances;
 
+import collection.CollectionHandler;
 import commands.AbstractCommand;
-import collection.DragonCollectionHandler;
 import commands.ActionResult;
 import commands.CommandArgs;
 import commands.CommandType;
@@ -10,9 +10,9 @@ import commands.CommandType;
  * A command to filter elements by type. Invokes {@link DragonCollectionHandler#filterByType(String)}
  */
 public class FilterByType extends AbstractCommand {
-    private DragonCollectionHandler collectionHandler;
+    private CollectionHandler<?> collectionHandler;
 
-    public FilterByType(DragonCollectionHandler collectionHandler) {
+    public FilterByType(CollectionHandler<?> collectionHandler) {
         super("filter_by_type", "вывести элементы, значение поля type которых равно заданному", CommandType.SIMPLE_ARG);
         this.collectionHandler = collectionHandler;
     }

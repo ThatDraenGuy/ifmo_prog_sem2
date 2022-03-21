@@ -1,7 +1,7 @@
 package commands.instances;
 
+import collection.CollectionHandler;
 import commands.AbstractCommand;
-import collection.DragonCollectionHandler;
 import commands.ActionResult;
 import commands.CommandArgs;
 import commands.CommandType;
@@ -12,9 +12,9 @@ import java.util.NoSuchElementException;
  * A command for removing first element from collection. Invokes {@link DragonCollectionHandler#removeFirst()}
  */
 public class RemoveFirst extends AbstractCommand {
-    DragonCollectionHandler collectionHandler;
+    CollectionHandler<?> collectionHandler;
 
-    public RemoveFirst(DragonCollectionHandler collectionHandler) {
+    public RemoveFirst(CollectionHandler<?> collectionHandler) {
         super("remove_first", "удалить первый элемент из коллекции", CommandType.NO_ARGS);
         this.collectionHandler = collectionHandler;
     }

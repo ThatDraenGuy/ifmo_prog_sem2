@@ -30,7 +30,7 @@ public interface CollectionHandler<T extends MainCollectible<T>> {
 
     String info();
 
-    Long checkIds(Collection<MainCollectible<T>> collection) throws InvalidCollectionException;
+    Long checkIds(Collection<T> collection) throws InvalidCollectionException;
 
     void load();
 

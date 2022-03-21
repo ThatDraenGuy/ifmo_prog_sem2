@@ -1,7 +1,7 @@
 package commands.instances;
 
 import client.ConnectionHandler;
-import collection.CollectionBuilder;
+import collection.DragonCollectionBuilder;
 import commands.*;
 import console.ConsoleHandler;
 
@@ -16,10 +16,10 @@ import java.util.Scanner;
 public class ExecuteScript extends AbstractCommand {
     private final ConnectionHandler connectionHandler;
     private final CommandsHandler clientCommandsHandler;
-    private final CollectionBuilder collectionBuilder;
+    private final DragonCollectionBuilder collectionBuilder;
     private final HashSet<String> scriptHistory;
 
-    public ExecuteScript(ConnectionHandler connectionHandler, CommandsHandler clientCommandsHandler, CollectionBuilder collectionBuilder) {
+    public ExecuteScript(ConnectionHandler connectionHandler, CommandsHandler clientCommandsHandler, DragonCollectionBuilder collectionBuilder) {
         super("execute_script", "считать и исполнить скрипт из указанного файла", CommandType.SIMPLE_ARG);
         this.connectionHandler = connectionHandler;
         this.clientCommandsHandler = clientCommandsHandler;

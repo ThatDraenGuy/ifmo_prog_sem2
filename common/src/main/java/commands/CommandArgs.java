@@ -1,5 +1,7 @@
 package commands;
 
+import collection.classes.MainCollectible;
+import collection.classes.RawCollectible;
 import collection.classes.RawDragon;
 import lombok.Getter;
 
@@ -15,7 +17,7 @@ public class CommandArgs implements Serializable {
     @Getter
     private String args;
     @Getter
-    private RawDragon rawObject;
+    private RawCollectible<?> rawObject;
 
     public CommandArgs(String args) {
         this.args = args;

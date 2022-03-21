@@ -1,10 +1,10 @@
 package commands.instances;
 
+import collection.CollectionHandler;
 import commands.AbstractCommand;
 import commands.ActionResult;
 import commands.CommandArgs;
 import commands.CommandType;
-import collection.DragonCollectionHandler;
 
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
@@ -13,9 +13,9 @@ import java.lang.reflect.InvocationTargetException;
  * A command for saving collection. Invokes {@link DragonCollectionHandler#save()}
  */
 public class Save extends AbstractCommand {
-    private DragonCollectionHandler collectionHandler;
+    private CollectionHandler<?> collectionHandler;
 
-    public Save(DragonCollectionHandler collectionHandler) {
+    public Save(CollectionHandler<?> collectionHandler) {
         super("save", "сохранить коллекцию в файл", CommandType.NO_ARGS);
         this.collectionHandler = collectionHandler;
     }
@@ -25,7 +25,7 @@ public class Save extends AbstractCommand {
         try {
             collectionHandler.save();
             return new ActionResult(true, "Successfully saved collection");
-        } catch (IOException | InvocationTargetException | NoSuchMethodException | IllegalAccessException e) {
+        } catch (IOException e) {
             return new ActionResult(false, "An exception occurred: " + e.getMessage());
         }
     }

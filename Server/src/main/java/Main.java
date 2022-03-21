@@ -1,14 +1,15 @@
+import collection.*;
+import collection.classes.DragonFactory;
 import collection.classes.MainCollectible;
 import commands.ServerCommandsHandler;
 import commands.instances.*;
-import collection.DragonCollectionHandler;
-import collection.FileStorageHandler;
 import collection.classes.Dragon;
 import message.ServerDataResponse;
 import server.ServerHandler;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.PriorityQueue;
 
 /**
  * A Main class, only consists of main() method.
@@ -30,8 +31,10 @@ public class Main {
             System.out.println("Can't find file \"" + filePath + "\". Starting up with default collection...");
             filePath = defaultPath;
         }
-        FileStorageHandler storageHandler = new FileStorageHandler(new File(filePath));
-        DragonCollectionHandler collectionHandler = new DragonCollectionHandler(storageHandler, target);
+        StorageHandler storageHandler = new FileStorageHandler(new File(filePath), new JsonHandler());
+        DragonFactory factory = new DragonFactory();
+        CollectionHandler<Dragon> collectionHandler = new AbstractCollectionHandler<>(storageHandler, new PriorityQueue<>(),
+                factory, new DragonCollectionBuilder(factory), Dragon.class);
         if (!filePath.equals(defaultPath)) collectionHandler.load();
         ServerCommandsHandler cmdHandler = new ServerCommandsHandler(collectionHandler);
         cmdHandler.addCommands(

@@ -1,18 +1,18 @@
 package commands.instances;
 
+import collection.CollectionHandler;
 import commands.AbstractCommand;
 import commands.ActionResult;
 import commands.CommandArgs;
 import commands.CommandType;
-import collection.DragonCollectionHandler;
 
 /**
  * A command for clearing the collection. Invokes {@link DragonCollectionHandler#clear()}
  */
 public class Clear extends AbstractCommand {
-    private DragonCollectionHandler collectionHandler;
+    private CollectionHandler<?> collectionHandler;
 
-    public Clear(DragonCollectionHandler collectionHandler) {
+    public Clear(CollectionHandler<?> collectionHandler) {
         super("clear", "очистить коллекцию", CommandType.NO_ARGS);
         this.collectionHandler = collectionHandler;
     }

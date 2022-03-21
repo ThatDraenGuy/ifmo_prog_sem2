@@ -1,15 +1,8 @@
 package console;
 
-import annotations.NotNull;
-import annotations.UserAccessibleEnum;
-import annotations.UserAccessibleField;
-import annotations.UserAccessibleObject;
 import client.ConnectionHandler;
-import collection.CollectionBuilder;
-import collection.JSONToCollection;
-import collection.Validator;
+import collection.DragonCollectionBuilder;
 import collection.classes.RawDragon;
-import lombok.Getter;
 import message.*;
 
 import exceptions.CommandArgsAmountException;
@@ -32,7 +25,7 @@ import java.util.Scanner;
 public class ConsoleHandler {
     final private ConnectionHandler connectionHandler;
     final private CommandsHandler clientCommandsHandler;
-    final private CollectionBuilder collectionBuilder;
+    final private DragonCollectionBuilder collectionBuilder;
     private HashMap<String, CommandData> clientCommands;
     private HashMap<String, CommandData> serverCommands;
     final private Class<?> targetClass;
@@ -40,7 +33,7 @@ public class ConsoleHandler {
     final private PrintStream out;
     final private PrintStream err;
 
-    public ConsoleHandler(ConnectionHandler connectionHandler, CommandsHandler clientCommandsHandler, CollectionBuilder collectionBuilder, InputStream in, PrintStream out, PrintStream err) {
+    public ConsoleHandler(ConnectionHandler connectionHandler, CommandsHandler clientCommandsHandler, DragonCollectionBuilder collectionBuilder, InputStream in, PrintStream out, PrintStream err) {
         this.connectionHandler = connectionHandler;
         this.clientCommandsHandler = clientCommandsHandler;
         this.collectionBuilder = collectionBuilder;
@@ -134,7 +127,7 @@ public class ConsoleHandler {
                 if (!isEmpty) {
                     throw new CommandArgsAmountException("Command \"" + commandData.getName() + "\" needs a complex argument, not a simple one!");
                 } else {
-                    RawDragon newArgs = promptComplexArgs(targetClass);
+                    RawDragon newArgs = promptComplexArgs();
                     arguments = new CommandArgs("", newArgs);
                 }
                 break;
@@ -147,7 +140,7 @@ public class ConsoleHandler {
                 if (isEmpty) {
                     throw new CommandArgsAmountException("Command \"" + commandData.getName() + "\" needs an in-line (simple) argument!");
                 } else {
-                    RawDragon complexArgs = promptComplexArgs(targetClass);
+                    RawDragon complexArgs = promptComplexArgs();
                     arguments = new CommandArgs(argumentString, complexArgs);
                 }
 
@@ -197,7 +190,6 @@ public class ConsoleHandler {
 
     /**
      * A method that gets a request and invokes ... method.
-     * Also checks if command needs a complex argument and invokes {@link #promptComplexArgs(Class)} if it does.
      *
      * @param request a request for a command execution
      * @return response gotten from command's execution
@@ -210,12 +202,12 @@ public class ConsoleHandler {
         return connectionHandler.send(request);
     }
 
-    private RawDragon promptComplexArgs(Class<?> targetClass) {
+    private RawDragon promptComplexArgs() {
         ArrayList<String> fieldNames = collectionBuilder.getFieldNames();
         for (String field : fieldNames) {
             promptField(field);
         }
-        return collectionBuilder.build();
+        return collectionBuilder.rawBuild();
 //        Method[] methods = RawDragon.builder().getClass().getDeclaredMethods();
 //        for (Method method : methods) {
 //            if (!method.getName().equals("build")) {

@@ -1,5 +1,5 @@
 import client.ConnectionHandler;
-import collection.CollectionBuilder;
+import collection.DragonCollectionBuilder;
 import commands.CommandsHandler;
 import commands.instances.*;
 import console.ConsoleHandler;
@@ -17,7 +17,7 @@ public class Main {
         try {
             ConnectionHandler connectionHandler = new ConnectionHandler("127.0.0.1", 2525);
             CommandsHandler clientCommandsHandler = new CommandsHandler();
-            CollectionBuilder collectionBuilder = new CollectionBuilder();
+            DragonCollectionBuilder collectionBuilder = new DragonCollectionBuilder();
             clientCommandsHandler.addCommands(
                     new Exit(connectionHandler),
                     new History(clientCommandsHandler),
