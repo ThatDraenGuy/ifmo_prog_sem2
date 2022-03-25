@@ -34,7 +34,7 @@ public class AbstractCollectionHandler<T extends MainCollectible<T>> implements 
             this.collection.addAll(collection);
             factory.setNextId(id + 1);
         } catch (InvalidCollectionException e) {
-            System.out.println("Loaded collection is invalid, initializing an empty collection...");
+            System.out.println("Loaded collection is invalid, initializing an empty collection...(" + e.getMessage() + ")");
         }
     }
 

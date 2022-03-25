@@ -6,9 +6,9 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Annotation of userAccessible fields with enum type
+ * Annotation of user accessible fields with Collectible type
  */
 @Target(ElementType.FIELD)
 @Retention(RetentionPolicy.RUNTIME)
-public @interface UserAccessibleEnum {
+public @interface CollectibleField {
 }

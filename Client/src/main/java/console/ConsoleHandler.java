@@ -1,7 +1,11 @@
 package console;
 
+import annotations.CollectibleField;
+import annotations.UserAccessible;
 import client.ConnectionHandler;
 import collection.DragonCollectionBuilder;
+import collection.Validator;
+import collection.classes.Collectible;
 import collection.classes.RawDragon;
 import message.*;
 
@@ -13,10 +17,8 @@ import commands.*;
 
 import java.io.InputStream;
 import java.io.PrintStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
+import java.lang.reflect.Field;
+import java.util.*;
 
 /**
  * A class for managing interactions with user. Prompts user's input, parses it, creates a request and sends it to .
@@ -203,50 +205,37 @@ public class ConsoleHandler {
     }
 
     private RawDragon promptComplexArgs() {
-        ArrayList<String> fieldNames = collectionBuilder.getFieldNames();
-        for (String field : fieldNames) {
-            promptField(field);
+        Map<String, Object> map = promptComplexArgs(RawDragon.class);
+        try {
+            return collectionBuilder.rawBuild(map);
+        } catch (ValueNotValidException ignored) {
+            return null;
         }
-        return collectionBuilder.rawBuild();
-//        Method[] methods = RawDragon.builder().getClass().getDeclaredMethods();
-//        for (Method method : methods) {
-//            if (!method.getName().equals("build")) {
-//                method.invoke(null, promptField(method));
-//            }
-//        }
-//        Field[] fields = targetClass.getDeclaredFields();
-//        for (Field field : fields) {
-//            if (field.isAnnotationPresent(UserAccessibleField.class)) {
-//                Object obj = promptField(field);
-//                map.put(field, obj);
-//            }
-//            if (field.isAnnotationPresent(UserAccessibleEnum.class)) {
-//                Object obj = promptEnum(field);
-//                map.put(field, obj);
-//            }
-//            if (field.isAnnotationPresent(UserAccessibleObject.class)) {
-//                if (!field.isAnnotationPresent(NotNull.class)) {
-//                    boolean answer = promptAgreement("Object \"" + field.getName() + "\" can be null. Are you gonna input it?");
-//                    if (answer) {
-//                        Object obj = promptComplexArgs(field.getType());
-//                        map.put(field, obj);
-//                    }
-//                } else {
-//                    Object obj = promptComplexArgs(field.getType());
-//                    map.put(field, obj);
-//                }
-//
-//            }
-//        }
-//        return map;
     }
 
-    private void promptField(String field) {
+    private Map<String, Object> promptComplexArgs(Class<?> targetClass) {
+        List<Field> fields = collectionBuilder.getClassFields(targetClass);
+        Map<String, Object> map = new HashMap<>();
+        for (Field field : fields) {
+            String key = field.getName();
+            if (field.isAnnotationPresent(UserAccessible.class)) {
+                if (!field.isAnnotationPresent(CollectibleField.class)) map.put(key, promptField(key, field));
+                else map.put(key, promptComplexArgs(field.getType()));
+            }
+        }
+        return map;
+    }
+
+    private Object promptField(String name, Field field) {
+        Class<?> fieldType = field.getType();
         while (true) {
-            String result = promptInput("Please enter " + field + ": ");
+            String message;
+            if (fieldType.isEnum()) message = generateEnumPrompt(field);
+            else message = "Please enter " + name + ": ";
+            String result = promptInput(message);
             try {
-                collectionBuilder.put(field, result);
-                return;
+                Object object = Validator.validate(field, fieldType, result);
+                return object;
             } catch (ValueNotValidException e) {
                 errorMessage(e);
             }
@@ -268,16 +257,16 @@ public class ConsoleHandler {
 //    /**
 //     * A method to prompt an enum-type field. Simply invokes {@link #promptWithValidation(Field, String)} with a custom message
 //     */
-//    private Object promptEnum(Field enumField) {
-//        StringBuilder message = new StringBuilder("Please enter " + enumField.getName() + " (");
-//        Field[] enums = enumField.getType().getFields();
-//        for (Field field : enums) {
-//            message.append(field.getName()).append(";");
-//        }
-//        message.deleteCharAt(message.length() - 1);
-//        message.append("): ");
-//        return promptWithValidation(enumField, message.toString());
-//    }
+private String generateEnumPrompt(Field enumField) {
+    StringBuilder message = new StringBuilder("Please enter " + enumField.getName() + " (");
+    Field[] enums = enumField.getType().getFields();
+    for (Field field : enums) {
+        message.append(field.getName()).append(";");
+    }
+    message.deleteCharAt(message.length() - 1);
+    message.append("): ");
+    return message.toString();
+}
 
     /**
      * A method to ask user for agreement. Returns a boolean result: true if the answer is "yes" and false if the answer is "no".

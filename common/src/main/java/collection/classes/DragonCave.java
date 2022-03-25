@@ -1,13 +1,13 @@
 package collection.classes;
 
 import annotations.NotNull;
-import annotations.UserAccessibleField;
+import annotations.UserAccessible;
 import lombok.Builder;
 import lombok.Getter;
 
 @Builder
 public class DragonCave implements Collectible {
-    @UserAccessibleField
+    @UserAccessible
     @NotNull
     @Getter
     private int depth;

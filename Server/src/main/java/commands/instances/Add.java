@@ -19,7 +19,7 @@ public class Add extends AbstractCommand {
 
     @Override
     public ActionResult action(CommandArgs args) {
-//        collectionHandler.add(args.getRawObject());
+        collectionHandler.add(args.getRawObject());
         return new ActionResult(true, "Successfully added new dragon to collection");
     }
 }

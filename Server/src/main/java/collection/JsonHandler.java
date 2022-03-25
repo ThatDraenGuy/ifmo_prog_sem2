@@ -1,7 +1,6 @@
 package collection;
 
 import collection.classes.MainCollectible;
-import exceptions.ValueNotValidException;
 import org.json.*;
 
 import java.util.*;
@@ -20,7 +19,7 @@ public class JsonHandler {
         JSONArray collectibleArray = fullFile.getJSONArray(target.getName());
         for (int i = 0; i < collectibleArray.length(); i++) {
             JSONObject collectible = collectibleArray.getJSONObject(i);
-            resultCollection.add(parseCollectible(collectible));
+            resultCollection.add(parseCollectible(collectible, target));
         }
         return resultCollection;
     }
@@ -28,7 +27,8 @@ public class JsonHandler {
     /**
      * A method to parse a single collectible from a JSON object to a deconstructed version
      */
-    public Map<String, Object> parseCollectible(JSONObject collectible) {
+    public <T> Map<String, Object> parseCollectible(JSONObject collectible, Class<T> target) {
+
 //        Map<String, Object> values = collectible.toMap();
 //        for (String key : values.keySet()) {
 //            collectionBuilder.put(key, values.get(key));

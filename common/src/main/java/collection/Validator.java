@@ -2,11 +2,13 @@ package collection;
 
 import annotations.LowerBounded;
 import annotations.NotNull;
+import annotations.CollectibleField;
 import exceptions.ValueNotValidException;
 
 import java.lang.reflect.Field;
 import java.time.format.DateTimeParseException;
 import java.util.HashMap;
+import java.util.Map;
 import java.util.function.Function;
 
 public class Validator {
@@ -46,11 +48,29 @@ public class Validator {
         }
         if (field.isAnnotationPresent(LowerBounded.class) && value != null) {
             double border = field.getAnnotation(LowerBounded.class).value();
-            if ((Long) value <= border) {
+            if (Double.parseDouble(value.toString()) <= border) {
                 throw new ValueNotValidException(field.getName() + " should be greater than " + border + ". Your input: " + value);
             }
         }
         return value;
+    }
+
+    public static void validate(Map<Field, Object> map) throws ValueNotValidException {
+        for (Field field : map.keySet()) {
+            validate(field, map.get(field));
+        }
+    }
+
+    public static Map<Field, Object> convertAndValidate(Map<Field, Object> map) throws ValueNotValidException {
+        Map<Field, Object> newMap = new HashMap<>();
+        for (Field field : map.keySet()) {
+            if (!field.isAnnotationPresent(CollectibleField.class))
+                newMap.put(field, validate(field, field.getType(), map.get(field).toString()));
+//            else newMap.put(field, convertAndValidate((Map<Field, Object>) map.get(field)));
+            else newMap.put(field, map.get(field));
+
+        }
+        return newMap;
     }
 
     /**
@@ -88,7 +108,7 @@ public class Validator {
                 throw new ValueNotValidException(fieldName + " cannot have a value \"" + value + "\"");
             }
         }
-        throw new ValueNotValidException(fieldName + " should have a " + fieldType.getSimpleName() + " value. Your value was: " + value);
+        throw new ValueNotValidException(fieldName + " should have a " + fieldType.getSimpleName() + " value.. Your value was: " + value);
 
     }
 }
