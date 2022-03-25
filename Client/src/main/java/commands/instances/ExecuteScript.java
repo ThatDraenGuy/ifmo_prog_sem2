@@ -1,5 +1,6 @@
 package commands.instances;
 
+import client.App;
 import client.ConnectionHandler;
 import collection.DragonCollectionBuilder;
 import commands.*;
@@ -14,16 +15,12 @@ import java.util.Scanner;
  * A command for executing scripts.
  */
 public class ExecuteScript extends AbstractCommand {
-    private final ConnectionHandler connectionHandler;
-    private final CommandsHandler clientCommandsHandler;
-    private final DragonCollectionBuilder collectionBuilder;
+    private final App app;
     private final HashSet<String> scriptHistory;
 
-    public ExecuteScript(ConnectionHandler connectionHandler, CommandsHandler clientCommandsHandler, DragonCollectionBuilder collectionBuilder) {
+    public ExecuteScript(App app) {
         super("execute_script", "считать и исполнить скрипт из указанного файла", CommandType.SIMPLE_ARG);
-        this.connectionHandler = connectionHandler;
-        this.clientCommandsHandler = clientCommandsHandler;
-        this.collectionBuilder = collectionBuilder;
+        this.app = app;
         this.scriptHistory = new HashSet<>();
     }
 
@@ -47,9 +44,9 @@ public class ExecuteScript extends AbstractCommand {
             PrintStream outPrint = new PrintStream(out);
             OutputStream err = new ByteArrayOutputStream();
             PrintStream errPrint = new PrintStream(err);
-            ConsoleHandler consoleHandler = new ConsoleHandler(connectionHandler, clientCommandsHandler, collectionBuilder, in, outPrint, errPrint);
+            ConsoleHandler consoleHandler = new ConsoleHandler(in, outPrint, errPrint);
             try {
-                consoleHandler.start();
+                app.useDifferentConsole(consoleHandler);
             } catch (NoSuchElementException e) {
                 return finishScript(false, "Reached end of the script in the process of executing command!", path);
             }

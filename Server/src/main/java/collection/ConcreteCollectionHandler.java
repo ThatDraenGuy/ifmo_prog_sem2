@@ -7,14 +7,14 @@ import exceptions.InvalidCollectionException;
 import java.io.IOException;
 import java.util.*;
 
-public class AbstractCollectionHandler<T extends MainCollectible<T>> implements CollectionHandler<T> {
+public class ConcreteCollectionHandler<T extends MainCollectible<T>> implements CollectionHandler<T> {
     final private Class<T> targetClass;
     private final Queue<T> collection;
     final private StorageHandler storageHandler;
     private final MainCollectibleFactory<T> factory;
     private final CollectionBuilder<T> collectionBuilder;
 
-    public AbstractCollectionHandler(StorageHandler storageHandler, Queue<T> collection, MainCollectibleFactory<T> factory, CollectionBuilder<T> collectionBuilder, Class<T> targetClass) {
+    public ConcreteCollectionHandler(StorageHandler storageHandler, Queue<T> collection, MainCollectibleFactory<T> factory, CollectionBuilder<T> collectionBuilder, Class<T> targetClass) {
         this.storageHandler = storageHandler;
         this.targetClass = targetClass;
         this.collection = collection;
@@ -142,11 +142,11 @@ public class AbstractCollectionHandler<T extends MainCollectible<T>> implements 
         return str.toString();
     }
 
-    public T handleRawCollectible(RawCollectible<T> rawCollectible) {
+    private T handleRawCollectible(RawCollectible<T> rawCollectible) {
         return factory.getObject(rawCollectible);
     }
 
-    public T handleRawCollectible(RawCollectible<T> rawCollectible, long id) {
+    private T handleRawCollectible(RawCollectible<T> rawCollectible, long id) {
         return factory.getObject(rawCollectible, id);
     }
 

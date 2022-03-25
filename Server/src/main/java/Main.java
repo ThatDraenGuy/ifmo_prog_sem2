@@ -1,7 +1,7 @@
 import collection.*;
 import collection.classes.DragonFactory;
 import collection.classes.MainCollectible;
-import commands.ServerCommandsHandler;
+import commands.CommandsHandler;
 import commands.instances.*;
 import collection.classes.Dragon;
 import message.ServerDataResponse;
@@ -27,25 +27,26 @@ public class Main {
             filePath = args[0];
         }
         File collectionFile = new File(filePath);
-        if (!collectionFile.isFile() && !filePath.equals(defaultPath)) {
+        if (!collectionFile.isFile()) {
             System.out.println("Can't find file \"" + filePath + "\". Starting up with default collection...");
             filePath = defaultPath;
         }
         StorageHandler storageHandler = new FileStorageHandler(new File(filePath), new JsonHandler());
         DragonFactory factory = new DragonFactory();
-        CollectionHandler<Dragon> collectionHandler = new AbstractCollectionHandler<>(storageHandler, new PriorityQueue<>(),
+        CollectionHandler<Dragon> collectionHandler = new ConcreteCollectionHandler<>(storageHandler, new PriorityQueue<>(),
                 factory, new DragonCollectionBuilder(factory), Dragon.class);
+        CollectionBridge<Dragon> collectionBridge = new CollectionBridge<>(collectionHandler);
         if (!filePath.equals(defaultPath)) collectionHandler.load();
-        ServerCommandsHandler cmdHandler = new ServerCommandsHandler(collectionHandler);
+        CommandsHandler cmdHandler = new CommandsHandler();
         cmdHandler.addCommands(
                 new Save(collectionHandler),
                 new Show(collectionHandler),
                 new RemoveFirst(collectionHandler),
                 new RemoveById(collectionHandler),
-                new Add(collectionHandler),
-                new Update(collectionHandler),
+                new Add(collectionBridge),
+                new Update(collectionBridge),
                 new Clear(collectionHandler),
-                new RemoveLower(collectionHandler),
+                new RemoveLower(collectionBridge),
                 new CountByColor(collectionHandler),
                 new FilterByType(collectionHandler),
                 new FilterGreaterThanAge(collectionHandler),

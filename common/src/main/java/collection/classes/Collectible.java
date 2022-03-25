@@ -1,6 +1,8 @@
 package collection.classes;
 
 
-public interface Collectible {
+import java.io.Serializable;
+
+public interface Collectible extends Serializable {
 
 }

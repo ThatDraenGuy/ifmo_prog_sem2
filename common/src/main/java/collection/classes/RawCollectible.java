@@ -1,5 +1,7 @@
 package collection.classes;
 
-public interface RawCollectible<T> {
+import java.io.Serializable;
+
+public interface RawCollectible<T> extends Serializable {
     String getName();
 }

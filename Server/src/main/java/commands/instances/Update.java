@@ -1,31 +1,32 @@
 package commands.instances;
 
+import collection.CollectionBridge;
 import collection.CollectionHandler;
 import commands.AbstractCommand;
 import commands.ActionResult;
 import commands.CommandArgs;
 import commands.CommandType;
 import exceptions.ElementIdException;
+import exceptions.IncorrectCollectibleTypeException;
 
 /**
  * A command for updating element in collection. Invokes
  */
 public class Update extends AbstractCommand {
-    private CollectionHandler<?> collectionHandler;
+    private CollectionBridge<?> collectionBridge;
 
-    public Update(CollectionHandler<?> collectionHandler) {
+    public Update(CollectionBridge<?> collectionBridge) {
         super("update", "обновить значение элемента коллекции, id которого равен заданному", CommandType.BOTH_ARG);
-        this.collectionHandler = collectionHandler;
+        this.collectionBridge = collectionBridge;
     }
 
     @Override
     public ActionResult action(CommandArgs args) {
-//        try {
-//            collectionHandler.update(args.getArgs(), args.getRawObject());
-//            return new ActionResult(true, "Successfully updated element with id " + args.getArgs());
-//        } catch (ElementIdException e) {
-//            return new ActionResult(false, e.getMessage());
-//        }
-        return null;
+        try {
+            collectionBridge.update(args.getArgs(), args.getRawObject());
+            return new ActionResult(true, "Successfully updated element with id " + args.getArgs());
+        } catch (ElementIdException | IncorrectCollectibleTypeException e) {
+            return new ActionResult(false, e.getMessage());
+        }
     }
 }

@@ -6,5 +6,4 @@ Timberly
 YELLOW
 AIR
 GOOD
-Y
 670

@@ -4,6 +4,8 @@ import collection.classes.MainCollectible;
 import exceptions.InvalidCollectionException;
 import exceptions.ValueNotValidException;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -17,10 +19,12 @@ import java.util.*;
 public class FileStorageHandler implements StorageHandler {
     private final File file;
     private final JsonHandler jsonHandler;
+    private final Logger logger;
 
     public FileStorageHandler(File file, JsonHandler jsonHandler) {
         this.file = file;
         this.jsonHandler = jsonHandler;
+        this.logger = LoggerFactory.getLogger("FileStorageHandler");
     }
 
     /**
@@ -40,9 +44,9 @@ public class FileStorageHandler implements StorageHandler {
             scanner.close();
             return jsonHandler.parseCollection(JSONString.toString(), target);
         } catch (IOException e) {
-            System.out.println(e);
+            logger.warn(e.toString());
         } catch (JSONException e) {
-            System.out.println("An exception occurred while reading from JSON file, initializing an empty collection..." + e);
+            logger.warn("An exception occurred while reading from JSON file, initializing an empty collection..." + e);
         }
         return null;
     }

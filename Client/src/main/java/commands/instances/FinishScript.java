@@ -11,6 +11,6 @@ public class FinishScript extends AbstractCommand {
     }
 
     public ActionResult action(CommandArgs args) {
-        return new ActionResult(true, "finish_script", true);
+        return new ActionResult(true, "finishing script...", true);
     }
 }

@@ -1,6 +1,6 @@
 package server;
 
-import commands.ServerCommandsHandler;
+import commands.CommandsHandler;
 import message.ServerDataResponse;
 import org.slf4j.LoggerFactory;
 
@@ -18,7 +18,7 @@ public class ServerHandler {
     private final Logger logger;
     final private int port = 2525;
 
-    public ServerHandler(ServerCommandsHandler commandsHandler, ServerDataResponse serverData) throws IOException {
+    public ServerHandler(CommandsHandler commandsHandler, ServerDataResponse serverData) throws IOException {
         server = new ServerSocket(port);
         this.requestHandler = new RequestHandler(commandsHandler, serverData);
         this.users = new ArrayList<>();
