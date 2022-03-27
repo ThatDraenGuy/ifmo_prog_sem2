@@ -28,6 +28,11 @@ public class ConnectionHandler {
     }
 
     private void connect() {
+        consoleHandler.message("Attempting to connect to connect to " + host + ":" + port);
+        reconnect();
+    }
+
+    private void reconnect() {
         while (true) {
             try {
                 socket = new Socket(host, port);
@@ -35,9 +40,17 @@ public class ConnectionHandler {
                 out.flush();
                 in = new ObjectInputStream(socket.getInputStream());
                 serverData = send(new ServerDataRequest());
+                consoleHandler.message("Successfully connected to the server");
                 return;
             } catch (IOException e) {
                 consoleHandler.errorMessage(e);
+                try {
+                    Thread.sleep(5000);
+
+                } catch (InterruptedException ex) {
+                    ex.printStackTrace();
+                }
+                consoleHandler.message("Attempting to reconnect...");
             }
         }
     }
@@ -48,10 +61,14 @@ public class ConnectionHandler {
             out.writeObject(message);
             Message<T> responseMessage = (Message<T>) in.readObject();
             return responseMessage.getData();
-        } catch (IOException | ClassNotFoundException e) {
-            System.err.println(e);
+        } catch (ClassNotFoundException e) {
+            consoleHandler.errorMessage(e);
             return null;
             //TODO normal check
+        } catch (IOException e) {
+            consoleHandler.errorMessage(new ConnectionException("Lost connection to the server, attempting to reconnect..."));
+            reconnect();
+            return send(data);
         }
     }
 }
