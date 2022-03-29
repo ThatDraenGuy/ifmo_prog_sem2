@@ -4,7 +4,7 @@ import collection.CollectionHandler;
 import commands.AbstractCommand;
 import commands.ActionResult;
 import commands.CommandArgs;
-import commands.CommandType;
+import commands.CommandArgsType;
 import exceptions.ElementIdException;
 
 /**
@@ -14,7 +14,7 @@ public class RemoveById extends AbstractCommand {
     CollectionHandler<?> collectionHandler;
 
     public RemoveById(CollectionHandler<?> collectionHandler) {
-        super("remove_by_id", "удалить элемент из коллекции по его id", CommandType.SIMPLE_ARG);
+        super("remove_by_id", "удалить элемент из коллекции по его id", CommandArgsType.SIMPLE_ARG);
         this.collectionHandler = collectionHandler;
     }
 

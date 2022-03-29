@@ -22,7 +22,7 @@ public interface CollectionHandler<T extends MainCollectible<T>> {
 
     void removeLower(RawCollectible<T> rawCollectible);
 
-    int countByColor(String color) throws IllegalArgumentException;
+    long countByColor(String color) throws IllegalArgumentException;
 
     String filterByType(String arg) throws IllegalArgumentException;
 

@@ -3,12 +3,10 @@ package client;
 
 import console.ConsoleHandler;
 import exceptions.ConnectionException;
-import lombok.Getter;
 import message.*;
 
 import java.io.*;
 import java.net.Socket;
-import java.net.UnknownHostException;
 
 public class ConnectionHandler {
     private final String host;
@@ -17,9 +15,6 @@ public class ConnectionHandler {
     private Socket socket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
-    @Getter
-    private ServerDataResponse serverData;
-
     public ConnectionHandler(String host, int port, ConsoleHandler consoleHandler) throws IOException, ClassNotFoundException {
         this.host = host;
         this.port = port;
@@ -28,38 +23,37 @@ public class ConnectionHandler {
     }
 
     private void connect() {
-        consoleHandler.message("Attempting to connect to connect to " + host + ":" + port);
+        consoleHandler.message("Attempting to connect to " + host + ":" + port);
         reconnect();
     }
 
     private void reconnect() {
         while (true) {
             try {
+                Thread.sleep(5000);
+
+            } catch (InterruptedException ex) {
+                ex.printStackTrace();
+            }
+            try {
                 socket = new Socket(host, port);
                 out = new ObjectOutputStream(socket.getOutputStream());
                 out.flush();
                 in = new ObjectInputStream(socket.getInputStream());
-                serverData = send(new ServerDataRequest());
                 consoleHandler.message("Successfully connected to the server");
                 return;
             } catch (IOException e) {
                 consoleHandler.errorMessage(e);
-                try {
-                    Thread.sleep(5000);
-
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
-                }
                 consoleHandler.message("Attempting to reconnect...");
             }
         }
     }
 
-    public <T extends Response, E extends Request> T send(E data) {
+    public Response send(Request data) {
         try {
-            Message<E> message = new Message<>(data);
+            Message<Request> message = new Message<>(data);
             out.writeObject(message);
-            Message<T> responseMessage = (Message<T>) in.readObject();
+            Message<Response> responseMessage = (Message<Response>) in.readObject();
             return responseMessage.getData();
         } catch (ClassNotFoundException e) {
             consoleHandler.errorMessage(e);

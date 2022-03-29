@@ -4,6 +4,8 @@ import exceptions.CommandNonExistentException;
 import lombok.Getter;
 import message.CommandRequest;
 import message.CommandResponse;
+import message.Request;
+import message.Response;
 
 
 import java.util.HashMap;
@@ -12,14 +14,10 @@ import java.util.LinkedList;
 public class CommandsHandler {
     @Getter
     private final HashMap<String, Command> commands;
-    private final LinkedList<Command> commandHistory;
 
     public CommandsHandler() {
         this.commands = new HashMap<>();
-        this.commandHistory = new LinkedList<>();
-        for (int i = 0; i < 5; i++) {
-            commandHistory.add(null);
-        }
+
     }
 
     public void addCommand(Command c) {
@@ -40,9 +38,6 @@ public class CommandsHandler {
     }
 
 
-    public LinkedList<Command> getCommandHistory() {
-        return commandHistory;
-    }
 
     public Command getCommand(CommandData data) throws CommandNonExistentException {
         String name = data.getName();
@@ -60,18 +55,20 @@ public class CommandsHandler {
         return res;
     }
 
-    public CommandResponse executeCommand(CommandRequest request) {
+    public Response executeCommand(Request request) {
         CommandData commandData = request.getCommandData();
         CommandArgs cmdArgs = request.getCommandArgs();
         try {
             Command command = getCommand(commandData);
             ActionResult result = command.action(cmdArgs);
-            commandHistory.addLast(command);
-            commandHistory.removeFirst();
-            return new CommandResponse(result);
+            return createResponse(result);
         } catch (CommandNonExistentException e) {
-            return new CommandResponse(new ActionResult(false, e.getMessage()));
+            return createResponse(new ActionResult(false, e.getMessage()));
         }
 
+    }
+
+    protected Response createResponse(ActionResult actionResult) {
+        return new CommandResponse(actionResult);
     }
 }

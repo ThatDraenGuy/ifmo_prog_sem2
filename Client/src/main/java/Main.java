@@ -2,6 +2,7 @@ import client.App;
 import client.ConnectionHandler;
 import collection.DragonCollectionBuilder;
 import collection.classes.DragonFactory;
+import commands.CommandsExecutor;
 import commands.CommandsHandler;
 import commands.instances.*;
 import console.ConsoleHandler;
@@ -21,11 +22,12 @@ public class Main {
             ConnectionHandler connectionHandler = new ConnectionHandler("127.0.0.1", 2525, consoleHandler);
             CommandsHandler clientCommandsHandler = new CommandsHandler();
             DragonCollectionBuilder collectionBuilder = new DragonCollectionBuilder(new DragonFactory());
-            App app = new App(connectionHandler, clientCommandsHandler, collectionBuilder, consoleHandler);
+            CommandsExecutor commandsExecutor = new CommandsExecutor(connectionHandler, clientCommandsHandler);
+            App app = new App(commandsExecutor, collectionBuilder, consoleHandler);
             clientCommandsHandler.addCommands(
-                    new Exit(connectionHandler, consoleHandler),
-                    new History(clientCommandsHandler),
-                    new Help(clientCommandsHandler, connectionHandler.getServerData().getServerCommands()),
+                    new Exit(consoleHandler, commandsExecutor),
+                    new History(commandsExecutor),
+                    new Help(commandsExecutor),
                     new ExecuteScript(app),
                     new FinishScript());
             app.start();

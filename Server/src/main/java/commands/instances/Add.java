@@ -1,11 +1,10 @@
 package commands.instances;
 
 import collection.CollectionBridge;
-import collection.CollectionHandler;
 import commands.AbstractCommand;
 import commands.ActionResult;
 import commands.CommandArgs;
-import commands.CommandType;
+import commands.CommandArgsType;
 import exceptions.IncorrectCollectibleTypeException;
 
 /**
@@ -15,7 +14,7 @@ public class Add extends AbstractCommand {
     CollectionBridge<?> collectionBridge;
 
     public Add(CollectionBridge<?> collectionBridge) {
-        super("add", "добавить новый элемент в коллекцию", CommandType.COMPLEX_ARG);
+        super("add", "добавить новый элемент в коллекцию", CommandArgsType.COMPLEX_ARG);
         this.collectionBridge = collectionBridge;
     }
 

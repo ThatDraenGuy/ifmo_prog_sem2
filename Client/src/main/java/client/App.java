@@ -12,7 +12,8 @@ import exceptions.CommandExecutionException;
 import exceptions.CommandNonExistentException;
 import exceptions.ValueNotValidException;
 import message.CommandRequest;
-import message.CommandResponse;
+import message.Request;
+import message.Response;
 
 
 import java.lang.reflect.Field;
@@ -22,28 +23,21 @@ import java.util.Map;
 import java.util.NoSuchElementException;
 
 public class App {
-    final private ConnectionHandler connectionHandler;
-    final private CommandsHandler clientCommandsHandler;
-    final private CollectionBuilder<?> collectionBuilder;
-    private HashMap<String, CommandData> clientCommands;
-    private HashMap<String, CommandData> serverCommands;
-    final private Class<?> targetClass;
+    private final CommandsExecutor commandsExecutor;
+    private final CollectionBuilder<?> collectionBuilder;
     private ConsoleHandler consoleHandler;
 
-    public App(ConnectionHandler connectionHandler, CommandsHandler clientCommandsHandler, CollectionBuilder<?> collectionBuilder, ConsoleHandler consoleHandler) {
-        this.connectionHandler = connectionHandler;
-        this.clientCommandsHandler = clientCommandsHandler;
+    public App(CommandsExecutor commandsExecutor, CollectionBuilder<?> collectionBuilder, ConsoleHandler consoleHandler) {
         this.collectionBuilder = collectionBuilder;
+        this.commandsExecutor = commandsExecutor;
         this.consoleHandler = consoleHandler;
-        this.targetClass = connectionHandler.getServerData().getTargetClass();
     }
 
     /**
      * Starts console's loop
      */
     public void start() {
-        this.clientCommands = clientCommandsHandler.getCommandsData();
-        this.serverCommands = connectionHandler.getServerData().getServerCommands();
+        commandsExecutor.start();
         loop();
     }
 
@@ -54,8 +48,8 @@ public class App {
         while (true) {
             try {
                 String input = consoleHandler.promptInput("");
-                CommandRequest cmdRequest = parseInput(input);
-                CommandResponse response = executeCommand(cmdRequest);
+                Request cmdRequest = parseInput(input);
+                Response response = commandsExecutor.executeCommand(cmdRequest);
                 boolean isExitQueried = handleResponse(response);
                 if (isExitQueried) return;
             } catch (CommandNonExistentException | CommandArgsAmountException | CommandExecutionException e) {
@@ -67,7 +61,7 @@ public class App {
         }
     }
 
-    private CommandRequest parseInput(String input) throws CommandNonExistentException, CommandArgsAmountException {
+    private Request parseInput(String input) throws CommandNonExistentException, CommandArgsAmountException {
         input = input.strip();
         CommandData commandData;
         CommandArgs cmdArgs = new CommandArgs("");
@@ -83,8 +77,8 @@ public class App {
         return (createRequest(commandData, cmdArgs));
     }
 
-    private CommandRequest createRequest(CommandData commandData, CommandArgs arguments) throws CommandArgsAmountException {
-        CommandType type = commandData.getCommandType();
+    private Request createRequest(CommandData commandData, CommandArgs arguments) throws CommandArgsAmountException {
+        CommandArgsType type = commandData.getCommandArgsType();
         String argumentString = arguments.getArgs();
         boolean isEmpty = argumentString.equals("");
         switch (type) {
@@ -126,30 +120,17 @@ public class App {
      * @throws CommandNonExistentException if inputted command cannot be found in the command list
      */
     private CommandData parseCommandData(String input) throws CommandNonExistentException {
-        if (isInCommands(input)) {
-            if (isClientCommand(input)) {
-                return clientCommands.get(input);
+        if (commandsExecutor.isInCommands(input)) {
+            if (commandsExecutor.isClientCommand(input)) {
+                return commandsExecutor.getAccessibleClientCommands().get(input);
             } else {
-                return serverCommands.get(input);
+                return commandsExecutor.getAccessibleServerCommands().get(input);
             }
         } else {
             throw new CommandNonExistentException(input);
         }
     }
 
-    private boolean isInCommands(String name) {
-        return (serverCommands.containsKey(name) || clientCommands.containsKey(name));
-        //TODO wtf?
-    }
-
-    private boolean isClientCommand(String name) {
-        return clientCommands.containsKey(name);
-    }
-
-    private boolean isClientCommand(CommandRequest request) {
-        return isClientCommand(request.getCommandData().getName());
-        //TODO rework
-    }
 
     /**
      * A method that gets a String and returns a CmdArgs object created with it
@@ -158,22 +139,9 @@ public class App {
         return new CommandArgs(input);
     }
 
-    /**
-     * A method that gets a request and invokes ... method.
-     *
-     * @param request a request for a command execution
-     * @return response gotten from command's execution
-     * @throws CommandArgsAmountException if command requires both a simple and a complex argument and a simple one wasn't provided
-     */
-    private CommandResponse executeCommand(CommandRequest request) throws CommandArgsAmountException {
-        if (isClientCommand(request)) {
-            return clientCommandsHandler.executeCommand(request);
-        }
-        return connectionHandler.send(request);
-    }
 
     private RawCollectible<?> promptComplexArgs() {
-        Map<String, Object> map = promptComplexArgs(targetClass);
+        Map<String, Object> map = promptComplexArgs(commandsExecutor.getTargetClass());
         try {
             return collectionBuilder.rawBuild(map);
         } catch (ValueNotValidException e) {
@@ -203,7 +171,7 @@ public class App {
             else message = "Please enter " + name + ": ";
             String result = consoleHandler.promptInput(message);
             try {
-                return Validator.validate(field, fieldType, result);
+                return Validator.convertAndValidate(field, fieldType, result);
             } catch (ValueNotValidException e) {
                 consoleHandler.errorMessage(e);
             }
@@ -228,7 +196,7 @@ public class App {
      * @return a boolean value: if the response is from an "Exit" command it's true, otherwise it's false.
      * @throws CommandExecutionException if ActionResult isn't success
      */
-    private boolean handleResponse(CommandResponse response) throws CommandExecutionException {
+    private boolean handleResponse(Response response) throws CommandExecutionException {
         ActionResult result = response.getActionResult();
         boolean isSuccess = result.isSuccess();
         if (isSuccess) {
@@ -240,10 +208,15 @@ public class App {
         }
     }
 
-    public void useDifferentConsole(ConsoleHandler consoleHandler) {
+
+    public void useDifferentSettings(ConsoleHandler consoleHandler, CommandAccessLevel accessLevel) {
         ConsoleHandler oldConsoleHandler = this.consoleHandler;
+        CommandAccessLevel oldAccessLevel = this.commandsExecutor.getUserAccessLevel();
         this.consoleHandler = consoleHandler;
+        this.commandsExecutor.setUserAccessLevel(accessLevel);
         loop();
+        this.commandsExecutor.setUserAccessLevel(oldAccessLevel);
         this.consoleHandler = oldConsoleHandler;
     }
+
 }

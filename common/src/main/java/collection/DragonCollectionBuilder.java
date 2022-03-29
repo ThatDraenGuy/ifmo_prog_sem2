@@ -7,16 +7,15 @@ import exceptions.ValueNotValidException;
 import lombok.Getter;
 
 import java.lang.reflect.Field;
-import java.lang.reflect.Method;
 import java.time.ZonedDateTime;
 import java.util.*;
 import java.util.function.Predicate;
 
 public class DragonCollectionBuilder implements CollectionBuilder<Dragon> {
-    @Getter
-    private final ArrayList<String> fieldNames;
-    @Getter
-    private final HashMap<String, Field> fieldsFromNames;
+//    @Getter
+//    private final ArrayList<String> fieldNames;
+@Getter
+private final HashMap<String, Field> fieldsFromNames;
     private final DragonFactory factory;
     private final List<Field> dragonFields;
     private final List<Field> rawDragonFields;
@@ -25,7 +24,7 @@ public class DragonCollectionBuilder implements CollectionBuilder<Dragon> {
 
     public DragonCollectionBuilder(DragonFactory factory) {
         this.factory = factory;
-        fieldNames = new ArrayList<>();
+//        fieldNames = new ArrayList<>();
         fieldsFromNames = new HashMap<>();
 
         dragonFields = List.of(Dragon.class.getDeclaredFields());

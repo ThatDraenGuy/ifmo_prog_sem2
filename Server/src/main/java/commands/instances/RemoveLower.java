@@ -1,11 +1,10 @@
 package commands.instances;
 
 import collection.CollectionBridge;
-import collection.CollectionHandler;
 import commands.AbstractCommand;
 import commands.ActionResult;
 import commands.CommandArgs;
-import commands.CommandType;
+import commands.CommandArgsType;
 import exceptions.IncorrectCollectibleTypeException;
 
 /**
@@ -14,7 +13,7 @@ public class RemoveLower extends AbstractCommand {
     private final CollectionBridge<?> collectionBridge;
 
     public RemoveLower(CollectionBridge<?> collectionBridge) {
-        super("remove_lower", "удалить из коллекции все элементы, меньшие, чем заданный", CommandType.COMPLEX_ARG);
+        super("remove_lower", "удалить из коллекции все элементы, меньшие, чем заданный", CommandArgsType.COMPLEX_ARG);
         this.collectionBridge = collectionBridge;
     }
 

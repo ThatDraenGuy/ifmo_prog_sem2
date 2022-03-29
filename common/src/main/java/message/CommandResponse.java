@@ -1,15 +1,20 @@
 package message;
 
 import commands.ActionResult;
+import lombok.Getter;
 
 public class CommandResponse implements Response {
-    private ActionResult actionResult;
+    @Getter
+    private final ActionResult actionResult;
+    @Getter
+    private ServerData serverData;
 
     public CommandResponse(ActionResult actionResult) {
         this.actionResult = actionResult;
     }
 
-    public ActionResult getActionResult() {
-        return actionResult;
+    public CommandResponse(ActionResult actionResult, ServerData serverData) {
+        this.actionResult = actionResult;
+        this.serverData = serverData;
     }
 }

@@ -1,5 +1,6 @@
 package commands.instances;
 
+import client.App;
 import commands.*;
 
 import java.util.HashMap;
@@ -9,35 +10,31 @@ import java.util.HashMap;
  */
 //TODO rework, replace
 public class Help extends AbstractCommand {
-    private String message = null;
-    private final CommandsHandler cmdHandler;
-    private final HashMap<String, CommandData> serverCommands;
+    private final CommandsExecutor commandsExecutor;
 
-    public Help(CommandsHandler cmdHandler, HashMap<String, CommandData> serverCommands) {
-        super("help", "вывести справку по доступным командам", CommandType.NO_ARGS);
-        this.cmdHandler = cmdHandler;
-        this.serverCommands = serverCommands;
+    public Help(CommandsExecutor commandsExecutor) {
+        super("help", "вывести справку по доступным командам", CommandArgsType.NO_ARGS);
+        this.commandsExecutor = commandsExecutor;
     }
 
     @Override
     public ActionResult action(CommandArgs args) {
-        if (message == null) {
-            message = createMessage();
-        }
+        String message = createMessage();
         return new ActionResult(true, message);
     }
 
     private String createMessage() {
+        HashMap<String, CommandData> clientCommands = commandsExecutor.getAccessibleClientCommands();
+        HashMap<String, CommandData> serverCommands = commandsExecutor.getAccessibleServerCommands();
         StringBuilder builder = new StringBuilder();
         builder.append("Local commands:\n");
-        for (CommandData data : cmdHandler.getCommandsData().values()) {
+        for (CommandData data : clientCommands.values()) {
             builder.append(data.getName()).append(": ").append(data.getDescription()).append("\n");
         }
         builder.append("Server commands:\n");
         for (CommandData data : serverCommands.values()) {
             builder.append(data.getName()).append(": ").append(data.getDescription()).append("\n");
         }
-        message = builder.toString();
-        return message;
+        return builder.toString();
     }
 }

@@ -64,7 +64,7 @@ public class ConcreteCollectionHandler<T extends MainCollectible<T>> implements 
     public void removeById(String strId) throws ElementIdException {
         try {
             long id = Long.parseLong(strId);
-            if (!collection.removeIf(collectible -> collectible.getId() == id)) {
+            if (!collection.removeIf(collectible -> collectible.getId().equals(id))) {
                 throw new ElementIdException(strId);
             }
         } catch (NumberFormatException e) {
@@ -77,54 +77,33 @@ public class ConcreteCollectionHandler<T extends MainCollectible<T>> implements 
         collection.removeIf(collectible -> collectible.compareTo(rawObject) < 0);
     }
 
-    public int countByColor(String arg) throws IllegalArgumentException {
-        Color target = Color.valueOf(arg);
-        int res = 0;
-        for (MainCollectible<?> collectible : collection) {
-            if (collectible.getColor().equals(target)) {
-                res++;
-            }
-        }
-        return res;
+    public long countByColor(String arg) throws IllegalArgumentException {
+        Color color = Color.valueOf(arg);
+        return collection.stream().filter(x -> x.getColor().equals(color)).count();
     }
 
     public String filterByType(String arg) throws IllegalArgumentException {
         DragonType type = DragonType.valueOf(arg);
         StringBuilder str = new StringBuilder();
-        for (MainCollectible<?> collectible : collection) {
-            DragonType collectibleType = collectible.getType();
-            if (collectibleType != null && collectibleType.equals(type)) {
-                str.append(collectible).append("\n");
-            }
-        }
+        collection.stream().filter(x -> x.getType() != null && x.getType().equals(type)).forEach(x -> str.append(x).append("\n"));
         return str.toString();
     }
 
     public String filterGreaterThanAge(String arg) {
         long age = Long.parseLong(arg);
         StringBuilder str = new StringBuilder();
-        for (MainCollectible<?> collectible : collection) {
-            Long collectibleAge = collectible.getAge();
-            if (collectibleAge != null && collectibleAge > age) {
-                str.append(collectible).append("\n");
-            }
-        }
+        collection.stream().filter(x -> x.getAge() != null && x.getAge() > age).forEach(x -> str.append(x).append("\n"));
         return str.toString();
     }
 
     public Long checkIds(Collection<T> collection) throws InvalidCollectionException {
-        HashSet<Long> ids = new HashSet<>();
-        for (MainCollectible<?> collectible : collection) {
-            boolean res = ids.add(collectible.getId());
-            if (!res) {
-                throw new InvalidCollectionException();
-            }
-        }
+        Set<Long> ids = new HashSet<>();
         long highestId = 0L;
-        for (long id : ids) {
-            if (id > highestId) {
-                highestId = id;
-            }
+        for (MainCollectible<?> collectible : collection) {
+            long id = collectible.getId();
+            boolean res = ids.add(id);
+            if (!res) throw new InvalidCollectionException();
+            if (id > highestId) highestId = id;
         }
         return highestId;
     }
@@ -136,9 +115,7 @@ public class ConcreteCollectionHandler<T extends MainCollectible<T>> implements 
     @Override
     public String toString() {
         StringBuilder str = new StringBuilder();
-        for (MainCollectible<?> collectible : collection) {
-            str.append(collectible.toString()).append("\n");
-        }
+        collection.forEach(x -> str.append(x).append("\n"));
         return str.toString();
     }
 

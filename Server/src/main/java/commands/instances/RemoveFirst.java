@@ -4,7 +4,7 @@ import collection.CollectionHandler;
 import commands.AbstractCommand;
 import commands.ActionResult;
 import commands.CommandArgs;
-import commands.CommandType;
+import commands.CommandArgsType;
 
 import java.util.NoSuchElementException;
 
@@ -15,7 +15,7 @@ public class RemoveFirst extends AbstractCommand {
     CollectionHandler<?> collectionHandler;
 
     public RemoveFirst(CollectionHandler<?> collectionHandler) {
-        super("remove_first", "удалить первый элемент из коллекции", CommandType.NO_ARGS);
+        super("remove_first", "удалить первый элемент из коллекции", CommandArgsType.NO_ARGS);
         this.collectionHandler = collectionHandler;
     }
 

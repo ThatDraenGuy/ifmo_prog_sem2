@@ -2,9 +2,10 @@ import collection.*;
 import collection.classes.DragonFactory;
 import collection.classes.MainCollectible;
 import commands.CommandsHandler;
+import commands.ServerCommandsHandler;
 import commands.instances.*;
 import collection.classes.Dragon;
-import message.ServerDataResponse;
+import message.ServerData;
 import server.ServerHandler;
 
 import java.io.File;
@@ -36,8 +37,16 @@ public class Main {
         CollectionHandler<Dragon> collectionHandler = new ConcreteCollectionHandler<>(storageHandler, new PriorityQueue<>(),
                 factory, new DragonCollectionBuilder(factory), Dragon.class);
         CollectionBridge<Dragon> collectionBridge = new CollectionBridge<>(collectionHandler);
-        if (!filePath.equals(defaultPath)) collectionHandler.load();
-        CommandsHandler cmdHandler = new CommandsHandler();
+        collectionHandler.load();
+        ServerCommandsHandler cmdHandler = new ServerCommandsHandler();
+        ServerHandler serverHandler = null;
+        try {
+            serverHandler = new ServerHandler(cmdHandler);
+        } catch (IOException e) {
+            System.out.println(e);
+            System.exit(1);
+            //TODO
+        }
         cmdHandler.addCommands(
                 new Save(collectionHandler),
                 new Show(collectionHandler),
@@ -50,14 +59,12 @@ public class Main {
                 new CountByColor(collectionHandler),
                 new FilterByType(collectionHandler),
                 new FilterGreaterThanAge(collectionHandler),
-                new Info(collectionHandler));
-        ServerDataResponse serverData = new ServerDataResponse(cmdHandler.getCommandsData(), target);
-        try {
-            ServerHandler serverHandler = new ServerHandler(cmdHandler, serverData);
-            serverHandler.listen();
-        } catch (IOException e) {
-            System.out.println(e);
-            //TODO
-        }
+                new Info(collectionHandler),
+                new FetchServerData(),
+                new Disconnect(),
+                new ShutDown(serverHandler));
+        ServerData serverData = new ServerData(cmdHandler.getCommandsData(), target);
+        cmdHandler.setServerData(serverData);
+        serverHandler.listen();
     }
 }

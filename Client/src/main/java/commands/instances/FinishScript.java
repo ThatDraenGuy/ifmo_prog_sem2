@@ -1,13 +1,10 @@
 package commands.instances;
 
-import commands.AbstractCommand;
-import commands.ActionResult;
-import commands.CommandArgs;
-import commands.CommandType;
+import commands.*;
 
 public class FinishScript extends AbstractCommand {
     public FinishScript() {
-        super("finish_script", "command needed for scripts", CommandType.NO_ARGS);
+        super("finish_script", "command needed for scripts", CommandArgsType.NO_ARGS, CommandAccessLevel.INTERNAL);
     }
 
     public ActionResult action(CommandArgs args) {

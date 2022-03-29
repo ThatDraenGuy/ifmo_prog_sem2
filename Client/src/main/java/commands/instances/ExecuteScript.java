@@ -1,8 +1,6 @@
 package commands.instances;
 
 import client.App;
-import client.ConnectionHandler;
-import collection.DragonCollectionBuilder;
 import commands.*;
 import console.ConsoleHandler;
 
@@ -19,7 +17,7 @@ public class ExecuteScript extends AbstractCommand {
     private final HashSet<String> scriptHistory;
 
     public ExecuteScript(App app) {
-        super("execute_script", "считать и исполнить скрипт из указанного файла", CommandType.SIMPLE_ARG);
+        super("execute_script", "считать и исполнить скрипт из указанного файла", CommandArgsType.SIMPLE_ARG);
         this.app = app;
         this.scriptHistory = new HashSet<>();
     }
@@ -46,7 +44,7 @@ public class ExecuteScript extends AbstractCommand {
             PrintStream errPrint = new PrintStream(err);
             ConsoleHandler consoleHandler = new ConsoleHandler(in, outPrint, errPrint);
             try {
-                app.useDifferentConsole(consoleHandler);
+                app.useDifferentSettings(consoleHandler, CommandAccessLevel.INTERNAL);
             } catch (NoSuchElementException e) {
                 return finishScript(false, "Reached end of the script in the process of executing command!", path);
             }

@@ -4,7 +4,7 @@ import collection.CollectionHandler;
 import commands.AbstractCommand;
 import commands.ActionResult;
 import commands.CommandArgs;
-import commands.CommandType;
+import commands.CommandArgsType;
 
 /**
  * A command for displaying information about collection. Invokes {@link DragonCollectionHandler#info()}
@@ -13,7 +13,7 @@ public class Info extends AbstractCommand {
     private CollectionHandler<?> collectionHandler;
 
     public Info(CollectionHandler<?> collectionHandler) {
-        super("info", "вывести информацию о коллекции", CommandType.NO_ARGS);
+        super("info", "вывести информацию о коллекции", CommandArgsType.NO_ARGS);
 
         this.collectionHandler = collectionHandler;
     }

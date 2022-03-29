@@ -1,11 +1,10 @@
 package commands.instances;
 
 import collection.CollectionBridge;
-import collection.CollectionHandler;
 import commands.AbstractCommand;
 import commands.ActionResult;
 import commands.CommandArgs;
-import commands.CommandType;
+import commands.CommandArgsType;
 import exceptions.ElementIdException;
 import exceptions.IncorrectCollectibleTypeException;
 
@@ -16,7 +15,7 @@ public class Update extends AbstractCommand {
     private CollectionBridge<?> collectionBridge;
 
     public Update(CollectionBridge<?> collectionBridge) {
-        super("update", "обновить значение элемента коллекции, id которого равен заданному", CommandType.BOTH_ARG);
+        super("update", "обновить значение элемента коллекции, id которого равен заданному", CommandArgsType.BOTH_ARG);
         this.collectionBridge = collectionBridge;
     }
 

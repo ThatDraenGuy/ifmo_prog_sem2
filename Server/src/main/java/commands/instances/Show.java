@@ -4,7 +4,7 @@ import collection.CollectionHandler;
 import commands.AbstractCommand;
 import commands.ActionResult;
 import commands.CommandArgs;
-import commands.CommandType;
+import commands.CommandArgsType;
 
 /**
  * A command for showing collection's elements. Invokes {@link CollectionHandler#toString()}
@@ -13,7 +13,7 @@ public class Show extends AbstractCommand {
     private final CollectionHandler<?> collectionHandler;
 
     public Show(CollectionHandler<?> collectionHandler) {
-        super("show", "вывести все элементы коллекции в строковом представлении", CommandType.NO_ARGS);
+        super("show", "вывести все элементы коллекции в строковом представлении", CommandArgsType.NO_ARGS);
         this.collectionHandler = collectionHandler;
     }
 

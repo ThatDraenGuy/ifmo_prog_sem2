@@ -2,44 +2,46 @@ package collection.classes;
 
 import annotations.*;
 import annotations.CollectibleField;
+import lombok.Getter;
 import lombok.NonNull;
 
 
 import java.time.ZonedDateTime;
 
+@Getter
 public class Dragon implements MainCollectible<Dragon> {
     @NotNull
     @NonNull
     @LowerBounded
-    private Long id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
+    private final Long id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     @NonNull
     @NotNull
     @UserAccessible
-    private String name; //Поле не может быть null, Строка не может быть пустой
+    private final String name; //Поле не может быть null, Строка не может быть пустой
     @NotNull
     @NonNull
     @UserAccessible
     @CollectibleField
-    private Coordinates coordinates; //Поле не может быть null
+    private final Coordinates coordinates; //Поле не может быть null
     @NotNull
     @NonNull
-    private ZonedDateTime creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
+    private final ZonedDateTime creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
     @UserAccessible
     @LowerBounded
-    private Long age; //Значение поля должно быть больше 0, Поле может быть null
+    private final Long age; //Значение поля должно быть больше 0, Поле может быть null
     @NotNull
     @NonNull
     @UserAccessible
-    private Color color; //Поле не может быть null
+    private final Color color; //Поле не может быть null
     @UserAccessible
-    private DragonType type; //Поле может быть null
+    private final DragonType type; //Поле может быть null
     @NotNull
     @NonNull
     @UserAccessible
-    private DragonCharacter character; //Поле не может быть null
+    private final DragonCharacter character; //Поле не может быть null
     @CollectibleField
     @UserAccessible
-    private DragonCave cave; //Поле может быть null
+    private final DragonCave cave; //Поле может быть null
 
     public Dragon(Long id, String name, Coordinates coordinates, ZonedDateTime creationDate, Long age, Color color, DragonType type, DragonCharacter character, DragonCave cave) {
         this.id = id;
@@ -54,52 +56,13 @@ public class Dragon implements MainCollectible<Dragon> {
 
     }
 
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public Long getAge() {
-        return age;
-    }
-
-    @Override
-    public Color getColor() {
-        return color;
-    }
-
-    public Coordinates getCoordinates() {
-        return coordinates;
-    }
-
-    public DragonCave getCave() {
-        return cave;
-    }
-
-    public DragonCharacter getCharacter() {
-        return character;
-    }
-
-    @Override
-    public DragonType getType() {
-        return type;
-    }
-
-    @Override
-    public Long getId() {
-        return id;
-    }
-
-    public java.time.ZonedDateTime getCreationDate() {
-        return creationDate;
-    }
 
     public int compareTo(Dragon dragon) {
-        return this.name.length() - dragon.name.length();
+        return this.name.compareTo(dragon.getName());
     }
 
-    public int compareTo(RawCollectible rawDragon) {
-        return this.name.length() - rawDragon.getName().length();
+    public int compareTo(RawCollectible<Dragon> rawDragon) {
+        return this.name.compareTo(rawDragon.getName());
     }
 
     @Override
@@ -110,7 +73,7 @@ public class Dragon implements MainCollectible<Dragon> {
         str.append(color).append(" ");
         if (type != null) str.append(type).append(" ");
         str.append(character).append(" dragon. He was created at ").append(creationDate).append(" and is currently at ").append(coordinates);
-        if (cave != null) str.append(". His cave is ").append(cave);
+        if (cave != null) str.append(". His cave ").append(cave);
         return str.toString();
     }
 
