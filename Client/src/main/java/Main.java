@@ -22,7 +22,7 @@ public class Main {
             ConnectionHandler connectionHandler = new ConnectionHandler("127.0.0.1", 2525, consoleHandler);
             CommandsHandler clientCommandsHandler = new CommandsHandler();
             DragonCollectionBuilder collectionBuilder = new DragonCollectionBuilder(new DragonFactory());
-            CommandsExecutor commandsExecutor = new CommandsExecutor(connectionHandler, clientCommandsHandler);
+            CommandsExecutor commandsExecutor = new CommandsExecutor(connectionHandler, clientCommandsHandler, consoleHandler);
             App app = new App(commandsExecutor, collectionBuilder, consoleHandler);
             clientCommandsHandler.addCommands(
                     new Exit(consoleHandler, commandsExecutor),

@@ -1,6 +1,5 @@
 package commands.instances;
 
-import client.ConnectionHandler;
 import commands.*;
 import console.ConsoleHandler;
 

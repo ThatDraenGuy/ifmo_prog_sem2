@@ -1,6 +1,7 @@
 package server;
 
 import commands.CommandsHandler;
+import commands.ServerCommandsHandler;
 import message.ServerData;
 import org.slf4j.LoggerFactory;
 
@@ -14,13 +15,13 @@ import org.slf4j.Logger;
 
 public class ServerHandler {
     private final List<UserHandler> users;
-    private final CommandsHandler commandsHandler;
+    private final ServerCommandsHandler commandsHandler;
     private final ServerSocket server;
     private final Logger logger;
     final private int port = 2525;
     private boolean shutdownFlag = false;
 
-    public ServerHandler(CommandsHandler commandsHandler) throws IOException {
+    public ServerHandler(ServerCommandsHandler commandsHandler) throws IOException {
         server = new ServerSocket(port);
         this.commandsHandler = commandsHandler;
         this.users = new ArrayList<>();
@@ -52,7 +53,7 @@ public class ServerHandler {
 
     public void shutdown() {
         logger.info("Shutting down the server...");
+        commandsHandler.getServerData().setDisconnectRequested(true);
 //        users.forEach(this::disconnect);
-        System.exit(0);
     }
 }

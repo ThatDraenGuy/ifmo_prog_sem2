@@ -49,11 +49,11 @@ public class ConnectionHandler {
         }
     }
 
-    public Response send(Request data) {
+    public synchronized Response send(Request data) {
         try {
             Message<Request> message = new Message<>(data);
-            out.writeObject(message);
-            Message<Response> responseMessage = (Message<Response>) in.readObject();
+            sendMessage(message);
+            Message<Response> responseMessage = readMessage();
             return responseMessage.getData();
         } catch (ClassNotFoundException e) {
             consoleHandler.errorMessage(e);
@@ -64,5 +64,13 @@ public class ConnectionHandler {
             reconnect();
             return send(data);
         }
+    }
+
+    private void sendMessage(Message<Request> message) throws IOException {
+        out.writeObject(message);
+    }
+
+    private Message<Response> readMessage() throws IOException, ClassNotFoundException {
+        return (Message<Response>) in.readObject();
     }
 }

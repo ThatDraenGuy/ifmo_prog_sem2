@@ -1,11 +1,13 @@
 package commands;
 
+import lombok.Getter;
 import lombok.Setter;
 import message.CommandResponse;
 import message.Response;
 import message.ServerData;
 
 public class ServerCommandsHandler extends CommandsHandler {
+    @Getter
     @Setter
     private ServerData serverData;
 
