@@ -60,10 +60,14 @@ public class ConsoleHandler {
         out.println(str);
     }
 
+    public void debugMessage(String str) {
+        message(str);
+    }
+
     /**
      * A simple method that displays exception's message
      */
     public void errorMessage(Exception e) {
-        err.println(e.getMessage());
+        err.println(e.toString());
     }
 }

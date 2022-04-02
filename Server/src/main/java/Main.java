@@ -61,7 +61,6 @@ public class Main {
                 new FilterGreaterThanAge(collectionHandler),
                 new Info(collectionHandler),
                 new FetchServerData(),
-                new Disconnect(),
                 new ShutDown(serverHandler));
         ServerData serverData = new ServerData(cmdHandler.getCommandsData(), target);
         cmdHandler.setServerData(serverData);

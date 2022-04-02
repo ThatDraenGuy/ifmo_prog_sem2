@@ -3,15 +3,14 @@ package commands.instances;
 import commands.*;
 
 import java.util.Collection;
-import java.util.LinkedList;
 
 /**
  * A History command. Displays 5 last used commands.
  */
 public class History extends AbstractCommand {
-    private CommandsExecutor commandsExecutor;
+    private ExecutionController commandsExecutor;
 
-    public History(CommandsExecutor commandsExecutor) {
+    public History(ExecutionController commandsExecutor) {
         super("history", "вывести последние 5 команд", CommandArgsType.NO_ARGS);
         this.commandsExecutor = commandsExecutor;
     }

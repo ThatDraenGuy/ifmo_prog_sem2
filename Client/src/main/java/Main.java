@@ -1,8 +1,10 @@
-import client.App;
-import client.ConnectionHandler;
+import commands.ClientCommandsHandler;
+import threads.ClientInteractionController;
+import web.ConnectionHandler;
+import threads.ThreadHandler;
 import collection.DragonCollectionBuilder;
 import collection.classes.DragonFactory;
-import commands.CommandsExecutor;
+import commands.ExecutionController;
 import commands.CommandsHandler;
 import commands.instances.*;
 import console.ConsoleHandler;
@@ -20,17 +22,22 @@ public class Main {
         ConsoleHandler consoleHandler = new ConsoleHandler(System.in, System.out, System.err);
         try {
             ConnectionHandler connectionHandler = new ConnectionHandler("127.0.0.1", 2525, consoleHandler);
-            CommandsHandler clientCommandsHandler = new CommandsHandler();
+            ClientCommandsHandler clientCommandsHandler = new ClientCommandsHandler();
             DragonCollectionBuilder collectionBuilder = new DragonCollectionBuilder(new DragonFactory());
-            CommandsExecutor commandsExecutor = new CommandsExecutor(connectionHandler, clientCommandsHandler, consoleHandler);
-            App app = new App(commandsExecutor, collectionBuilder, consoleHandler);
+            ExecutionController executionController = new ExecutionController(clientCommandsHandler, consoleHandler);
+            ClientInteractionController app = new ClientInteractionController(executionController, collectionBuilder, consoleHandler);
+            ThreadHandler threadHandler = new ThreadHandler(connectionHandler, executionController, app, consoleHandler);
             clientCommandsHandler.addCommands(
-                    new Exit(consoleHandler, commandsExecutor),
-                    new History(commandsExecutor),
-                    new Help(commandsExecutor),
+                    new Exit(consoleHandler, executionController),
+                    new History(executionController),
+                    new Help(executionController),
                     new ExecuteScript(app),
-                    new FinishScript());
-            app.start();
+                    new FinishScript(),
+                    new Disconnect(connectionHandler, executionController),
+                    new Connect(connectionHandler, executionController, threadHandler));
+            //TODO think below
+            executionController.setThreadHandler(threadHandler);
+            threadHandler.start();
         } catch (IOException | ClassNotFoundException e) {
             consoleHandler.errorMessage(e);
         }

@@ -1,29 +1,24 @@
 package commands;
 
-import client.ConnectionHandler;
 import commands.instances.Disconnect;
+import threads.ThreadHandler;
 import commands.instances.FetchServerData;
 import console.ConsoleHandler;
 import exceptions.CommandArgsAmountException;
-import exceptions.ConnectionException;
 import lombok.Getter;
-import message.CommandRequest;
-import message.Request;
-import message.Response;
-import message.ServerData;
+import lombok.Setter;
+import message.*;
 
-import java.io.Serializable;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.LinkedList;
 
-public class CommandsExecutor {
-    final private static Command fetchServerDataCommand = new FetchServerData();
-    final private static Command disconnectCommand = new Disconnect();
+public class ExecutionController {
     @Getter
-    private CommandAccessLevel userAccessLevel = CommandAccessLevel.DEV;
-    final private ConnectionHandler connectionHandler;
-    final private CommandsHandler clientCommandsHandler;
+    private CommandAccessLevel userAccessLevel;
+    @Setter
+    private ThreadHandler threadHandler;
+    final private ClientCommandsHandler clientCommandsHandler;
     final private ConsoleHandler consoleHandler;
     private HashMap<String, CommandData> clientCommands;
     private HashMap<String, CommandData> serverCommands;
@@ -35,50 +30,44 @@ public class CommandsExecutor {
     private final HashMap<String, CommandData> accessibleServerCommands;
     @Getter
     private final Deque<CommandData> history;
-    private final int historyLength = 5;
-    private final Runnable fetchingLoop = () -> {
-        while (true) {
-            try {
-                Thread.sleep(5000);
-                fetchServerData();
-            } catch (InterruptedException e) {
-                return;
-            }
-        }
-    };
-    private final Thread fetchingThread = new Thread(fetchingLoop, "fetchingLoop");
+    private UserData userData;
 
-    public CommandsExecutor(ConnectionHandler connectionHandler, CommandsHandler clientCommandsHandler, ConsoleHandler consoleHandler) {
-        this.connectionHandler = connectionHandler;
+    public ExecutionController(ClientCommandsHandler clientCommandsHandler, ConsoleHandler consoleHandler) {
         this.clientCommandsHandler = clientCommandsHandler;
         this.consoleHandler = consoleHandler;
         this.accessibleClientCommands = new HashMap<>();
         this.accessibleServerCommands = new HashMap<>();
         this.history = new LinkedList<>();
+        this.clientCommands = null;
+        this.serverCommands = null;
+        this.userAccessLevel = CommandAccessLevel.DISCONNECTED;
+        this.userData = new UserData(clientCommandsHandler.getDisconnectCommandData());
     }
 
-    public void start() {
+    public void initialize() {
         clientCommands = clientCommandsHandler.getCommandsData();
-        fetchServerData();
+//        fetchServerData();
         historySetup();
-        commandAccessSetup();
-        fetchingThread.start();
+        commandSetup();
     }
 
-    private void commandAccessSetup() {
+    private void commandSetup() {
         accessibleClientCommands.clear();
         accessibleServerCommands.clear();
         for (String key : clientCommands.keySet()) {
             CommandData data = clientCommands.get(key);
             if (data.getAccessLevel().compareTo(userAccessLevel) <= 0) accessibleClientCommands.put(key, data);
         }
-        for (String key : serverCommands.keySet()) {
-            CommandData data = serverCommands.get(key);
-            if (data.getAccessLevel().compareTo(userAccessLevel) <= 0) accessibleServerCommands.put(key, data);
+        if (serverCommands != null) {
+            for (String key : serverCommands.keySet()) {
+                CommandData data = serverCommands.get(key);
+                if (data.getAccessLevel().compareTo(userAccessLevel) <= 0) accessibleServerCommands.put(key, data);
+            }
         }
     }
 
     private void historySetup() {
+        final int historyLength = 5;
         for (int i = 0; i <= historyLength; i++) {
             history.add(null);
         }
@@ -99,24 +88,32 @@ public class CommandsExecutor {
     }
 
     public Response executeCommand(Request request) throws CommandArgsAmountException {
+        handleServerData(request.getServerData());
+//        request.setUserData(userData);
         history.addLast(request.getCommandData());
         history.removeFirst();
         Response response;
+        consoleHandler.debugMessage("executing command...");
         if (isClientCommand(request)) response = clientCommandsHandler.executeCommand(request);
-        else response = connectionHandler.send(request);
+        else response = threadHandler.sendRequest(request);
         return handleResponse(response);
     }
 
-
-    private Response executeCommand(Command command) {
-        Request request = new CommandRequest(command.getData(), new CommandArgs(""));
-        try {
-            return executeCommand(request);
-        } catch (CommandArgsAmountException e) {
-            e.printStackTrace();
-            return null;
-        }
+    public Request createRequest(CommandData commandData, CommandArgs commandArgs) {
+        userData = new UserData(clientCommandsHandler.getDisconnectCommandData());
+        return new CommandRequest(commandData, commandArgs, userData);
     }
+
+//    private Response executeCommand(Command command) {
+//        //TODO
+//        Request request = createRequest(command.getData(), new CommandArgs(""));
+//        try {
+//            return executeCommand(request);
+//        } catch (CommandArgsAmountException e) {
+//            e.printStackTrace();
+//            return null;
+//        }
+//    }
 
     private Response handleResponse(Response response) {
         handleServerData(response.getServerData());
@@ -127,27 +124,17 @@ public class CommandsExecutor {
         if (serverData != null) {
             targetClass = serverData.getTargetClass();
             serverCommands = serverData.getServerCommands();
-            if (serverData.isDisconnectRequested()) forceDisconnect();
+            commandSetup();
+//            if (serverData.isDisconnectRequested()) forceDisconnect();
         }
-    }
-
-    public void fetchServerData() {
-        Response response = executeCommand(fetchServerDataCommand);
-        handleServerData(response.getServerData());
-    }
-
-    private void forceDisconnect() {
-        consoleHandler.errorMessage(new ConnectionException("Server forced disconnection"));
-        disconnect();
-    }
-
-    public void disconnect() {
-        fetchingThread.interrupt();
-        executeCommand(disconnectCommand);
     }
 
     public void setUserAccessLevel(CommandAccessLevel accessLevel) {
         this.userAccessLevel = accessLevel;
-        commandAccessSetup();
+        commandSetup();
+    }
+
+    public void exit() {
+        threadHandler.stop();
     }
 }

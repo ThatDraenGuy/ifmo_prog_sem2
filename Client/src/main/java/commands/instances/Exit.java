@@ -8,17 +8,17 @@ import console.ConsoleHandler;
  */
 public class Exit extends AbstractCommand {
     private final ConsoleHandler consoleHandler;
-    private final CommandsExecutor commandsExecutor;
+    private final ExecutionController commandsExecutor;
 
-    public Exit(ConsoleHandler consoleHandler, CommandsExecutor commandsExecutor) {
-        super("exit", "завершить программу (без сохранения в файл)", CommandArgsType.NO_ARGS, true);
+    public Exit(ConsoleHandler consoleHandler, ExecutionController executionController) {
+        super("exit", "выйти из приложения", CommandArgsType.NO_ARGS, CommandAccessLevel.DISCONNECTED, true);
         this.consoleHandler = consoleHandler;
-        this.commandsExecutor = commandsExecutor;
+        this.commandsExecutor = executionController;
     }
 
     public ActionResult action(CommandArgs args) {
         if (consoleHandler.promptAgreement("Are you sure you want to exit?")) {
-            commandsExecutor.disconnect();
+            commandsExecutor.exit();
             return new ActionResult(true, "exiting...", true);
         } else return new ActionResult(false, "Exit cancelled");
     }

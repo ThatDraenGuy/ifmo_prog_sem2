@@ -1,5 +1,6 @@
 package commands;
 
+import commands.instances.FetchServerData;
 import lombok.Getter;
 import lombok.Setter;
 import message.CommandResponse;
@@ -10,6 +11,8 @@ public class ServerCommandsHandler extends CommandsHandler {
     @Getter
     @Setter
     private ServerData serverData;
+    @Getter
+    private final Command fetchServerDataCommand = new FetchServerData();
 
     public ServerCommandsHandler() {
         super();

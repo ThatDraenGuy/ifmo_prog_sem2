@@ -1,6 +1,6 @@
 package commands.instances;
 
-import client.App;
+import threads.ClientInteractionController;
 import commands.*;
 import console.ConsoleHandler;
 
@@ -13,12 +13,12 @@ import java.util.Scanner;
  * A command for executing scripts.
  */
 public class ExecuteScript extends AbstractCommand {
-    private final App app;
+    private final ClientInteractionController app;
     private final HashSet<String> scriptHistory;
 
-    public ExecuteScript(App app) {
+    public ExecuteScript(ClientInteractionController clientInteractionController) {
         super("execute_script", "считать и исполнить скрипт из указанного файла", CommandArgsType.SIMPLE_ARG);
-        this.app = app;
+        this.app = clientInteractionController;
         this.scriptHistory = new HashSet<>();
     }
 

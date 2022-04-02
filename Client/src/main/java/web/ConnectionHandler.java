@@ -1,4 +1,4 @@
-package client;
+package web;
 
 
 import console.ConsoleHandler;
@@ -15,14 +15,15 @@ public class ConnectionHandler {
     private Socket socket;
     private ObjectInputStream in;
     private ObjectOutputStream out;
+
     public ConnectionHandler(String host, int port, ConsoleHandler consoleHandler) throws IOException, ClassNotFoundException {
         this.host = host;
         this.port = port;
         this.consoleHandler = consoleHandler;
-        connect();
+//        connect();
     }
 
-    private void connect() {
+    public void connect() {
         consoleHandler.message("Attempting to connect to " + host + ":" + port);
         reconnect();
     }
@@ -35,6 +36,7 @@ public class ConnectionHandler {
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
+            if (socket != null && socket.isClosed()) return;
             try {
                 socket = new Socket(host, port);
                 out = new ObjectOutputStream(socket.getOutputStream());
@@ -49,28 +51,57 @@ public class ConnectionHandler {
         }
     }
 
-    public synchronized Response send(Request data) {
+    public void disconnect() {
+        try {
+            socket.close();
+        } catch (IOException e) {
+            consoleHandler.errorMessage(e);
+        }
+
+    }
+
+    public void handleLostConnection() {
+        consoleHandler.errorMessage(new ConnectionException("Lost connection to the server, attempting to reconnect..."));
+        if (!socket.isClosed()) {
+            reconnect();
+        }
+    }
+
+    public void send(Request data) {
         try {
             Message<Request> message = new Message<>(data);
+            consoleHandler.debugMessage("I'm gonna send it");
             sendMessage(message);
-            Message<Response> responseMessage = readMessage();
-            return responseMessage.getData();
-        } catch (ClassNotFoundException e) {
-            consoleHandler.errorMessage(e);
-            return null;
-            //TODO normal check
+            consoleHandler.debugMessage("I sent it.");
         } catch (IOException e) {
-            consoleHandler.errorMessage(new ConnectionException("Lost connection to the server, attempting to reconnect..."));
-            reconnect();
-            return send(data);
+            handleLostConnection();
+            if (isConnectionOpen()) send(data);
         }
+//        try {
+//            Message<Request> message = new Message<>(data);
+//            sendMessage(message);
+//            Message<Response> responseMessage = readMessage();
+//            return responseMessage.getData();
+//        } catch (ClassNotFoundException e) {
+//            consoleHandler.errorMessage(e);
+//            return null;
+//            //TODO normal check
+//        } catch (IOException e) {
+//            consoleHandler.errorMessage(new ConnectionException("Lost connection to the server, attempting to reconnect..."));
+//            reconnect();
+//            return send(data);
+//        }
     }
 
     private void sendMessage(Message<Request> message) throws IOException {
         out.writeObject(message);
     }
 
-    private Message<Response> readMessage() throws IOException, ClassNotFoundException {
-        return (Message<Response>) in.readObject();
+    public synchronized <T> Message<T> readMessage() throws IOException, ClassNotFoundException {
+        return (Message<T>) in.readObject();
+    }
+
+    public boolean isConnectionOpen() {
+        return !socket.isClosed() && socket.isConnected();
     }
 }

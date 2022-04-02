@@ -1,7 +1,9 @@
 package server;
 
+import commands.CommandArgs;
 import commands.CommandsHandler;
 import commands.ServerCommandsHandler;
+import message.CommandRequest;
 import message.ServerData;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +55,7 @@ public class ServerHandler {
 
     public void shutdown() {
         logger.info("Shutting down the server...");
-        commandsHandler.getServerData().setDisconnectRequested(true);
+        users.forEach(UserHandler::forceDisconnect);
 //        users.forEach(this::disconnect);
     }
 }

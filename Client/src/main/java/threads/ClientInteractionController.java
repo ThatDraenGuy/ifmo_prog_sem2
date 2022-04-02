@@ -1,4 +1,4 @@
-package client;
+package threads;
 
 import annotations.CollectibleField;
 import annotations.UserAccessible;
@@ -11,7 +11,6 @@ import exceptions.CommandArgsAmountException;
 import exceptions.CommandExecutionException;
 import exceptions.CommandNonExistentException;
 import exceptions.ValueNotValidException;
-import message.CommandRequest;
 import message.Request;
 import message.Response;
 
@@ -22,29 +21,24 @@ import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
-public class App {
-    private final CommandsExecutor commandsExecutor;
+public class ClientInteractionController extends Thread {
+    private final ExecutionController commandsExecutor;
     private final CollectionBuilder<?> collectionBuilder;
     private ConsoleHandler consoleHandler;
 
-    public App(CommandsExecutor commandsExecutor, CollectionBuilder<?> collectionBuilder, ConsoleHandler consoleHandler) {
+    public ClientInteractionController(ExecutionController commandsExecutor, CollectionBuilder<?> collectionBuilder, ConsoleHandler consoleHandler) {
         this.collectionBuilder = collectionBuilder;
         this.commandsExecutor = commandsExecutor;
         this.consoleHandler = consoleHandler;
     }
 
-    /**
-     * Starts console's loop
-     */
-    public void start() {
-        commandsExecutor.start();
-        loop();
-    }
 
     /**
      * A main loop. Only returns if the "Exit" command is executed or a critical exception occurs.
      */
-    private void loop() {
+    public void run() {
+        consoleHandler.debugMessage("interactionController started");
+        commandsExecutor.initialize();
         while (true) {
             try {
                 String input = consoleHandler.promptInput("");
@@ -109,7 +103,7 @@ public class App {
                 }
 
         }
-        return new CommandRequest(commandData, arguments);
+        return commandsExecutor.createRequest(commandData, arguments);
     }
 
     /**
@@ -214,7 +208,7 @@ public class App {
         CommandAccessLevel oldAccessLevel = this.commandsExecutor.getUserAccessLevel();
         this.consoleHandler = consoleHandler;
         this.commandsExecutor.setUserAccessLevel(accessLevel);
-        loop();
+        run();
         this.commandsExecutor.setUserAccessLevel(oldAccessLevel);
         this.consoleHandler = oldConsoleHandler;
     }

@@ -13,4 +13,11 @@ public interface Request extends Serializable {
     CommandData getCommandData();
 
     CommandArgs getCommandArgs();
+
+    UserData getUserData();
+
+//    void setUserData(UserData userData);
+
+    ServerData getServerData();
+
 }
