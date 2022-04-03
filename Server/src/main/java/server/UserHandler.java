@@ -55,7 +55,7 @@ public class UserHandler extends Thread {
             } catch (EOFException e) {
                 logger.warn("Lost connection with user");
                 silentDisconnect();
-//                return;
+                return;
             } catch (IOException | ClassNotFoundException e) {
                 logger.error(e.toString());
                 disconnect();
@@ -63,14 +63,18 @@ public class UserHandler extends Thread {
         }
     }
 
-    public void silentDisconnect() {
+    private void closeSocket() {
         try {
             stopFlag = true;
-            myServerHandler.disconnect(this);
             user.close();
         } catch (IOException e) {
             logger.error("How did you screw up that badly? " + e);
         }
+    }
+
+    public void silentDisconnect() {
+        closeSocket();
+        myServerHandler.disconnect(this);
     }
 
     public void disconnect() {
@@ -80,7 +84,7 @@ public class UserHandler extends Thread {
 
     public void forceDisconnect() {
         sendRequest(new CommandRequest(userData.getDisconnectCommandData(), new CommandArgs("")));
-        silentDisconnect();
+        closeSocket();
     }
 
     public Message<Request> readMessage() throws IOException, ClassNotFoundException {

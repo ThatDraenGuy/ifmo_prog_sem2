@@ -1,10 +1,6 @@
 package server;
 
-import commands.CommandArgs;
-import commands.CommandsHandler;
 import commands.ServerCommandsHandler;
-import message.CommandRequest;
-import message.ServerData;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
@@ -53,9 +49,18 @@ public class ServerHandler {
         users.remove(userHandler);
     }
 
-    public void shutdown() {
-        logger.info("Shutting down the server...");
-        users.forEach(UserHandler::forceDisconnect);
-//        users.forEach(this::disconnect);
+    public void stopServer() {
+        final Runnable stopServer = () -> {
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException ignored) {
+            }
+            logger.info("Disconnecting all users...");
+            users.forEach(UserHandler::forceDisconnect);
+            users.forEach(this::disconnect);
+            logger.debug(users.toString());
+        };
+        Thread stopThread = new Thread(stopServer, "stopThread");
+        stopThread.start();
     }
 }

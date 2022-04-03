@@ -1,7 +1,6 @@
 import collection.*;
 import collection.classes.DragonFactory;
 import collection.classes.MainCollectible;
-import commands.CommandsHandler;
 import commands.ServerCommandsHandler;
 import commands.instances.*;
 import collection.classes.Dragon;
@@ -61,7 +60,7 @@ public class Main {
                 new FilterGreaterThanAge(collectionHandler),
                 new Info(collectionHandler),
                 new FetchServerData(),
-                new ShutDown(serverHandler));
+                new StopServer(serverHandler));
         ServerData serverData = new ServerData(cmdHandler.getCommandsData(), target);
         cmdHandler.setServerData(serverData);
         serverHandler.listen();

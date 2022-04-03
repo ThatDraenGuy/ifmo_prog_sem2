@@ -48,8 +48,9 @@ public class MessageReader implements Runnable {
                 }
             } catch (EOFException e) {
                 connectionHandler.handleLostConnection();
-//            } catch (SocketException ignored) {
-
+            } catch (SocketException ignored) {
+                consoleHandler.message("(connection terminated)");
+                //TODO think
             } catch (IOException | ClassNotFoundException e) {
                 consoleHandler.errorMessage(e);
             }

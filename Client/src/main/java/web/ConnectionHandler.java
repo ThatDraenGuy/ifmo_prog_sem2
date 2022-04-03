@@ -36,7 +36,7 @@ public class ConnectionHandler {
             } catch (InterruptedException ex) {
                 ex.printStackTrace();
             }
-            if (socket != null && socket.isClosed()) return;
+//            if (socket != null && socket.isClosed()) return;
             try {
                 socket = new Socket(host, port);
                 out = new ObjectOutputStream(socket.getOutputStream());
@@ -54,10 +54,10 @@ public class ConnectionHandler {
     public void disconnect() {
         try {
             socket.close();
+
         } catch (IOException e) {
             consoleHandler.errorMessage(e);
         }
-
     }
 
     public void handleLostConnection() {
