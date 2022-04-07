@@ -2,6 +2,8 @@ package collection;
 
 import collection.classes.MainCollectible;
 import org.json.*;
+import utility.ArrayListWithID;
+import utility.CollectionWithID;
 
 import java.util.*;
 
@@ -13,9 +15,10 @@ public class JsonHandler {
     /**
      *
      */
-    public <T extends MainCollectible<T>> Collection<Map<String, Object>> parseCollection(String collection, Class<T> target) {
-        List<Map<String, Object>> resultCollection = new ArrayList<>();
+    public <T extends MainCollectible<T>> CollectionWithID<Map<String, Object>> parseCollection(String collection, Class<T> target) {
         JSONObject fullFile = new JSONObject(collection);
+        long id = fullFile.getLong("collectionId");
+        CollectionWithID<Map<String, Object>> resultCollection = new ArrayListWithID<>(id);
         JSONArray collectibleArray = fullFile.getJSONArray(target.getName());
         for (int i = 0; i < collectibleArray.length(); i++) {
             JSONObject collectible = collectibleArray.getJSONObject(i);
@@ -28,12 +31,6 @@ public class JsonHandler {
      * A method to parse a single collectible from a JSON object to a deconstructed version
      */
     public <T> Map<String, Object> parseCollectible(JSONObject collectible, Class<T> target) {
-
-//        Map<String, Object> values = collectible.toMap();
-//        for (String key : values.keySet()) {
-//            collectionBuilder.put(key, values.get(key));
-//        }
-//        return collectionBuilder.build();
         return collectible.toMap();
     }
 
@@ -41,19 +38,16 @@ public class JsonHandler {
     /**
      *
      */
-    public <T extends MainCollectible<T>> String serializeCollection(Collection<T> collection, Class<T> target) {
+    public <T extends MainCollectible<T>> String serializeCollection(CollectionWithID<T> collection, Class<T> target) {
         JSONArray array = new JSONArray();
-//        StringBuilder builder = new StringBuilder("{ \"" + target.getName() + "\": [");
         for (T collectible : collection) {
-//            builder.append(serializeCollectible(collectible)).append(",");
             array.put(serializeCollectible(collectible));
         }
-//        builder.deleteCharAt(builder.length() - 1);
-//        builder.append("]}");
+
         JSONObject result = new JSONObject();
+        result.put("collectionId", collection.getId());
         result.put(target.getName(), array);
         return result.toString();
-//        return builder.toString();
     }
 
     /**

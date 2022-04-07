@@ -1,18 +1,20 @@
-package server;
+package web;
 
+import collection.classes.MainCollectible;
+import collection.history.CollectionChange;
 import commands.CommandArgs;
-import commands.CommandsHandler;
 import commands.ServerCommandsHandler;
+import lombok.Getter;
 import message.*;
 import org.slf4j.Logger;
+import utility.QueueWithID;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.Socket;
-import java.nio.channels.Channel;
-import java.nio.channels.SocketChannel;
+import java.util.Queue;
 
 
 public class UserHandler extends Thread {
@@ -23,6 +25,7 @@ public class UserHandler extends Thread {
     private final Socket user;
     private final ObjectInputStream in;
     private final ObjectOutputStream out;
+    @Getter
     private final Logger logger;
     private final ServerCommandsHandler commandsHandler;
     private UserData userData;
@@ -42,7 +45,7 @@ public class UserHandler extends Thread {
 
     @Override
     public synchronized void run() {
-        sendRequest(new CommandRequest(commandsHandler.getFetchServerDataCommand().getData(), new CommandArgs("")));
+        sendRequest(new CommandRequest(commandsHandler.getFetchServerDataCommand().getData(), new CommandArgs(""), commandsHandler.getServerData()));
         while (!stopFlag) {
             try {
 //                logger.debug("i'm still here");
@@ -88,14 +91,16 @@ public class UserHandler extends Thread {
     }
 
     public Message<Request> readMessage() throws IOException, ClassNotFoundException {
-        return (Message<Request>) in.readObject();
+        @SuppressWarnings({"unchecked"}) Message<Request> requestMessage = (Message<Request>) in.readObject();
+        return requestMessage;
     }
 
     public Message<Response> handleMessage(Message<Request> message) {
         Request request = message.getData();
         userData = request.getUserData();
-        if (userData != null) logger.debug(userData + " " + userData.getDisconnectCommandData());
-        else logger.debug("bruh");
+        UserDataHandler.handleUserData(this, userData);
+//        if (userData != null) logger.debug(userData + " " + userData.getDisconnectCommandData());
+//        else logger.debug("bruh");
         disconnectionFlag = request.getCommandData().isDisconnectionNeeded();
         logger.info("got a request");
         return new Message<>(commandsHandler.executeCommand(request));
@@ -109,7 +114,7 @@ public class UserHandler extends Thread {
             sendMessage(requestMessage);
             logger.debug("sent a request");
         } catch (IOException e) {
-            logger.error("Couldn't send request to user: " + e.toString());
+            logger.error("Couldn't send request to user: " + e);
         }
     }
 
@@ -117,4 +122,15 @@ public class UserHandler extends Thread {
         out.writeObject(message);
     }
 
+    public void sendCollectionChangeRequest(Queue<CollectionChange<? extends MainCollectible<?>>> collectionChanges) {
+        logger.debug(collectionChanges.toString());
+        Request request = new CommandRequest(userData.getApplyCollectionChangeCommandData(), new CommandArgs("", collectionChanges));
+        sendRequest(request);
+    }
+
+    public void sendFullCollectionChangeRequest(QueueWithID<? extends MainCollectible<?>> collection) {
+        logger.debug(collection.toString());
+        Request request = new CommandRequest(userData.getApplyFullCollectionCommandData(), new CommandArgs("", collection));
+        sendRequest(request);
+    }
 }

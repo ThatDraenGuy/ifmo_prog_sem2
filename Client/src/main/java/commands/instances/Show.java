@@ -1,5 +1,6 @@
 package commands.instances;
 
+import collection.CollectionClassesHandler;
 import collection.CollectionHandler;
 import commands.AbstractCommand;
 import commands.ActionResult;
@@ -10,18 +11,18 @@ import commands.CommandArgsType;
  * A command for showing collection's elements. Invokes {@link CollectionHandler#toString()}
  */
 public class Show extends AbstractCommand {
-    private final CollectionHandler<?> collectionHandler;
+    private final CollectionClassesHandler collectionClassesHandler;
 
-    public Show(CollectionHandler<?> collectionHandler) {
+    public Show(CollectionClassesHandler collectionClassesHandler) {
         super("show", "вывести все элементы коллекции в строковом представлении", CommandArgsType.NO_ARGS);
-        this.collectionHandler = collectionHandler;
+        this.collectionClassesHandler = collectionClassesHandler;
     }
 
     @Override
     public ActionResult action(CommandArgs args) {
-        String str = collectionHandler.toString();
+        String str = collectionClassesHandler.getCurrentCollectionHandler().toString();
         if (!str.equals("")) {
-            return new ActionResult(true, collectionHandler.toString());
+            return new ActionResult(true, str);
         } else {
             return new ActionResult(true, "There are no elements in the collection");
         }

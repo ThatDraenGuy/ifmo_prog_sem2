@@ -1,17 +1,17 @@
 package commands;
 
-import commands.instances.Disconnect;
-import threads.ThreadHandler;
+
+import collection.CollectionClassesHandler;
 import commands.instances.FetchServerData;
+import threads.ThreadHandler;
 import console.ConsoleHandler;
 import exceptions.CommandArgsAmountException;
 import lombok.Getter;
 import lombok.Setter;
 import message.*;
+import utility.LimitedCollection;
 
-import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedList;
 
 public class ExecutionController {
     @Getter
@@ -20,34 +20,34 @@ public class ExecutionController {
     private ThreadHandler threadHandler;
     final private ClientCommandsHandler clientCommandsHandler;
     final private ConsoleHandler consoleHandler;
+    @Getter
+    private final CollectionClassesHandler targetClassHandler;
     private HashMap<String, CommandData> clientCommands;
     private HashMap<String, CommandData> serverCommands;
-    @Getter
-    private Class<?> targetClass;
     @Getter
     private final HashMap<String, CommandData> accessibleClientCommands;
     @Getter
     private final HashMap<String, CommandData> accessibleServerCommands;
     @Getter
-    private final Deque<CommandData> history;
+    private final LimitedCollection<CommandData> history;
     private UserData userData;
 
-    public ExecutionController(ClientCommandsHandler clientCommandsHandler, ConsoleHandler consoleHandler) {
+    public ExecutionController(ClientCommandsHandler clientCommandsHandler, ConsoleHandler consoleHandler, CollectionClassesHandler targetClassHandler) {
         this.clientCommandsHandler = clientCommandsHandler;
         this.consoleHandler = consoleHandler;
         this.accessibleClientCommands = new HashMap<>();
         this.accessibleServerCommands = new HashMap<>();
-        this.history = new LinkedList<>();
+        this.history = new LimitedCollection<>(5);
         this.clientCommands = null;
         this.serverCommands = null;
         this.userAccessLevel = CommandAccessLevel.DISCONNECTED;
-        this.userData = new UserData(clientCommandsHandler.getDisconnectCommandData());
+        this.targetClassHandler = targetClassHandler;
+        this.userData = createUserData();
     }
 
     public void initialize() {
         clientCommands = clientCommandsHandler.getCommandsData();
 //        fetchServerData();
-        historySetup();
         commandSetup();
     }
 
@@ -66,12 +66,6 @@ public class ExecutionController {
         }
     }
 
-    private void historySetup() {
-        final int historyLength = 5;
-        for (int i = 0; i <= historyLength; i++) {
-            history.add(null);
-        }
-    }
 
     public boolean isInCommands(String name) {
         return (accessibleServerCommands.containsKey(name) || accessibleClientCommands.containsKey(name));
@@ -88,10 +82,8 @@ public class ExecutionController {
     }
 
     public Response executeCommand(Request request) throws CommandArgsAmountException {
-        handleServerData(request.getServerData());
-//        request.setUserData(userData);
-        history.addLast(request.getCommandData());
-        history.removeFirst();
+        request = handleRequest(request);
+        history.add(request.getCommandData());
         Response response;
         consoleHandler.debugMessage("executing command...");
         if (isClientCommand(request)) response = clientCommandsHandler.executeCommand(request);
@@ -100,11 +92,11 @@ public class ExecutionController {
     }
 
     public Request createRequest(CommandData commandData, CommandArgs commandArgs) {
-        userData = new UserData(clientCommandsHandler.getDisconnectCommandData());
+        userData = createUserData();
         return new CommandRequest(commandData, commandArgs, userData);
     }
 
-//    private Response executeCommand(Command command) {
+    //    private Response executeCommand(Command command) {
 //        //TODO
 //        Request request = createRequest(command.getData(), new CommandArgs(""));
 //        try {
@@ -114,6 +106,11 @@ public class ExecutionController {
 //            return null;
 //        }
 //    }
+    private Request handleRequest(Request request) {
+        handleServerData(request.getServerData());
+        request.setUserData(userData);
+        return request;
+    }
 
     private Response handleResponse(Response response) {
         handleServerData(response.getServerData());
@@ -122,7 +119,7 @@ public class ExecutionController {
 
     private void handleServerData(ServerData serverData) {
         if (serverData != null) {
-            targetClass = serverData.getTargetClass();
+            targetClassHandler.handleTargetClass(serverData.getTargetClass());
             serverCommands = serverData.getServerCommands();
             commandSetup();
 //            if (serverData.isDisconnectRequested()) forceDisconnect();
@@ -134,7 +131,10 @@ public class ExecutionController {
         commandSetup();
     }
 
-    public void exit() {
-        threadHandler.stop();
+    private UserData createUserData() {
+        return new UserData(targetClassHandler.getCurrentId(), clientCommandsHandler.getDisconnectCommandData(), clientCommandsHandler.getApplyCollectionChangeCommandData(), clientCommandsHandler.getApplyFullCollectionCommandData());
     }
+//    public void fetchServerData() {
+//        executeCommand(new FetchServerData());
+//    }
 }

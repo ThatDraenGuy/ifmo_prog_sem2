@@ -16,7 +16,7 @@ public interface Request extends Serializable {
 
     UserData getUserData();
 
-//    void setUserData(UserData userData);
+    void setUserData(UserData userData);
 
     ServerData getServerData();
 

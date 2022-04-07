@@ -8,7 +8,7 @@ import commands.CommandArgsType;
 import exceptions.ElementIdException;
 
 /**
- * A command for removing element by its id. Invokes {@link DragonCollectionHandler#removeById(String)}
+ * A command for removing element by its id. Invokes {@link CollectionHandler#removeById(String)}
  */
 public class RemoveById extends AbstractCommand {
     CollectionHandler<?> collectionHandler;

@@ -9,7 +9,7 @@ import commands.CommandArgsType;
 import java.util.NoSuchElementException;
 
 /**
- * A command for removing first element from collection. Invokes {@link DragonCollectionHandler#removeFirst()}
+ * A command for removing first element from collection. Invokes {@link CollectionHandler#removeFirst()}
  */
 public class RemoveFirst extends AbstractCommand {
     CollectionHandler<?> collectionHandler;

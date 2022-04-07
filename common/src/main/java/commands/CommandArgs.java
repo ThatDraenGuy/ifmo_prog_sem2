@@ -2,12 +2,13 @@ package commands;
 
 import collection.classes.MainCollectible;
 import collection.classes.RawCollectible;
-import collection.classes.RawDragon;
+import collection.history.CollectionChange;
 import lombok.Getter;
+import utility.LimitedCollection;
+import utility.QueueWithID;
 
 import java.io.Serializable;
-import java.lang.reflect.Field;
-import java.util.HashMap;
+import java.util.Queue;
 
 /**
  * A class that represents arguments command needs to perform its action. As of now it uses separated fields for
@@ -18,6 +19,10 @@ public class CommandArgs implements Serializable {
     private final String args;
     @Getter
     private RawCollectible<?> rawObject;
+    @Getter
+    private Queue<CollectionChange<? extends MainCollectible<?>>> collectionChanges;
+    @Getter
+    private QueueWithID<? extends MainCollectible<?>> fullCollection;
 
     public CommandArgs(String args) {
         this.args = args;
@@ -29,5 +34,13 @@ public class CommandArgs implements Serializable {
         this.args = args;
     }
 
+    public CommandArgs(String args, Queue<CollectionChange<? extends MainCollectible<?>>> collectionChanges) {
+        this.args = args;
+        this.collectionChanges = collectionChanges;
+    }
 
+    public CommandArgs(String args, QueueWithID<? extends MainCollectible<?>> fullCollection) {
+        this.args = args;
+        this.fullCollection = fullCollection;
+    }
 }

@@ -1,7 +1,7 @@
 package commands.instances;
 
 import commands.*;
-import server.ServerHandler;
+import web.ServerHandler;
 
 public class StopServer extends AbstractCommand {
     private final ServerHandler serverHandler;

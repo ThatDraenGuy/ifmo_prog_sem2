@@ -22,7 +22,9 @@ public class ThreadHandler {
     private final ConsoleHandler consoleHandler;
     private Thread requestListenerThread;
     private Thread messageReaderThread;
+    @Getter
     private final MessageReader messageReader;
+    private final RequestListener requestListener;
 
 
     public ThreadHandler(ConnectionHandler connectionHandler, ExecutionController executionController, ClientInteractionController clientInteractionController, ConsoleHandler consoleHandler) {
@@ -31,33 +33,27 @@ public class ThreadHandler {
         this.clientInteractionController = clientInteractionController;
         this.consoleHandler = consoleHandler;
         this.messageReader = new MessageReader(this, connectionHandler, consoleHandler);
+        this.requestListener = new RequestListener(this, consoleHandler, executionController);
 //        freshRequestMessage = null;
 //        freshResponseMessage = null;
     }
 
     public void start() {
-        final Runnable requestListener = () -> {
-            while (true) {
-                consoleHandler.debugMessage("requestListener started");
-                try {
-                    synchronized (requestListenerLock) {
-                        requestListenerLock.wait();
-                        executionController.executeCommand(messageReader.getFreshRequestMessage().getData());
-                    }
-                } catch (InterruptedException e) {
-                    return;
-                } catch (CommandArgsAmountException ignored) {
-                }
+//        final Runnable requestListener = () -> {
+//            while (true) {
+//                consoleHandler.debugMessage("requestListener started");
 //                try {
-//                    Message<Request> requestMessage = connectionHandler.readMessage();
-//                    commandsHandler.executeCommand(requestMessage.getData());
-//                } catch (IOException | ClassNotFoundException e) {
-//                    //TODO
+//                    synchronized (requestListenerLock) {
+//                        requestListenerLock.wait();
+//                        executionController.executeCommand(messageReader.getFreshRequestMessage().getData());
+//                    }
+//                } catch (InterruptedException e) {
+//                    return;
+//                } catch (CommandArgsAmountException ignored) {
 //                }
-            }
-        };
+//            }
+//        };
         requestListenerThread = new Thread(requestListener, "requestListener");
-//        reloadMessageReader();
         requestListenerThread.start();
         clientInteractionController.start();
     }
@@ -78,30 +74,6 @@ public class ThreadHandler {
     }
 
     public void reloadMessageReader() {
-//        final Runnable messageReader = () -> {
-//            while (connectionHandler.isConnectionOpen()) {
-//                consoleHandler.debugMessage("messageReader started");
-//                try {
-//                    Message<?> message = connectionHandler.readMessage();
-//                    consoleHandler.debugMessage("I got a message!");
-//                    if (message.getData() instanceof Request) {
-//                        freshRequestMessage = (Message<Request>) message;
-//                        synchronized (requestListenerLock) {
-//                            requestListenerLock.notify();
-//                        }
-//                    } else {
-//                        freshResponseMessage = (Message<Response>) message;
-//                        synchronized (responseListenerLock) {
-//                            responseListenerLock.notify();
-//                        }
-//                    }
-//                } catch (EOFException e) {
-//                    connectionHandler.handleLostConnection();
-//                } catch (IOException | ClassNotFoundException e) {
-//                    consoleHandler.errorMessage(e);
-//                }
-//            }
-//        };
         messageReaderThread = new Thread(messageReader, "messageReader");
         messageReaderThread.start();
     }

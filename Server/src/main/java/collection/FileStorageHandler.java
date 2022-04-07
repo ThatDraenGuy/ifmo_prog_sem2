@@ -6,6 +6,7 @@ import exceptions.ValueNotValidException;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utility.CollectionWithID;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
@@ -34,7 +35,7 @@ public class FileStorageHandler implements StorageHandler {
      * @return a list of deconstructed objects to be put in a collection
      */
     @Override
-    public <T extends MainCollectible<T>> Collection<Map<String, Object>> load(Class<T> target) {
+    public <T extends MainCollectible<T>> CollectionWithID<Map<String, Object>> load(Class<T> target) {
         try {
             StringBuilder JSONString = new StringBuilder();
             Scanner scanner = new Scanner(file);
@@ -59,7 +60,7 @@ public class FileStorageHandler implements StorageHandler {
      * @throws IOException if there is an issue with writing information in a file.
      */
     @Override
-    public <T extends MainCollectible<T>> void save(Collection<T> collection, Class<T> target) throws IOException {
+    public <T extends MainCollectible<T>> void save(CollectionWithID<T> collection, Class<T> target) throws IOException {
         String JSONString = jsonHandler.serializeCollection(collection, target);
         FileOutputStream fileOutputStream = new FileOutputStream(this.file);
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);

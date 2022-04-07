@@ -11,6 +11,7 @@ public class CommandRequest implements Request {
     @Getter
     private final CommandArgs commandArgs;
     @Getter
+    @Setter
     private UserData userData;
     @Getter
     private ServerData serverData;

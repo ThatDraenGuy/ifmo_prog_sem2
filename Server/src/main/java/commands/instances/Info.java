@@ -7,7 +7,7 @@ import commands.CommandArgs;
 import commands.CommandArgsType;
 
 /**
- * A command for displaying information about collection. Invokes {@link DragonCollectionHandler#info()}
+ * A command for displaying information about collection. Invokes {@link CollectionHandler#info()}
  */
 public class Info extends AbstractCommand {
     private CollectionHandler<?> collectionHandler;

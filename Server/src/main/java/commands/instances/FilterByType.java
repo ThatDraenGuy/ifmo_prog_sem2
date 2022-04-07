@@ -7,7 +7,7 @@ import commands.CommandArgs;
 import commands.CommandArgsType;
 
 /**
- * A command to filter elements by type. Invokes {@link DragonCollectionHandler#filterByType(String)}
+ * A command to filter elements by type. Invokes {@link CollectionHandler#filterByType(String)}
  */
 public class FilterByType extends AbstractCommand {
     private CollectionHandler<?> collectionHandler;

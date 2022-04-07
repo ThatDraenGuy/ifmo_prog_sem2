@@ -5,11 +5,11 @@ import commands.ServerCommandsHandler;
 import commands.instances.*;
 import collection.classes.Dragon;
 import message.ServerData;
-import server.ServerHandler;
+import web.ServerHandler;
+import web.UserDataHandler;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.PriorityQueue;
 
 /**
  * A Main class, only consists of main() method.
@@ -33,10 +33,6 @@ public class Main {
         }
         StorageHandler storageHandler = new FileStorageHandler(new File(filePath), new JsonHandler());
         DragonFactory factory = new DragonFactory();
-        CollectionHandler<Dragon> collectionHandler = new ConcreteCollectionHandler<>(storageHandler, new PriorityQueue<>(),
-                factory, new DragonCollectionBuilder(factory), Dragon.class);
-        CollectionBridge<Dragon> collectionBridge = new CollectionBridge<>(collectionHandler);
-        collectionHandler.load();
         ServerCommandsHandler cmdHandler = new ServerCommandsHandler();
         ServerHandler serverHandler = null;
         try {
@@ -46,9 +42,15 @@ public class Main {
             System.exit(1);
             //TODO
         }
+        ServerCollectionHandler<Dragon> collectionHandler = new ServerCollectionHandler<>(storageHandler, serverHandler,
+                factory, new DragonCollectionBuilder(factory), Dragon.class);
+        UserDataHandler.setCollectionHandler(collectionHandler);
+        CollectionBridge<Dragon> collectionBridge = new CollectionBridge<>(collectionHandler);
+        collectionHandler.load();
+
         cmdHandler.addCommands(
                 new Save(collectionHandler),
-                new Show(collectionHandler),
+//                new Show(collectionHandler),
                 new RemoveFirst(collectionHandler),
                 new RemoveById(collectionHandler),
                 new Add(collectionBridge),

@@ -21,6 +21,7 @@ public class Connect extends AbstractCommand {
         connectionHandler.connect();
         threadHandler.reloadMessageReader();
         executionController.setUserAccessLevel(CommandAccessLevel.DEV);
+//        executionController.fetchServerData();
         //TODO normal level changing
         return new ActionResult(true, "You have been successfully connected");
     }

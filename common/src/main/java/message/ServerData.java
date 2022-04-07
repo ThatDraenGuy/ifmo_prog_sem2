@@ -1,5 +1,6 @@
 package message;
 
+import collection.history.CollectionChange;
 import commands.CommandData;
 import lombok.Getter;
 import lombok.Setter;

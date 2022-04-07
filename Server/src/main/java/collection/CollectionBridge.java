@@ -6,9 +6,9 @@ import exceptions.ElementIdException;
 import exceptions.IncorrectCollectibleTypeException;
 
 public class CollectionBridge<T extends MainCollectible<T>> {
-    private final CollectionHandler<T> collectionHandler;
+    private final ServerCollectionHandler<T> collectionHandler;
 
-    public CollectionBridge(CollectionHandler<T> collectionHandler) {
+    public CollectionBridge(ServerCollectionHandler<T> collectionHandler) {
         this.collectionHandler = collectionHandler;
     }
 

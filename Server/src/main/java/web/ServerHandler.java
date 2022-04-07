@@ -1,5 +1,7 @@
-package server;
+package web;
 
+import collection.classes.MainCollectible;
+import collection.history.CollectionChange;
 import commands.ServerCommandsHandler;
 import org.slf4j.LoggerFactory;
 
@@ -8,8 +10,10 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Queue;
 
 import org.slf4j.Logger;
+import utility.LimitedCollection;
 
 public class ServerHandler {
     private final List<UserHandler> users;
@@ -23,7 +27,7 @@ public class ServerHandler {
         server = new ServerSocket(port);
         this.commandsHandler = commandsHandler;
         this.users = new ArrayList<>();
-        logger = LoggerFactory.getLogger("server");
+        logger = LoggerFactory.getLogger("web");
     }
 
     public void listen() {
@@ -63,4 +67,9 @@ public class ServerHandler {
         Thread stopThread = new Thread(stopServer, "stopThread");
         stopThread.start();
     }
+
+    public void sendCollectionChanges(Queue<CollectionChange<? extends MainCollectible<?>>> collectionChanges) {
+        users.forEach(userHandler -> userHandler.sendCollectionChangeRequest(collectionChanges));
+    }
+
 }

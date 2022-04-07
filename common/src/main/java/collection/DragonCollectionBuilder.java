@@ -5,6 +5,8 @@ import collection.classes.*;
 import exceptions.InvalidCollectionException;
 import exceptions.ValueNotValidException;
 import lombok.Getter;
+import utility.ArrayListWithID;
+import utility.CollectionWithID;
 
 import java.lang.reflect.Field;
 import java.time.ZonedDateTime;
@@ -68,9 +70,10 @@ private final HashMap<String, Field> fieldsFromNames;
         return builder.build();
     }
 
-    public Collection<Dragon> build(Collection<Map<String, Object>> collection) throws InvalidCollectionException {
+    public CollectionWithID<Dragon> build(CollectionWithID<Map<String, Object>> collection) throws InvalidCollectionException {
+        long id = collection.getId();
         try {
-            Collection<Dragon> resultCollection = new ArrayList<>();
+            CollectionWithID<Dragon> resultCollection = new ArrayListWithID<>(id);
             for (Map<String, Object> map : collection) {
                 resultCollection.add(buildDragon(map));
             }

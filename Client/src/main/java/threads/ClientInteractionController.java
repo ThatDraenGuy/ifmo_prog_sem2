@@ -2,7 +2,6 @@ package threads;
 
 import annotations.CollectibleField;
 import annotations.UserAccessible;
-import collection.CollectionBuilder;
 import collection.Validator;
 import collection.classes.RawCollectible;
 import commands.*;
@@ -23,11 +22,9 @@ import java.util.NoSuchElementException;
 
 public class ClientInteractionController extends Thread {
     private final ExecutionController commandsExecutor;
-    private final CollectionBuilder<?> collectionBuilder;
     private ConsoleHandler consoleHandler;
 
-    public ClientInteractionController(ExecutionController commandsExecutor, CollectionBuilder<?> collectionBuilder, ConsoleHandler consoleHandler) {
-        this.collectionBuilder = collectionBuilder;
+    public ClientInteractionController(ExecutionController commandsExecutor, ConsoleHandler consoleHandler) {
         this.commandsExecutor = commandsExecutor;
         this.consoleHandler = consoleHandler;
     }
@@ -135,23 +132,23 @@ public class ClientInteractionController extends Thread {
 
 
     private RawCollectible<?> promptComplexArgs() {
-        Map<String, Object> map = promptComplexArgs(commandsExecutor.getTargetClass());
+        Map<String, Object> map = promptComplexArgsMap(commandsExecutor.getTargetClassHandler().getCurrentClass());
         try {
-            return collectionBuilder.rawBuild(map);
+            return commandsExecutor.getTargetClassHandler().getCurrentCollectionBuilder().rawBuild(map);
         } catch (ValueNotValidException e) {
             consoleHandler.errorMessage(e);
             return null;
         }
     }
 
-    private Map<String, Object> promptComplexArgs(Class<?> targetClass) {
-        List<Field> fields = collectionBuilder.getClassFields(targetClass);
+    private Map<String, Object> promptComplexArgsMap(Class<?> targetClass) {
+        List<Field> fields = commandsExecutor.getTargetClassHandler().getCurrentCollectionBuilder().getClassFields(targetClass);
         Map<String, Object> map = new HashMap<>();
         for (Field field : fields) {
             String key = field.getName();
             if (field.isAnnotationPresent(UserAccessible.class)) {
                 if (!field.isAnnotationPresent(CollectibleField.class)) map.put(key, promptField(key, field));
-                else map.put(key, promptComplexArgs(field.getType()));
+                else map.put(key, promptComplexArgsMap(field.getType()));
             }
         }
         return map;
