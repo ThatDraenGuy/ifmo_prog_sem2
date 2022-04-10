@@ -36,12 +36,17 @@ public class MessageReader implements Runnable {
                 Message<?> message = connectionHandler.readMessage();
                 consoleHandler.debugMessage("I got a message!");
                 if (message.getData() instanceof Request) {
-                    freshRequestMessage = (Message<Request>) message;
+                    @SuppressWarnings({"unchecked"})
+                    Message<Request> requestMessage = (Message<Request>) message;
+                    freshRequestMessage = requestMessage;
                     synchronized (threadHandler.getRequestListenerLock()) {
                         threadHandler.getRequestListenerLock().notify();
                     }
                 } else {
-                    freshResponseMessage = (Message<Response>) message;
+                    @SuppressWarnings({"unchecked"})
+
+                    Message<Response> responseMessage = (Message<Response>) message;
+                    freshResponseMessage = responseMessage;
                     synchronized (threadHandler.getResponseListenerLock()) {
                         threadHandler.getResponseListenerLock().notify();
                     }
@@ -50,7 +55,6 @@ public class MessageReader implements Runnable {
                 connectionHandler.handleLostConnection();
             } catch (SocketException ignored) {
                 consoleHandler.message("(connection terminated)");
-                //TODO think
             } catch (IOException | ClassNotFoundException e) {
                 consoleHandler.errorMessage(e);
             }

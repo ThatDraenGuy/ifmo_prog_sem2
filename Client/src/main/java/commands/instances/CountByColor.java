@@ -1,7 +1,6 @@
 package commands.instances;
 
 import collection.CollectionClassesHandler;
-import collection.CollectionHandler;
 import commands.AbstractCommand;
 import commands.ActionResult;
 import commands.CommandArgs;

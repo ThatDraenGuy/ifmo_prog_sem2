@@ -6,8 +6,6 @@ import exceptions.CollectionVersionIsBehindException;
 import utility.PriorityQueueWithID;
 import utility.QueueWithID;
 
-import java.util.Collection;
-
 public class ClientCollectionHandler<T extends MainCollectible<T>> extends CollectionHandler<T> {
     public ClientCollectionHandler(CollectionBuilder<T> collectionBuilder, Class<T> targetClass) {
         super(new PriorityQueueWithID<>(), collectionBuilder, targetClass);
@@ -25,19 +23,15 @@ public class ClientCollectionHandler<T extends MainCollectible<T>> extends Colle
                 throw new CollectionVersionIsBehindException("Local collection is behind");
             return;
         }
-        doChange((CollectionChange<T>) collectionChange);
-    }
-
-    private void doChange(CollectionChange<T> collectionChange) {
-        Collection<?> addedElements = collectionChange.getAddedElements();
-        Collection<?> removedElements = collectionChange.getRemovedElements();
-        collection.addAll(castCollection(addedElements));
-        collection.removeAll(castCollection(removedElements));
-        collection.setId(collectionChange.getNewCollectionId());
+        @SuppressWarnings({"unchecked"})
+        CollectionChange<T> castedCollectionChange = (CollectionChange<T>) collectionChange;
+        castedCollectionChange.apply(collection);
     }
 
     public void setCollection(QueueWithID<? extends MainCollectible<?>> collection) {
-        this.collection = (QueueWithID<T>) collection;
+        @SuppressWarnings({"unchecked"})
+        QueueWithID<T> castedCollection = (QueueWithID<T>) collection;
+        this.collection = castedCollection;
     }
 
     public CollectionBuilder<T> getCollectionBuilder() {

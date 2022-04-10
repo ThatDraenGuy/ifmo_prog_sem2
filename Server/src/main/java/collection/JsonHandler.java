@@ -22,7 +22,7 @@ public class JsonHandler {
         JSONArray collectibleArray = fullFile.getJSONArray(target.getName());
         for (int i = 0; i < collectibleArray.length(); i++) {
             JSONObject collectible = collectibleArray.getJSONObject(i);
-            resultCollection.add(parseCollectible(collectible, target));
+            resultCollection.add(parseCollectible(collectible));
         }
         return resultCollection;
     }
@@ -30,7 +30,7 @@ public class JsonHandler {
     /**
      * A method to parse a single collectible from a JSON object to a deconstructed version
      */
-    public <T> Map<String, Object> parseCollectible(JSONObject collectible, Class<T> target) {
+    public Map<String, Object> parseCollectible(JSONObject collectible) {
         return collectible.toMap();
     }
 

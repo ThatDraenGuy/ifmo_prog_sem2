@@ -1,6 +1,5 @@
 package commands.instances;
 
-import collection.CollectionHandler;
 import collection.ServerCollectionHandler;
 import commands.*;
 

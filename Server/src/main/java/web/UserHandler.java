@@ -7,35 +7,36 @@ import commands.ServerCommandsHandler;
 import lombok.Getter;
 import message.*;
 import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import utility.QueueWithID;
 
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.Socket;
+import java.nio.channels.SocketChannel;
 import java.util.Queue;
 
 
 public class UserHandler extends Thread {
     private final ServerHandler myServerHandler;
-    //TODO think
-    private final Socket user;
     private final ObjectInputStream in;
     private final ObjectOutputStream out;
     @Getter
     private final Logger logger;
     private final ServerCommandsHandler commandsHandler;
     private UserData userData;
+    //
+    private final SocketChannel userChannel;
 
-    public UserHandler(Socket user, ServerCommandsHandler commandsHandler, Logger logger, ServerHandler serverHandler) throws IOException {
-        super(user.getInetAddress().toString());
-        this.user = user;
+    public UserHandler(SocketChannel userChannel, ServerCommandsHandler commandsHandler, ServerHandler serverHandler) throws IOException {
+        super(userChannel.socket().getInetAddress().toString());
+        this.userChannel = userChannel;
         this.commandsHandler = commandsHandler;
-        this.logger = logger;
+        this.logger = LoggerFactory.getLogger("server." + userChannel.getRemoteAddress());
         this.myServerHandler = serverHandler;
-        in = new ObjectInputStream(user.getInputStream());
-        out = new ObjectOutputStream(user.getOutputStream());
+        in = new ObjectInputStream(userChannel.socket().getInputStream());
+        out = new ObjectOutputStream(userChannel.socket().getOutputStream());
         out.flush();
         start();
     }
@@ -43,9 +44,8 @@ public class UserHandler extends Thread {
     @Override
     public synchronized void run() {
         sendRequest(new CommandRequest(commandsHandler.getFetchServerDataCommand().getData(), new CommandArgs(""), commandsHandler.getServerData()));
-        while (!user.isClosed()) {
+        while (userChannel.isOpen()) {
             try {
-//                logger.debug("i'm still here");
                 Message<Request> requestMessage = readMessage();
                 Message<Response> responseMessage = handleMessage(requestMessage);
                 sendMessage(responseMessage);
@@ -55,7 +55,7 @@ public class UserHandler extends Thread {
                 silentDisconnect();
                 return;
             } catch (IOException | ClassNotFoundException e) {
-                if (!user.isClosed()) {
+                if (userChannel.isOpen()) {
                     logger.error(e.toString());
                     disconnect();
                 }
@@ -65,7 +65,7 @@ public class UserHandler extends Thread {
 
     private void closeSocket() {
         try {
-            user.close();
+            userChannel.close();
         } catch (IOException e) {
             logger.error("How did you screw up that badly? " + e);
         }

@@ -19,6 +19,7 @@ public class DragonCollectionSetupper implements CollectionSetupper<Dragon> {
 
     @Override
     public ClientCollectionHandler<Dragon> setup(QueueWithID<? extends MainCollectible<?>> collection) {
+        @SuppressWarnings({"unchecked"})
         QueueWithID<Dragon> dragonCollection = (QueueWithID<Dragon>) collection;
         return new ClientCollectionHandler<>(collectionBuilder, Dragon.class, dragonCollection);
     }

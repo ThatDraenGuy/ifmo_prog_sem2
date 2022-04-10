@@ -3,45 +3,47 @@ package web;
 import collection.classes.MainCollectible;
 import collection.history.CollectionChange;
 import commands.CommandArgs;
-import commands.CommandData;
 import commands.ServerCommandsHandler;
 import message.CommandRequest;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
-import java.net.ServerSocket;
-import java.net.Socket;
+import java.net.InetSocketAddress;
+import java.nio.channels.ServerSocketChannel;
+import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
 
 import org.slf4j.Logger;
-import utility.LimitedCollection;
 
-public class ServerHandler {
+public class ServerHandler implements Runnable {
     private final List<UserHandler> users;
     private final ServerCommandsHandler commandsHandler;
-    private final ServerSocket server;
     private final Logger logger;
     final private int port = 2525;
+    //
+    private final ServerSocketChannel serverSocketChannel;
 
     public ServerHandler(ServerCommandsHandler commandsHandler) throws IOException {
-        server = new ServerSocket(port);
         this.commandsHandler = commandsHandler;
         this.users = new ArrayList<>();
         logger = LoggerFactory.getLogger("server");
+        serverSocketChannel = ServerSocketChannel.open();
+        serverSocketChannel.configureBlocking(true);
+        serverSocketChannel.socket().bind(new InetSocketAddress(port));
     }
 
-    public void listen() {
-        while (!server.isClosed()) {
+    public void run() {
+        logger.info("Started server");
+        while (serverSocketChannel.isOpen()) {
             try {
-                Socket user = server.accept();
-                logger.info(user.getInetAddress() + " started connecting...");
-                users.add(new UserHandler(user, commandsHandler, logger, this));
-                logger.info(user.getInetAddress() + " successfully connected");
-
+                SocketChannel userChannel = serverSocketChannel.accept();
+                logger.info(userChannel.socket().getInetAddress() + " started connecting...");
+                users.add(new UserHandler(userChannel, commandsHandler, this));
+                logger.info(userChannel.socket().getInetAddress() + " successfully connected");
             } catch (IOException e) {
-                if (!server.isClosed()) logger.error(e.toString());
+                if (serverSocketChannel.isOpen()) logger.error(e.toString());
             }
         }
     }
@@ -50,9 +52,9 @@ public class ServerHandler {
         users.remove(userHandler);
     }
 
-    private void closeSocket() {
+    private void closeChannel() {
         try {
-            server.close();
+            serverSocketChannel.close();
         } catch (IOException ignored) {
         }
     }
@@ -63,19 +65,21 @@ public class ServerHandler {
                 Thread.sleep(1000);
             } catch (InterruptedException ignored) {
             }
+            logger.info("Stopping the server...");
             logger.info("Disconnecting all users...");
             users.forEach(UserHandler::forceDisconnect);
             users.clear();
+            closeChannel();
             logger.info("Saving collection...");
             commandsHandler.executeCommand(new CommandRequest(commandsHandler.getSaveCommandData(), new CommandArgs("")));
             logger.info("exiting...");
-            closeSocket();
         };
         Thread stopThread = new Thread(stopServer, "stoppingThread");
         stopThread.start();
     }
 
     public void shutdown() {
+        logger.info("shutdown");
         System.exit(0);
     }
 

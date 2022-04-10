@@ -1,8 +1,6 @@
 package collection;
 
 import collection.classes.MainCollectible;
-import exceptions.InvalidCollectionException;
-import exceptions.ValueNotValidException;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

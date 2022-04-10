@@ -5,7 +5,6 @@ import collection.classes.MainCollectible;
 import collection.history.CollectionChange;
 import exceptions.CollectionVersionIsBehindException;
 import lombok.Getter;
-import utility.LimitedCollection;
 import utility.QueueWithID;
 
 import java.util.HashMap;
@@ -29,7 +28,7 @@ public class CollectionClassesHandler {
     public void createCollection(Class<?> targetClass) {
         checkClassSupport(targetClass);
         currentCollectionHandler = supportedClasses.get(targetClass).setup();
-        currentClass = (Class<? extends MainCollectible<?>>) targetClass;
+        currentClass = castClass(targetClass);
 //        System.out.println("created empty collection: " + currentCollectionHandler);
     }
 
@@ -39,10 +38,16 @@ public class CollectionClassesHandler {
         if (!isCurrentClass(targetClass)) createCollection(targetClass);
     }
 
+    private Class<? extends MainCollectible<?>> castClass(Class<?> targetClass) {
+        @SuppressWarnings({"unchecked"})
+        Class<? extends MainCollectible<?>> castedClass = (Class<? extends MainCollectible<?>>) targetClass;
+        return castedClass;
+    }
+
     public void createCollection(Class<?> targetClass, QueueWithID<? extends MainCollectible<?>> queue) {
         checkClassSupport(targetClass);
         currentCollectionHandler = supportedClasses.get(targetClass).setup(queue);
-        currentClass = (Class<? extends MainCollectible<?>>) targetClass;
+        currentClass = castClass(targetClass);
 //        System.out.println("created collection from server collection: " + currentCollectionHandler);
     }
 

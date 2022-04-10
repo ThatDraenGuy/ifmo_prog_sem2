@@ -2,6 +2,7 @@ package collection.history;
 
 import collection.classes.MainCollectible;
 import lombok.Getter;
+import utility.CollectionWithID;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -9,9 +10,7 @@ import java.util.Collection;
 public class CollectionChange<T extends MainCollectible<T>> implements Serializable {
     @Getter
     private final long newCollectionId;
-    @Getter
     private final Collection<T> addedElements;
-    @Getter
     private final Collection<T> removedElements;
     @Getter
     private final Class<T> elementClass;
@@ -21,6 +20,12 @@ public class CollectionChange<T extends MainCollectible<T>> implements Serializa
         this.addedElements = addedElements;
         this.removedElements = removedElements;
         this.elementClass = elementClass;
+    }
+
+    public void apply(CollectionWithID<T> collection) {
+        collection.addAll(addedElements);
+        collection.removeAll(removedElements);
+        collection.setId(newCollectionId);
     }
 
     @Override

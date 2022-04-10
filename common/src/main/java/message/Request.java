@@ -1,7 +1,6 @@
 package message;
 
 import commands.CommandArgs;
-import commands.Command;
 import commands.CommandData;
 
 import java.io.Serializable;

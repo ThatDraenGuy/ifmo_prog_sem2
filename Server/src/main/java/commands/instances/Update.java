@@ -12,7 +12,7 @@ import exceptions.IncorrectCollectibleTypeException;
  * A command for updating element in collection. Invokes
  */
 public class Update extends AbstractCommand {
-    private CollectionBridge<?> collectionBridge;
+    private final CollectionBridge<?> collectionBridge;
 
     public Update(CollectionBridge<?> collectionBridge) {
         super("update", "обновить значение элемента коллекции, id которого равен заданному", CommandArgsType.BOTH_ARG);

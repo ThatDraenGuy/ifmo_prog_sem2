@@ -7,7 +7,6 @@ import java.util.HashMap;
 /**
  * A Help command. Displays all commands and their descriptions.
  */
-//TODO rework, replace
 public class Help extends AbstractCommand {
     private final ExecutionController commandsExecutor;
 

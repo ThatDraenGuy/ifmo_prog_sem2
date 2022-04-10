@@ -19,7 +19,7 @@ public class Main {
     public static void main(String... args) {
         ConsoleHandler consoleHandler = new ConsoleHandler(System.in, System.out, System.err);
         try {
-            ConnectionHandler connectionHandler = new ConnectionHandler("127.0.0.1", 2525, consoleHandler);
+            ConnectionHandler connectionHandler = new ConnectionHandler(consoleHandler);
             ClientCommandsHandler clientCommandsHandler = new ClientCommandsHandler();
             CollectionClassesHandler collectionClassesHandler = new CollectionClassesHandler();
             ExecutionController executionController = new ExecutionController(clientCommandsHandler, consoleHandler, collectionClassesHandler);
@@ -40,7 +40,6 @@ public class Main {
                     new CountByColor(collectionClassesHandler),
                     new FilterByType(collectionClassesHandler),
                     new FilterGreaterThanAge(collectionClassesHandler));
-            //TODO think below & above
             executionController.setThreadHandler(threadHandler);
             threadHandler.start();
         } catch (IOException | ClassNotFoundException e) {

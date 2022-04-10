@@ -24,7 +24,6 @@ public class ExecuteScript extends AbstractCommand {
 
     @Override
     public ActionResult action(CommandArgs args) {
-        //TODO normal log
         try {
             File scriptFile = new File(args.getArgs());
             String path = scriptFile.getAbsolutePath();
@@ -50,7 +49,7 @@ public class ExecuteScript extends AbstractCommand {
             } finally {
                 app.setExitQueried(false);
             }
-            String outRes = out.toString();
+//            String outRes = out.toString();
             String errRes = err.toString();
             if (errRes.equals("")) {
                 return finishScript(true, "Successfully executed script.", path);

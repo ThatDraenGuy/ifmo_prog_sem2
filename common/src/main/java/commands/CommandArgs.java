@@ -4,7 +4,6 @@ import collection.classes.MainCollectible;
 import collection.classes.RawCollectible;
 import collection.history.CollectionChange;
 import lombok.Getter;
-import utility.LimitedCollection;
 import utility.QueueWithID;
 
 import java.io.Serializable;

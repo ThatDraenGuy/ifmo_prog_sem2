@@ -41,6 +41,10 @@ public class ClientInteractionController extends Thread {
         commandsExecutor.initialize();
         while (!exitQueried) {
             try {
+                Thread.sleep(200);
+            } catch (InterruptedException ignored) {
+            }
+            try {
                 String input = consoleHandler.promptInput("");
                 Request cmdRequest = parseInput(input);
                 Response response = commandsExecutor.executeCommand(cmdRequest);
@@ -113,7 +117,7 @@ public class ClientInteractionController extends Thread {
      * @throws CommandNonExistentException if inputted command cannot be found in the command list
      */
     private CommandData parseCommandData(String input) throws CommandNonExistentException {
-        if (commandsExecutor.isInCommands(input)) {
+        if (commandsExecutor.isAccessibleCommand(input)) {
             if (commandsExecutor.isClientCommand(input)) {
                 return commandsExecutor.getAccessibleClientCommands().get(input);
             } else {
@@ -186,7 +190,6 @@ public class ClientInteractionController extends Thread {
      * A method to handle command's execution's response. Gets ActionResult from it and displays it.
      *
      * @param response a response gotten from ...
-     * @return a boolean value: if the response is from an "Exit" command it's true, otherwise it's false.
      * @throws CommandExecutionException if ActionResult isn't success
      */
     private void handleResponse(Response response) throws CommandExecutionException {

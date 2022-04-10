@@ -14,10 +14,8 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class DragonCollectionBuilder implements CollectionBuilder<Dragon> {
-//    @Getter
-//    private final ArrayList<String> fieldNames;
-@Getter
-private final HashMap<String, Field> fieldsFromNames;
+    @Getter
+    private final HashMap<String, Field> fieldsFromNames;
     private final DragonFactory factory;
     private final List<Field> dragonFields;
     private final List<Field> rawDragonFields;
@@ -92,6 +90,7 @@ private final HashMap<String, Field> fieldsFromNames;
     }
 
     private Coordinates buildCoords(Object object) {
+        @SuppressWarnings({"unchecked"})
         Map<String, Object> map = (Map<String, Object>) object;
         Coordinates.CoordinatesBuilder builder = Coordinates.builder();
         builder.x((Integer) map.get("x"));
@@ -100,6 +99,7 @@ private final HashMap<String, Field> fieldsFromNames;
     }
 
     private DragonCave buildCave(Object object) {
+        @SuppressWarnings({"unchecked"})
         Map<String, Object> map = (Map<String, Object>) object;
         DragonCave.DragonCaveBuilder builder = DragonCave.builder();
         builder.depth((Integer) map.get("depth"));
@@ -127,14 +127,13 @@ private final HashMap<String, Field> fieldsFromNames;
         return newMap;
     }
 
-    private Map<String, Object> addMissingValues(Map<String, Object> map, Class<?> target) {
+    private void addMissingValues(Map<String, Object> map, Class<?> target) {
 //        System.out.println("miss: " + map + " " + target);
         List<Field> fields = getClassFields(target);
         for (Field field : fields) {
             if (!map.containsKey(field.getName())) map.put(field.getName(), null);
         }
 //        System.out.println("miss: " + map + " " + target);
-        return map;
     }
 
     private Map<Field, Object> convertMapToString(Map<Field, Object> map) throws ValueNotValidException {
@@ -144,7 +143,9 @@ private final HashMap<String, Field> fieldsFromNames;
                 newMap.put(field, convertValueToString(map.get(field)));
             } else {
 //                System.out.println("convert: " + field + " " + map.get(field));
-                newMap.put(field, fullConvert((Map<String, Object>) map.get(field), field.getType()));
+                @SuppressWarnings({"unchecked"})
+                Map<String, Object> castedMap = (Map<String, Object>) map.get(field);
+                newMap.put(field, fullConvert(castedMap, field.getType()));
             }
         }
         return newMap;

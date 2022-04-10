@@ -46,7 +46,6 @@ public class ExecutionController {
 
     public void initialize() {
         clientCommands = clientCommandsHandler.getCommandsData();
-//        fetchServerData();
         commandSetup();
     }
 
@@ -66,9 +65,8 @@ public class ExecutionController {
     }
 
 
-    public boolean isInCommands(String name) {
+    public boolean isAccessibleCommand(String name) {
         return (accessibleServerCommands.containsKey(name) || accessibleClientCommands.containsKey(name));
-        //TODO wtf?
     }
 
     public boolean isClientCommand(String name) {
@@ -77,7 +75,6 @@ public class ExecutionController {
 
     public boolean isClientCommand(Request request) {
         return isClientCommand(request.getCommandData().getName());
-        //TODO rework
     }
 
     public Response executeCommand(Request request) throws CommandArgsAmountException {

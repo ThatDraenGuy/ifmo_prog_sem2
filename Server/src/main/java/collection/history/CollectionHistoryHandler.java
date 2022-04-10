@@ -4,7 +4,6 @@ import collection.classes.MainCollectible;
 import utility.PriorityQueueWithID;
 import utility.QueueWithID;
 import web.ServerHandler;
-import utility.CollectionWithID;
 import utility.LimitedCollection;
 import web.UserHandler;
 

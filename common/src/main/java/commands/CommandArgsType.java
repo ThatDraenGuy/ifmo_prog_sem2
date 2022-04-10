@@ -7,5 +7,5 @@ public enum CommandArgsType {
     NO_ARGS,
     SIMPLE_ARG,
     COMPLEX_ARG,
-    BOTH_ARG;
+    BOTH_ARG
 }

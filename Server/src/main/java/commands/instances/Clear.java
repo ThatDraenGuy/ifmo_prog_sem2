@@ -7,10 +7,10 @@ import commands.CommandArgs;
 import commands.CommandArgsType;
 
 /**
- * A command for clearing the collection. Invokes {@link DragonCollectionHandler#clear()}
+ * A command for clearing the collection. Invokes {@link CollectionHandler#clear()}
  */
 public class Clear extends AbstractCommand {
-    private CollectionHandler<?> collectionHandler;
+    private final CollectionHandler<?> collectionHandler;
 
     public Clear(CollectionHandler<?> collectionHandler) {
         super("clear", "очистить коллекцию", CommandArgsType.NO_ARGS);

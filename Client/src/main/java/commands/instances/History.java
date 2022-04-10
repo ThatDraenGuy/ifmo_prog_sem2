@@ -8,16 +8,16 @@ import java.util.Collection;
  * A History command. Displays 5 last used commands.
  */
 public class History extends AbstractCommand {
-    private ExecutionController commandsExecutor;
+    private final ExecutionController executionController;
 
-    public History(ExecutionController commandsExecutor) {
+    public History(ExecutionController executionController) {
         super("history", "вывести последние 5 команд", CommandArgsType.NO_ARGS);
-        this.commandsExecutor = commandsExecutor;
+        this.executionController = executionController;
     }
 
     @Override
     public ActionResult action(CommandArgs args) {
-        Collection<CommandData> history = commandsExecutor.getHistory();
+        Collection<CommandData> history = executionController.getHistory();
         StringBuilder str = new StringBuilder();
         for (CommandData data : history) {
             if (data != null) {

@@ -26,7 +26,9 @@ public class CollectionBridge<T extends MainCollectible<T>> {
 
     private RawCollectible<T> cast(RawCollectible<?> rawCollectible) throws IncorrectCollectibleTypeException {
         try {
-            return (RawCollectible<T>) rawCollectible;
+            @SuppressWarnings({"unchecked"})
+            RawCollectible<T> castedCollectible = (RawCollectible<T>) rawCollectible;
+            return castedCollectible;
         } catch (ClassCastException e) {
             throw new IncorrectCollectibleTypeException();
         }

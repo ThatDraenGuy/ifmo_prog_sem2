@@ -11,7 +11,7 @@ import commands.CommandArgsType;
  * A command to filter elements by type. Invokes {@link CollectionHandler#filterByType(String)}
  */
 public class FilterByType extends AbstractCommand {
-    private CollectionClassesHandler collectionClassesHandler;
+    private final CollectionClassesHandler collectionClassesHandler;
 
     public FilterByType(CollectionClassesHandler collectionClassesHandler) {
         super("filter_by_type", "вывести элементы, значение поля type которых равно заданному", CommandArgsType.SIMPLE_ARG);

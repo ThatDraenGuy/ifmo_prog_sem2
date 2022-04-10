@@ -3,7 +3,6 @@ package collection;
 import collection.classes.*;
 import exceptions.ElementIdException;
 import exceptions.InvalidCollectionException;
-import utility.PriorityQueueWithID;
 import utility.QueueWithID;
 
 import java.util.*;
@@ -92,11 +91,6 @@ public class CollectionHandler<T extends MainCollectible<T>> {
         str.append("Collection id: ").append(collection.getId()).append("\n");
         collection.forEach(x -> str.append(x).append("\n"));
         return str.toString();
-    }
-
-
-    protected Collection<T> castCollection(Collection<?> collection) {
-        return (Collection<T>) collection;
     }
 
     public long getId() {

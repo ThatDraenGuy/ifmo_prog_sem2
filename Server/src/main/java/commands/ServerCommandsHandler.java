@@ -19,10 +19,6 @@ public class ServerCommandsHandler extends CommandsHandler {
         super();
     }
 
-    public ServerCommandsHandler(ServerData serverData) {
-        super();
-        this.serverData = serverData;
-    }
 
     @Override
     protected Response createResponse(ActionResult actionResult) {

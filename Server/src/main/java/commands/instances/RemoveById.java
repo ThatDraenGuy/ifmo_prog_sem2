@@ -11,7 +11,7 @@ import exceptions.ElementIdException;
  * A command for removing element by its id. Invokes {@link CollectionHandler#removeById(String)}
  */
 public class RemoveById extends AbstractCommand {
-    CollectionHandler<?> collectionHandler;
+    private final CollectionHandler<?> collectionHandler;
 
     public RemoveById(CollectionHandler<?> collectionHandler) {
         super("remove_by_id", "удалить элемент из коллекции по его id", CommandArgsType.SIMPLE_ARG);

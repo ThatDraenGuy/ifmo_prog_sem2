@@ -1,11 +1,9 @@
 package collection;
 
 import collection.classes.MainCollectible;
-import exceptions.InvalidCollectionException;
 import utility.CollectionWithID;
 
 import java.io.IOException;
-import java.util.Collection;
 import java.util.Map;
 
 public interface StorageHandler {

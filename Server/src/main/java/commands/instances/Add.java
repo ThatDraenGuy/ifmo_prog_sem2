@@ -11,7 +11,7 @@ import exceptions.IncorrectCollectibleTypeException;
  * A command for adding new elements to collection. Receives a deconstructed object on the form of a complex arg and calls
  */
 public class Add extends AbstractCommand {
-    CollectionBridge<?> collectionBridge;
+    private final CollectionBridge<?> collectionBridge;
 
     public Add(CollectionBridge<?> collectionBridge) {
         super("add", "добавить новый элемент в коллекцию", CommandArgsType.COMPLEX_ARG);

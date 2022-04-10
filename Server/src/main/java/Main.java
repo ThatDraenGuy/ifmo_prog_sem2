@@ -5,6 +5,8 @@ import commands.ServerCommandsHandler;
 import commands.instances.*;
 import collection.classes.Dragon;
 import message.ServerData;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import web.ServerHandler;
 import web.UserDataHandler;
 
@@ -19,16 +21,18 @@ public class Main {
     final static String defaultPath = "DefaultCollection.json";
 
     public static void main(String... args) {
+        Logger logger = LoggerFactory.getLogger("loader");
+        logger.info("Starting the server...");
         String filePath;
         if (args.length != 1) {
-            System.out.println("Input a filepath as jar's argument! Starting up with default collection...");
+            logger.warn("Filepath wasn't inputted; starting up with default collection");
             filePath = defaultPath;
         } else {
             filePath = args[0];
         }
         File collectionFile = new File(filePath);
         if (!collectionFile.isFile()) {
-            System.out.println("Can't find file \"" + filePath + "\". Starting up with default collection...");
+            logger.warn("Couldn't find file \"" + filePath + "\". Starting up with empty collection...");
             filePath = defaultPath;
         }
         StorageHandler storageHandler = new FileStorageHandler(new File(filePath), new JsonHandler());
@@ -38,9 +42,8 @@ public class Main {
         try {
             serverHandler = new ServerHandler(cmdHandler);
         } catch (IOException e) {
-            System.out.println(e);
+            logger.error("Error occurred while trying to start the server: " + e);
             System.exit(1);
-            //TODO
         }
         ServerCollectionHandler<Dragon> collectionHandler = new ServerCollectionHandler<>(storageHandler, serverHandler,
                 factory, new DragonCollectionBuilder(factory), Dragon.class);
@@ -50,22 +53,19 @@ public class Main {
 
         cmdHandler.addCommands(
                 new Save(collectionHandler),
-//                new Show(collectionHandler),
                 new RemoveFirst(collectionHandler),
                 new RemoveById(collectionHandler),
                 new Add(collectionBridge),
                 new Update(collectionBridge),
                 new Clear(collectionHandler),
                 new RemoveLower(collectionBridge),
-//                new CountByColor(collectionHandler),
-//                new FilterByType(collectionHandler),
-//                new FilterGreaterThanAge(collectionHandler),
-//                new Info(collectionHandler),
                 new FetchServerData(),
                 new StopServer(serverHandler),
                 new Shutdown(serverHandler));
+        logger.info("Successfully loaded commands");
         ServerData serverData = new ServerData(cmdHandler.getCommandsData(), target);
         cmdHandler.setServerData(serverData);
-        serverHandler.listen();
+        Thread serverThread = new Thread(serverHandler, "Server");
+        serverThread.start();
     }
 }

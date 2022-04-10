@@ -2,14 +2,10 @@ package commands;
 
 import exceptions.CommandNonExistentException;
 import lombok.Getter;
-import message.CommandRequest;
 import message.CommandResponse;
 import message.Request;
 import message.Response;
-
-
 import java.util.HashMap;
-import java.util.LinkedList;
 
 public class CommandsHandler {
     @Getter
@@ -20,23 +16,22 @@ public class CommandsHandler {
 
     }
 
-    public void addCommand(Command c) {
-        final String name = c.getData().getName();
+    public void addCommand(Command command) {
+        final String name = command.getData().getName();
         if (!isInCommands(name)) {
-            this.commands.put(name, c);
+            this.commands.put(name, command);
         }
     }
 
-    public void addCommands(Command... cmds) {
-        for (Command c : cmds) {
-            addCommand(c);
+    public void addCommands(Command... commands) {
+        for (Command command : commands) {
+            addCommand(command);
         }
     }
 
     public boolean isInCommands(String name) {
         return this.commands.containsKey(name);
     }
-
 
 
     public Command getCommand(CommandData data) throws CommandNonExistentException {
@@ -48,11 +43,11 @@ public class CommandsHandler {
     }
 
     public HashMap<String, CommandData> getCommandsData() {
-        HashMap<String, CommandData> res = new HashMap<>();
+        HashMap<String, CommandData> result = new HashMap<>();
         for (String key : commands.keySet()) {
-            res.put(key, commands.get(key).getData());
+            result.put(key, commands.get(key).getData());
         }
-        return res;
+        return result;
     }
 
     public Response executeCommand(Request request) {
