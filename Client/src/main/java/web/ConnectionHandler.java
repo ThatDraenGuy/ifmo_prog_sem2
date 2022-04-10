@@ -53,7 +53,7 @@ public class ConnectionHandler {
 
     public void disconnect() {
         try {
-            socket.close();
+            if (socket != null) socket.close();
 
         } catch (IOException e) {
             consoleHandler.errorMessage(e);

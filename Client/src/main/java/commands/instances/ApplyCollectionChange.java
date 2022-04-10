@@ -14,8 +14,8 @@ public class ApplyCollectionChange extends AbstractCommand {
     @Override
     public ActionResult action(CommandArgs args) {
         targetClassHandler.applyCollectionChanges(args.getCollectionChanges());
-        System.out.println("Collection was changed");
-        System.out.println(targetClassHandler.getCurrentCollectionHandler());
+//        System.out.println("Collection was changed");
+//        System.out.println(targetClassHandler.getCurrentCollectionHandler());
         //TODO remove
         return new ActionResult(true, "successfully applied changes");
     }

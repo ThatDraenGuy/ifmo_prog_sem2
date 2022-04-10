@@ -30,12 +30,16 @@ public class Main {
                     new History(executionController),
                     new Help(executionController),
                     new ExecuteScript(app),
-                    new FinishScript(),
+                    new FinishScript(app),
                     new Disconnect(connectionHandler, executionController),
                     new Connect(connectionHandler, executionController, threadHandler),
                     new ApplyCollectionChange(collectionClassesHandler),
                     new ApplyFullCollection(collectionClassesHandler),
-                    new Show(collectionClassesHandler));
+                    new Show(collectionClassesHandler),
+                    new Info(collectionClassesHandler),
+                    new CountByColor(collectionClassesHandler),
+                    new FilterByType(collectionClassesHandler),
+                    new FilterGreaterThanAge(collectionClassesHandler));
             //TODO think below & above
             executionController.setThreadHandler(threadHandler);
             threadHandler.start();

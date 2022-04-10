@@ -14,6 +14,7 @@ public class ServerCommandsHandler extends CommandsHandler {
     @Getter
     private final Command fetchServerDataCommand = new FetchServerData();
 
+
     public ServerCommandsHandler() {
         super();
     }
@@ -26,5 +27,9 @@ public class ServerCommandsHandler extends CommandsHandler {
     @Override
     protected Response createResponse(ActionResult actionResult) {
         return new CommandResponse(actionResult, serverData);
+    }
+
+    public CommandData getSaveCommandData() {
+        return getCommandsData().get("save");
     }
 }

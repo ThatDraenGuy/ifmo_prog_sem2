@@ -30,7 +30,7 @@ public class CollectionClassesHandler {
         checkClassSupport(targetClass);
         currentCollectionHandler = supportedClasses.get(targetClass).setup();
         currentClass = (Class<? extends MainCollectible<?>>) targetClass;
-        System.out.println("created empty collection: " + currentCollectionHandler);
+//        System.out.println("created empty collection: " + currentCollectionHandler);
     }
 
     public void handleTargetClass(Class<?> targetClass) {
@@ -43,7 +43,7 @@ public class CollectionClassesHandler {
         checkClassSupport(targetClass);
         currentCollectionHandler = supportedClasses.get(targetClass).setup(queue);
         currentClass = (Class<? extends MainCollectible<?>>) targetClass;
-        System.out.println("created collection from server collection: " + currentCollectionHandler);
+//        System.out.println("created collection from server collection: " + currentCollectionHandler);
     }
 
     public void applyCollectionChanges(Queue<CollectionChange<? extends MainCollectible<?>>> collectionChanges) {
@@ -51,7 +51,7 @@ public class CollectionClassesHandler {
             for (CollectionChange<? extends MainCollectible<?>> collectionChange : collectionChanges) {
                 checkClassSupport(collectionChange.getElementClass());
                 currentCollectionHandler.applyChange(collectionChange);
-                System.out.println("applied collectionChange: " + collectionChange);
+//                System.out.println("applied collectionChange: " + collectionChange);
             }
         } catch (CollectionVersionIsBehindException e) {
             e.printStackTrace();

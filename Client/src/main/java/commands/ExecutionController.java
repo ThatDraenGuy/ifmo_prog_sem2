@@ -2,7 +2,6 @@ package commands;
 
 
 import collection.CollectionClassesHandler;
-import commands.instances.FetchServerData;
 import threads.ThreadHandler;
 import console.ConsoleHandler;
 import exceptions.CommandArgsAmountException;
@@ -82,8 +81,9 @@ public class ExecutionController {
     }
 
     public Response executeCommand(Request request) throws CommandArgsAmountException {
-        request = handleRequest(request);
-        history.add(request.getCommandData());
+        handleRequest(request);
+        if (!request.getCommandData().getAccessLevel().equals(CommandAccessLevel.INTERNAL))
+            history.add(request.getCommandData());
         Response response;
         consoleHandler.debugMessage("executing command...");
         if (isClientCommand(request)) response = clientCommandsHandler.executeCommand(request);
@@ -96,20 +96,9 @@ public class ExecutionController {
         return new CommandRequest(commandData, commandArgs, userData);
     }
 
-    //    private Response executeCommand(Command command) {
-//        //TODO
-//        Request request = createRequest(command.getData(), new CommandArgs(""));
-//        try {
-//            return executeCommand(request);
-//        } catch (CommandArgsAmountException e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }
-    private Request handleRequest(Request request) {
+    private void handleRequest(Request request) {
         handleServerData(request.getServerData());
         request.setUserData(userData);
-        return request;
     }
 
     private Response handleResponse(Response response) {
@@ -122,7 +111,6 @@ public class ExecutionController {
             targetClassHandler.handleTargetClass(serverData.getTargetClass());
             serverCommands = serverData.getServerCommands();
             commandSetup();
-//            if (serverData.isDisconnectRequested()) forceDisconnect();
         }
     }
 
@@ -134,7 +122,4 @@ public class ExecutionController {
     private UserData createUserData() {
         return new UserData(targetClassHandler.getCurrentId(), clientCommandsHandler.getDisconnectCommandData(), clientCommandsHandler.getApplyCollectionChangeCommandData(), clientCommandsHandler.getApplyFullCollectionCommandData());
     }
-//    public void fetchServerData() {
-//        executeCommand(new FetchServerData());
-//    }
 }

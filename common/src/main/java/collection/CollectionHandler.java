@@ -22,6 +22,7 @@ public class CollectionHandler<T extends MainCollectible<T>> {
 
     public void clear() {
         collection.clear();
+        handleCollectionChange();
     }
 
     protected void handleCollectionChange() {

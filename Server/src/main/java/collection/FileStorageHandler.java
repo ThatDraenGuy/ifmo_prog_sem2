@@ -25,7 +25,7 @@ public class FileStorageHandler implements StorageHandler {
     public FileStorageHandler(File file, JsonHandler jsonHandler) {
         this.file = file;
         this.jsonHandler = jsonHandler;
-        this.logger = LoggerFactory.getLogger("FileStorageHandler");
+        this.logger = LoggerFactory.getLogger("StorageHandler");
     }
 
     /**
@@ -43,7 +43,9 @@ public class FileStorageHandler implements StorageHandler {
                 JSONString.append(scanner.nextLine());
             }
             scanner.close();
-            return jsonHandler.parseCollection(JSONString.toString(), target);
+            CollectionWithID<Map<String, Object>> collection = jsonHandler.parseCollection(JSONString.toString(), target);
+            logger.info("Successfully loaded collection");
+            return collection;
         } catch (IOException e) {
             logger.warn(e.toString());
         } catch (JSONException e) {
@@ -66,5 +68,6 @@ public class FileStorageHandler implements StorageHandler {
         BufferedOutputStream bufferedOutputStream = new BufferedOutputStream(fileOutputStream);
         bufferedOutputStream.write(JSONString.getBytes());
         bufferedOutputStream.close();
+        logger.info("Successfully saved collection");
     }
 }

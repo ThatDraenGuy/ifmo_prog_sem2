@@ -13,9 +13,6 @@ public class ServerData implements Serializable {
     private final HashMap<String, CommandData> serverCommands;
     @Getter
     private final Class<?> targetClass;
-    @Getter
-    @Setter
-    private boolean disconnectRequested = false;
 
     public ServerData(HashMap<String, CommandData> serverCommands, Class<?> targetClass) {
         this.serverCommands = serverCommands;

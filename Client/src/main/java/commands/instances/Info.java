@@ -1,5 +1,6 @@
 package commands.instances;
 
+import collection.CollectionClassesHandler;
 import collection.CollectionHandler;
 import commands.AbstractCommand;
 import commands.ActionResult;
@@ -10,16 +11,16 @@ import commands.CommandArgsType;
  * A command for displaying information about collection. Invokes {@link CollectionHandler#info()}
  */
 public class Info extends AbstractCommand {
-    private CollectionHandler<?> collectionHandler;
+    private final CollectionClassesHandler collectionClassesHandler;
 
-    public Info(CollectionHandler<?> collectionHandler) {
+    public Info(CollectionClassesHandler collectionClassesHandler) {
         super("info", "вывести информацию о коллекции", CommandArgsType.NO_ARGS);
 
-        this.collectionHandler = collectionHandler;
+        this.collectionClassesHandler = collectionClassesHandler;
     }
 
     @Override
     public ActionResult action(CommandArgs args) {
-        return new ActionResult(true, collectionHandler.info());
+        return new ActionResult(true, collectionClassesHandler.getCurrentCollectionHandler().info());
     }
 }

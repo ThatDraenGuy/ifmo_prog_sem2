@@ -7,6 +7,8 @@ import collection.history.CollectionHistoryHandler;
 import exceptions.ElementIdException;
 import exceptions.InvalidCollectionException;
 import lombok.Getter;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import web.ServerHandler;
 import utility.CollectionWithID;
 import utility.PriorityQueueWithID;
@@ -20,12 +22,14 @@ public class ServerCollectionHandler<T extends MainCollectible<T>> extends Colle
     private final StorageHandler storageHandler;
     private final ServerHandler serverHandler;
     protected final MainCollectibleFactory<T> factory;
+    private final Logger logger;
 
     public ServerCollectionHandler(StorageHandler storageHandler, ServerHandler serverHandler, MainCollectibleFactory<T> factory, CollectionBuilder<T> collectionBuilder, Class<T> targetClass) {
         super(new PriorityQueueWithID<>(), collectionBuilder, targetClass);
         this.factory = factory;
         this.storageHandler = storageHandler;
         this.serverHandler = serverHandler;
+        this.logger = LoggerFactory.getLogger("CollectionHandler");
     }
 
     public void add(RawCollectible<T> rawObject) {
@@ -68,6 +72,7 @@ public class ServerCollectionHandler<T extends MainCollectible<T>> extends Colle
     protected void handleCollectionChange() {
         collection.incrementId();
         historyHandler.saveChange(collection);
+        logger.info("Collection was changed");
     }
 
     private T handleRawCollectible(RawCollectible<T> rawCollectible) {

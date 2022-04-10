@@ -128,12 +128,12 @@ private final HashMap<String, Field> fieldsFromNames;
     }
 
     private Map<String, Object> addMissingValues(Map<String, Object> map, Class<?> target) {
-        System.out.println("miss: " + map + " " + target);
+//        System.out.println("miss: " + map + " " + target);
         List<Field> fields = getClassFields(target);
         for (Field field : fields) {
             if (!map.containsKey(field.getName())) map.put(field.getName(), null);
         }
-        System.out.println("miss: " + map + " " + target);
+//        System.out.println("miss: " + map + " " + target);
         return map;
     }
 
@@ -143,7 +143,7 @@ private final HashMap<String, Field> fieldsFromNames;
             if (!field.isAnnotationPresent(CollectibleField.class)) {
                 newMap.put(field, convertValueToString(map.get(field)));
             } else {
-                System.out.println("convert: " + field + " " + map.get(field));
+//                System.out.println("convert: " + field + " " + map.get(field));
                 newMap.put(field, fullConvert((Map<String, Object>) map.get(field), field.getType()));
             }
         }

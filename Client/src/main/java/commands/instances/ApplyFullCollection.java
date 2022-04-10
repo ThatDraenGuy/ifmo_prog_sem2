@@ -14,8 +14,8 @@ public class ApplyFullCollection extends AbstractCommand {
     @Override
     public ActionResult action(CommandArgs args) {
         targetClassHandler.applyFullCollection(args.getFullCollection());
-        System.out.println("Collection was changed (new collection)" + args.getFullCollection());
-        System.out.println(targetClassHandler.getCurrentCollectionHandler());
+//        System.out.println("Collection was changed (new collection)" + args.getFullCollection());
+//        System.out.println(targetClassHandler.getCurrentCollectionHandler());
         return new ActionResult(true, "successfully applied changes");
     }
 }

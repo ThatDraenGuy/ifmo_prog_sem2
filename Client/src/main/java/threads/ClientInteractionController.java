@@ -10,6 +10,7 @@ import exceptions.CommandArgsAmountException;
 import exceptions.CommandExecutionException;
 import exceptions.CommandNonExistentException;
 import exceptions.ValueNotValidException;
+import lombok.Setter;
 import message.Request;
 import message.Response;
 
@@ -23,6 +24,8 @@ import java.util.NoSuchElementException;
 public class ClientInteractionController extends Thread {
     private final ExecutionController commandsExecutor;
     private ConsoleHandler consoleHandler;
+    @Setter
+    private boolean exitQueried;
 
     public ClientInteractionController(ExecutionController commandsExecutor, ConsoleHandler consoleHandler) {
         this.commandsExecutor = commandsExecutor;
@@ -36,13 +39,12 @@ public class ClientInteractionController extends Thread {
     public void run() {
         consoleHandler.debugMessage("interactionController started");
         commandsExecutor.initialize();
-        while (true) {
+        while (!exitQueried) {
             try {
                 String input = consoleHandler.promptInput("");
                 Request cmdRequest = parseInput(input);
                 Response response = commandsExecutor.executeCommand(cmdRequest);
-                boolean isExitQueried = handleResponse(response);
-                if (isExitQueried) return;
+                handleResponse(response);
             } catch (CommandNonExistentException | CommandArgsAmountException | CommandExecutionException e) {
                 consoleHandler.errorMessage(e);
             } catch (NoSuchElementException e) {
@@ -187,16 +189,11 @@ public class ClientInteractionController extends Thread {
      * @return a boolean value: if the response is from an "Exit" command it's true, otherwise it's false.
      * @throws CommandExecutionException if ActionResult isn't success
      */
-    private boolean handleResponse(Response response) throws CommandExecutionException {
+    private void handleResponse(Response response) throws CommandExecutionException {
         ActionResult result = response.getActionResult();
-        boolean isSuccess = result.isSuccess();
-        if (isSuccess) {
-            String message = result.getMessage();
-            consoleHandler.message(message);
-            return result.isConsoleExitQueried();
-        } else {
-            throw new CommandExecutionException(result);
-        }
+        if (!result.isSuccess()) throw new CommandExecutionException(result);
+        String message = result.getMessage();
+        consoleHandler.message(message);
     }
 
 

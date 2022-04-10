@@ -19,7 +19,6 @@ public class ConsoleHandler {
         inputScanner = new Scanner(in);
         this.out = out;
         this.err = err;
-
     }
 
 
@@ -61,13 +60,13 @@ public class ConsoleHandler {
     }
 
     public void debugMessage(String str) {
-        message(str);
+//        message(str);
     }
 
     /**
      * A simple method that displays exception's message
      */
     public void errorMessage(Exception e) {
-        err.println(e.toString());
+        err.println(e.getMessage());
     }
 }

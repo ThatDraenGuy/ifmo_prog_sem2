@@ -81,5 +81,6 @@ public class ThreadHandler {
     public void stop() {
         connectionHandler.disconnect();
         requestListenerThread.interrupt();
+        clientInteractionController.setExitQueried(true);
     }
 }

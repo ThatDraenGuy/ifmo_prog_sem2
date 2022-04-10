@@ -47,6 +47,8 @@ public class ExecuteScript extends AbstractCommand {
                 app.useDifferentSettings(consoleHandler, CommandAccessLevel.INTERNAL);
             } catch (NoSuchElementException e) {
                 return finishScript(false, "Reached end of the script in the process of executing command!", path);
+            } finally {
+                app.setExitQueried(false);
             }
             String outRes = out.toString();
             String errRes = err.toString();

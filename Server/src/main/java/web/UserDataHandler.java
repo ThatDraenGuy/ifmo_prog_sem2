@@ -10,14 +10,14 @@ public class UserDataHandler {
 
     public static void handleUserData(UserHandler userHandler, UserData userData) {
         if (userData == null) {
-            userHandler.getLogger().debug("NULL-userData!!");
-            return; //TODO
+//            userHandler.getLogger().debug("NULL-userData!!");
+            return;
         }
-        userHandler.getLogger().debug(userData.toString());
+//        userHandler.getLogger().debug(userData.toString());
         long clientCollectionId = userData.getClientCollectionId();
         if (collectionHandler.isIdBehind(clientCollectionId)) {
             collectionHandler.getHistoryHandler().handleBehindId(userHandler, clientCollectionId);
-            userHandler.getLogger().debug("sent changes?");
+//            userHandler.getLogger().debug("sent changes?");
         }
     }
 }

@@ -57,12 +57,13 @@ public class Main {
                 new Update(collectionBridge),
                 new Clear(collectionHandler),
                 new RemoveLower(collectionBridge),
-                new CountByColor(collectionHandler),
-                new FilterByType(collectionHandler),
-                new FilterGreaterThanAge(collectionHandler),
-                new Info(collectionHandler),
+//                new CountByColor(collectionHandler),
+//                new FilterByType(collectionHandler),
+//                new FilterGreaterThanAge(collectionHandler),
+//                new Info(collectionHandler),
                 new FetchServerData(),
-                new StopServer(serverHandler));
+                new StopServer(serverHandler),
+                new Shutdown(serverHandler));
         ServerData serverData = new ServerData(cmdHandler.getCommandsData(), target);
         cmdHandler.setServerData(serverData);
         serverHandler.listen();
