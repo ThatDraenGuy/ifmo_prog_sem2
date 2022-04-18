@@ -1,4 +1,4 @@
-package collection;
+package collection.storage;
 
 import collection.classes.MainCollectible;
 import utility.CollectionWithID;

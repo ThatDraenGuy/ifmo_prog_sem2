@@ -4,6 +4,7 @@ import collection.classes.MainCollectible;
 import collection.classes.MainCollectibleFactory;
 import collection.classes.RawCollectible;
 import collection.history.CollectionHistoryHandler;
+import collection.storage.StorageHandler;
 import exceptions.ElementIdException;
 import exceptions.InvalidCollectionException;
 import lombok.Getter;

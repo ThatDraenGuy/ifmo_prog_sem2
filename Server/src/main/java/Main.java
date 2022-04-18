@@ -1,6 +1,10 @@
 import collection.*;
 import collection.classes.DragonFactory;
 import collection.classes.MainCollectible;
+import collection.storage.DatabaseHandler;
+import collection.storage.FileStorageHandler;
+import collection.storage.JsonHandler;
+import collection.storage.StorageHandler;
 import commands.ServerCommandsHandler;
 import commands.instances.*;
 import collection.classes.Dragon;
@@ -12,6 +16,7 @@ import web.UserDataHandler;
 
 import java.io.File;
 import java.io.IOException;
+import java.sql.SQLException;
 
 /**
  * A Main class, only consists of main() method.
@@ -23,6 +28,13 @@ public class Main {
     public static void main(String... args) {
         Logger logger = LoggerFactory.getLogger("loader");
         logger.info("Starting the server...");
+        try {
+            DatabaseHandler databaseHandler = new DatabaseHandler();
+        } catch (SQLException e) {
+            logger.error(e.toString());
+        }
+
+
         String filePath;
         if (args.length != 1) {
             logger.warn("Filepath wasn't inputted; starting up with default collection");
