@@ -1,0 +1,5 @@
+16:58:06.158 [ INFO ] (loader) - Starting the server...
+16:58:06.165 [ WARN ] (loader) - Filepath wasn't inputted; starting up with default collection
+16:58:06.203 [ INFO ] (StorageHandler) - Successfully loaded collection
+16:58:06.236 [ INFO ] (loader) - Successfully loaded commands
+16:58:06.237 [ INFO ] (server) - Started server

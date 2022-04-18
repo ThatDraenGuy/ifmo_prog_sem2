@@ -1,0 +1,51 @@
+19:27:13.075 [ INFO ] (StorageHandler) - Successfully loaded collection
+19:27:13.108 [ INFO ] (server) - Started server
+19:27:21.624 [ INFO ] (server) - /127.0.0.1 started connecting...
+19:27:21.631 [ INFO ] (server) - /127.0.0.1 successfully connected
+19:27:21.652 [ INFO ] (server./127.0.0.1:54276) - Sent a request to user
+19:27:21.728 [ INFO ] (server./127.0.0.1:54276) - Sent full collection to user
+19:27:21.737 [ INFO ] (server./127.0.0.1:54276) - Sent a request to user
+19:27:21.738 [ INFO ] (server./127.0.0.1:54276) - got a request from user
+19:27:21.740 [ INFO ] (server./127.0.0.1:54276) - successfully sent response
+19:27:51.691 [ INFO ] (server./127.0.0.1:54276) - got a request from user
+19:27:51.697 [ INFO ] (server./127.0.0.1:54276) - Sent a request to user
+19:27:51.698 [ INFO ] (CollectionHandler) - Collection was changed
+19:27:51.698 [ INFO ] (server./127.0.0.1:54276) - successfully sent response
+19:28:00.186 [ WARN ] (server./127.0.0.1:54276) - Lost connection with user
+19:28:19.473 [ INFO ] (server) - /127.0.0.1 started connecting...
+19:28:19.475 [ INFO ] (server) - /127.0.0.1 successfully connected
+19:28:19.476 [ INFO ] (server./127.0.0.1:54280) - Sent a request to user
+19:28:19.557 [ INFO ] (server./127.0.0.1:54280) - Sent full collection to user
+19:28:19.559 [ INFO ] (server./127.0.0.1:54280) - Sent a request to user
+19:28:19.559 [ INFO ] (server./127.0.0.1:54280) - got a request from user
+19:28:19.559 [ INFO ] (server./127.0.0.1:54280) - successfully sent response
+19:28:25.840 [ INFO ] (server./127.0.0.1:54280) - got a request from user
+19:28:25.843 [ INFO ] (server./127.0.0.1:54280) - successfully sent response
+19:28:26.843 [ INFO ] (server) - Disconnecting all users...
+19:28:26.845 [ INFO ] (server./127.0.0.1:54280) - Sent a request to user
+19:28:26.845 [ INFO ] (server) - Saving collection...
+19:28:26.851 [ INFO ] (StorageHandler) - Successfully saved collection
+19:28:26.851 [ INFO ] (server) - exiting...
+21:47:38.109 [ INFO ] (StorageHandler) - Successfully loaded collection
+21:47:38.143 [ INFO ] (server) - Started server
+21:47:50.742 [ INFO ] (server) - /127.0.0.1 started connecting...
+21:47:50.749 [ INFO ] (server) - /127.0.0.1 successfully connected
+21:47:50.779 [ INFO ] (server./127.0.0.1:54286) - Sent a request to user
+21:47:50.849 [ INFO ] (server./127.0.0.1:54286) - Sent full collection to user
+21:47:50.861 [ INFO ] (server./127.0.0.1:54286) - Sent a request to user
+21:47:50.861 [ INFO ] (server./127.0.0.1:54286) - got a request from user
+21:47:50.864 [ INFO ] (server./127.0.0.1:54286) - successfully sent response
+21:49:06.894 [ WARN ] (server./127.0.0.1:54286) - Lost connection with user
+21:54:03.549 [ INFO ] (loader) - Starting the server...
+21:54:03.551 [ WARN ] (loader) - Filepath wasn't inputted; starting up with default collection
+21:54:03.587 [ INFO ] (StorageHandler) - Successfully loaded collection
+21:54:03.620 [ INFO ] (loader) - Successfully loaded commands
+21:54:03.621 [ INFO ] (server) - Started server
+21:54:20.444 [ INFO ] (server) - /127.0.0.1 started connecting...
+21:54:20.452 [ INFO ] (server) - /127.0.0.1 successfully connected
+21:54:20.482 [ INFO ] (server./127.0.0.1:54288) - Sent a request to user
+21:54:20.551 [ INFO ] (server./127.0.0.1:54288) - Sent full collection to user
+21:54:20.564 [ INFO ] (server./127.0.0.1:54288) - Sent a request to user
+21:54:20.565 [ INFO ] (server./127.0.0.1:54288) - got a request from user
+21:54:20.567 [ INFO ] (server./127.0.0.1:54288) - successfully sent response
+21:54:42.216 [ WARN ] (server./127.0.0.1:54288) - Lost connection with user
