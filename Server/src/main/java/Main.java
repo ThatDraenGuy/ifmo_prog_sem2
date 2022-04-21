@@ -1,7 +1,7 @@
 import collection.*;
 import collection.classes.DragonFactory;
 import collection.classes.MainCollectible;
-import collection.storage.DatabaseHandler;
+import collection.storage.database.DatabaseHandler;
 import collection.storage.FileStorageHandler;
 import collection.storage.JsonHandler;
 import collection.storage.StorageHandler;

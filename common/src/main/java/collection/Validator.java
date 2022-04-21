@@ -3,6 +3,7 @@ package collection;
 import annotations.LowerBounded;
 import annotations.NotNull;
 import annotations.CollectibleField;
+import collection.meta.FieldData;
 import exceptions.ValueNotValidException;
 
 import java.lang.reflect.Field;
@@ -18,33 +19,34 @@ public class Validator {
      * @return validated and converted value
      * @throws ValueNotValidException if validation was failed
      */
-    public static <T> T convertAndValidate(Field field, Class<T> fieldType, String value) throws ValueNotValidException {
-        T convertedValue = convert(field.getName(), fieldType, value);
-        return validate(field, convertedValue);
+    public static <T> T convertAndValidate(FieldData fieldData, Class<T> fieldType, String value) throws ValueNotValidException {
+        T convertedValue = convert(fieldData.getSimpleName(), fieldType, value);
+        return validate(fieldData, convertedValue);
     }
 
-    public static <T> T validate(Field field, T value) throws ValueNotValidException {
-        if (field.isAnnotationPresent(NotNull.class) && value == null) {
-            throw new ValueNotValidException(field.getName() + " cannot be null!");
+    public static <T> T validate(FieldData fieldData, T value) throws ValueNotValidException {
+        if (fieldData.isNotNull() && value == null) {
+            throw new ValueNotValidException(fieldData.getSimpleName() + " cannot be null!");
         }
-        if (field.isAnnotationPresent(LowerBounded.class) && value != null) {
-            double border = field.getAnnotation(LowerBounded.class).value();
+        if (fieldData.isLowerBounded() && value != null) {
+            double border = fieldData.getLowerBoundedValue();
             if (Double.parseDouble(value.toString()) <= border) {
-                throw new ValueNotValidException(field.getName() + " should be greater than " + border + ". Your input: " + value);
+                throw new ValueNotValidException(fieldData.getSimpleName() + " should be greater than " + border + ". Your input: " + value);
             }
         }
         return value;
     }
 
     public static Map<Field, Object> convertAndValidate(Map<Field, Object> map) throws ValueNotValidException {
-        Map<Field, Object> newMap = new HashMap<>();
-        for (Field field : map.keySet()) {
-            if (!field.isAnnotationPresent(CollectibleField.class))
-                newMap.put(field, convertAndValidate(field, field.getType(), map.get(field).toString()));
-            else newMap.put(field, map.get(field));
-
-        }
-        return newMap;
+//        Map<Field, Object> newMap = new HashMap<>();
+//        for (Field field : map.keySet()) {
+//            if (!field.isAnnotationPresent(CollectibleField.class))
+//                newMap.put(field, convertAndValidate(field, field.getType(), map.get(field).toString()));
+//            else newMap.put(field, map.get(field));
+//
+//        }
+//        return newMap;
+        return null;
     }
 
     /**
