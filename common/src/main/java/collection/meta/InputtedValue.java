@@ -25,4 +25,10 @@ public class InputtedValue {
             string = input.toString();
         }
     }
+
+    @Override
+    public String toString() {
+        //TODO think? (creation of inputted value from inputted value)
+        return string;
+    }
 }

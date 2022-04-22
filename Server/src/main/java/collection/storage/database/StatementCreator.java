@@ -1,27 +1,33 @@
 package collection.storage.database;
 
+import collection.classes.Collectible;
 import collection.meta.CollectibleScheme;
 import collection.meta.FieldData;
 import lombok.Getter;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
 public class StatementCreator {
     // statements:
-    // - add (insert)
+    // + add (insert)
     // - remove_by_id
     // - update
     // - remove_lower
     // - remove_first
     // - clear
+    // +- load
+    // + *init
     @Getter
     private CollectibleScheme targetCollectibleScheme;
     @Getter
     private PreparedStatement insertStatement;
+    @Getter
+    private PreparedStatement loadStatement;
     @Getter
     private final ArrayList<String> clearStatement;
     private final DatabaseHandler databaseHandler;
@@ -40,6 +46,77 @@ public class StatementCreator {
     private void generateStatements() throws SQLException {
         generateClear();
         generateInsert();
+        generateLoad();
+        generateInit();
+    }
+
+    private void generateInit() {
+        StringBuilder builder = new StringBuilder();
+        genInit(targetCollectibleScheme, builder);
+        System.out.println(builder);
+    }
+
+    private void genInit(CollectibleScheme collectibleScheme, StringBuilder builder) {
+        for (FieldData fieldData : collectibleScheme.getFieldsData().values()) {
+            if (fieldData.isCollectible()) genInit(fieldData.getCollectibleScheme(), builder);
+            else if (fieldData.getType().isEnum()) genEnumInit(fieldData.getType(), builder);
+        }
+        builder.append("CREATE TABLE ").append(collectibleScheme.getSimpleName()).append(" (\n");
+        builder.append("id BIGSERIAL PRIMARY KEY,\n");
+        //TODO NOT NULL;
+        for (String field : collectibleScheme.getFieldsData().keySet()) {
+            FieldData fieldData = collectibleScheme.getFieldsData().get(field);
+            builder.append(field).append(" ").append(getSqlType(fieldData.getType()));
+            if (fieldData.isNotNull()) builder.append(" NOT NULL");
+            if (fieldData.isLowerBounded())
+                builder.append(" CHECK (").append(field).append(">").append(fieldData.getLowerBoundedValue()).append(")");
+            if (fieldData.isCollectible())
+                builder.append(" REFERENCES ").append(fieldData.getCollectibleScheme().getSimpleName()).append("(id)");
+            //TODO
+            builder.append(",\n");
+        }
+        builder.deleteCharAt(builder.length() - 1);
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append("\n);\n");
+    }
+
+    private <T> void genEnumInit(Class<T> target, StringBuilder builder) {
+        builder.append("CREATE TYPE ").append(target.getSimpleName()).append(" AS ENUM (");
+        for (T value : target.getEnumConstants()) {
+            builder.append("'").append(value).append("',");
+        }
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append(");\n");
+    }
+
+    private String getSqlType(Class<?> target) {
+        if (target.equals(int.class) || target.equals(Integer.class)) return "INT";
+        else if (target.equals(long.class) || target.equals(Long.class) || Collectible.class.isAssignableFrom(target))
+            return "BIGINT";
+        else if (target.equals(String.class) || target.equals(ZonedDateTime.class)) return "VARCHAR(99)";
+        else if (target.isEnum()) return target.getSimpleName();
+        else return "";
+    }
+
+    private void generateLoad() throws SQLException {
+        StringBuilder builder = new StringBuilder();
+        builder.append("SELECT * FROM ").append(targetCollectibleScheme.getSimpleName());
+        genLoad(targetCollectibleScheme, builder);
+        String result = builder.toString();
+        System.out.println(result);
+        loadStatement = databaseHandler.prepareStatement(result);
+    }
+
+    private void genLoad(CollectibleScheme collectibleScheme, StringBuilder builder) {
+        for (String field : collectibleScheme.getFieldsData().keySet()) {
+            FieldData fieldData = collectibleScheme.getFieldsData().get(field);
+            if (fieldData.isCollectible()) {
+                String name = fieldData.getSimpleName();
+                builder.append(" JOIN ").append(name);
+                builder.append(" on ").append(name).append(".id = ").append(collectibleScheme.getSimpleName()).append(".").append(field);
+                genLoad(fieldData.getCollectibleScheme(), builder);
+            }
+        }
     }
 
     private void generateInsert() throws SQLException {
@@ -50,6 +127,7 @@ public class StatementCreator {
         builder.append(" ").append(finalString);
         String result = builder.toString();
         System.out.println(result);
+        //TODO remove print
         insertStatement = databaseHandler.prepareStatement(result);
     }
 
@@ -74,25 +152,8 @@ public class StatementCreator {
             builder.append(",");
         }
         builder.deleteCharAt(builder.length() - 1);
-        builder.append(") RETURNING ").append(collectibleName).append("_id\n),");
-        return "(SELECT " + collectibleName + "_id FROM " + collectibleName + "_id)";
-
-
-//        for (FieldData fieldData : collectibleScheme.getFieldsData().values()) {
-//            if (fieldData.isCollectible()) genInsert(fieldData.getCollectibleScheme());
-//        }
-//        StringBuilder builder = new StringBuilder();
-//        builder.append("INSERT INTO").append(collectibleScheme.getSimpleName()).append(" (");
-//        for (String column : collectibleScheme.getFieldsData().keySet()) {
-//            builder.append(column).append(",");
-//        }
-//        builder.deleteCharAt(builder.length() - 1).append(") VALUES (");
-//        builder.append("?,".repeat(collectibleScheme.getFieldsData().keySet().size()));
-//        builder.deleteCharAt(builder.length() - 1).append(")");
-//        insertStatement.add(builder.toString());
-//        String idGetter = "SELECT last_value FROM "+collectibleScheme.getSimpleName()+"_"+collectibleScheme.getSimpleName()+"_id_seq";
-//        insertStatement.add(idGetter);
-        // TODO REDO for result like this:
+        builder.append(") RETURNING id\n),");
+        return "(SELECT id FROM " + collectibleName + "_id)";
 //        WITH coordinates_id AS  (
 //                INSERT INTO coordinates (x,y) VALUES (13, 13)
 //                RETURNING coordinates_id

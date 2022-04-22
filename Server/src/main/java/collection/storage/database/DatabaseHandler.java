@@ -37,11 +37,11 @@ public class DatabaseHandler {
     private void debug() throws SQLException {
         simpleQuery = connection.prepareStatement("SELECT * FROM dragon");
         ResultSet results = simpleQuery.executeQuery();
-        results.next();
-        logger.debug(Integer.valueOf(results.getInt(1)).toString());
+        if (results.next()) logger.debug(Integer.valueOf(results.getInt(1)).toString());
         simpleQuery.close();
         PreparedStatement testStatement = connection.prepareStatement("INSERT INTO dragonCave (depth) VALUES (-20)");
         testStatement.executeUpdate();
+        statementCreator.setTargetCollectibleScheme(new CollectibleScheme(Dragon.class));
         PreparedStatement preparedStatement = connection.prepareStatement("" +
                 "WITH coordinates_id AS  (\n" +
                 "                INSERT INTO coordinates (x,y) VALUES (?, ?)\n" +
@@ -69,7 +69,6 @@ public class DatabaseHandler {
         testRes.next();
         logger.debug(String.valueOf(testRes.getLong(1)));
         connection.commit();
-        statementCreator.setTargetCollectibleScheme(new CollectibleScheme(Dragon.class));
     }
 
     public PreparedStatement prepareStatement(String sql) throws SQLException {

@@ -4,6 +4,10 @@ import annotations.CollectibleField;
 import annotations.UserAccessible;
 import collection.Validator;
 import collection.classes.RawCollectible;
+import collection.meta.CollectibleModel;
+import collection.meta.CollectibleScheme;
+import collection.meta.FieldData;
+import collection.meta.InputtedValue;
 import commands.*;
 import console.ConsoleHandler;
 import exceptions.CommandArgsAmountException;
@@ -88,7 +92,7 @@ public class ClientInteractionController extends Thread {
                 if (!isEmpty) {
                     throw new CommandArgsAmountException("Command \"" + commandData.getName() + "\" needs a complex argument, not a simple one!");
                 } else {
-                    RawCollectible<?> newArgs = promptComplexArgs();
+                    CollectibleModel newArgs = promptComplexArgs();
                     arguments = new CommandArgs("", newArgs);
                 }
                 break;
@@ -101,7 +105,7 @@ public class ClientInteractionController extends Thread {
                 if (isEmpty) {
                     throw new CommandArgsAmountException("Command \"" + commandData.getName() + "\" needs an in-line (simple) argument!");
                 } else {
-                    RawCollectible<?> complexArgs = promptComplexArgs();
+                    CollectibleModel complexArgs = promptComplexArgs();
                     arguments = new CommandArgs(argumentString, complexArgs);
                 }
 
@@ -137,47 +141,49 @@ public class ClientInteractionController extends Thread {
     }
 
 
-    private RawCollectible<?> promptComplexArgs() {
-        Map<String, Object> map = promptComplexArgsMap(commandsExecutor.getTargetClassHandler().getCurrentClass());
+    private CollectibleModel promptComplexArgs() {
+        CollectibleScheme collectibleScheme = commandsExecutor.getTargetClassHandler().getCurrentCollectibleScheme();
+        Map<String, InputtedValue> map = promptComplexArgsMap(collectibleScheme);
         try {
-            return commandsExecutor.getTargetClassHandler().getCurrentCollectionBuilder().rawBuild(map);
+            return new CollectibleModel(collectibleScheme, map);
+//            return commandsExecutor.getTargetClassHandler().getCurrentCollectionBuilder().rawBuild(map);
         } catch (ValueNotValidException e) {
             consoleHandler.errorMessage(e);
             return null;
         }
     }
 
-    private Map<String, Object> promptComplexArgsMap(Class<?> targetClass) {
-        List<Field> fields = commandsExecutor.getTargetClassHandler().getCurrentCollectionBuilder().getClassFields(targetClass);
-        Map<String, Object> map = new HashMap<>();
-        for (Field field : fields) {
-            String key = field.getName();
-            if (field.isAnnotationPresent(UserAccessible.class)) {
-                if (!field.isAnnotationPresent(CollectibleField.class)) map.put(key, promptField(key, field));
-                else map.put(key, promptComplexArgsMap(field.getType()));
+    private Map<String, InputtedValue> promptComplexArgsMap(CollectibleScheme collectibleScheme) {
+//        List<Field> fields = commandsExecutor.getTargetClassHandler().getCurrentCollectionBuilder().getClassFields(targetClass);
+        Map<String, InputtedValue> map = new HashMap<>();
+        for (String key : collectibleScheme.getFieldsData().keySet()) {
+            FieldData fieldData = collectibleScheme.getFieldsData().get(key);
+            if (fieldData.isUserAccessible()) {
+                if (!fieldData.isCollectible()) map.put(key, new InputtedValue(promptField(key, fieldData)));
+                else map.put(key, new InputtedValue(promptComplexArgsMap(fieldData.getCollectibleScheme())));
             }
         }
         return map;
     }
 
-    private Object promptField(String name, Field field) {
-        Class<?> fieldType = field.getType();
+    private Object promptField(String name, FieldData fieldData) {
+        Class<?> fieldType = fieldData.getType();
         while (true) {
             String message;
-            if (fieldType.isEnum()) message = generateEnumPrompt(field);
+            if (fieldType.isEnum()) message = generateEnumPrompt(fieldData);
             else message = "Please enter " + name + ": ";
             String result = consoleHandler.promptInput(message);
             try {
-                return Validator.convertAndValidate(field, fieldType, result);
+                return Validator.convertAndValidate(fieldData, fieldType, result);
             } catch (ValueNotValidException e) {
                 consoleHandler.errorMessage(e);
             }
         }
     }
 
-    private String generateEnumPrompt(Field enumField) {
-        StringBuilder message = new StringBuilder("Please enter " + enumField.getName() + " (");
-        Field[] enums = enumField.getType().getFields();
+    private String generateEnumPrompt(FieldData enumFieldData) {
+        StringBuilder message = new StringBuilder("Please enter " + enumFieldData.getSimpleName() + " (");
+        Field[] enums = enumFieldData.getType().getFields();
         for (Field field : enums) {
             message.append(field.getName()).append(";");
         }

@@ -16,7 +16,7 @@ public class FieldModel {
         this.fieldData = fieldData;
         if (fieldData.isCollectible()) {
             if (!value.isComplex())
-                throw new ValueNotValidException(fieldData.getSimpleName() + " is not a collectible!");
+                throw new ValueNotValidException(fieldData.getSimpleName() + " should be a collectible!");
             Map<String, InputtedValue> mappedCollectible = value.getInputtedValues();
             this.value = new CollectibleModel(fieldData.getCollectibleScheme(), mappedCollectible);
         } else {
