@@ -1,54 +1,26 @@
 package collection;
 
 import collection.classes.*;
+import collection.meta.CollectibleScheme;
 import exceptions.ElementIdException;
 import exceptions.InvalidCollectionException;
+import lombok.Getter;
 import utility.QueueWithID;
 
 import java.util.*;
 
 public class CollectionHandler<T extends MainCollectible<T>> {
     protected final Class<T> targetClass;
+    @Getter
+    protected final CollectibleScheme collectibleScheme;
     protected QueueWithID<T> collection;
-    protected final CollectionBuilder<T> collectionBuilder;
 
-    public CollectionHandler(QueueWithID<T> collection, CollectionBuilder<T> collectionBuilder, Class<T> targetClass) {
+    public CollectionHandler(QueueWithID<T> collection, Class<T> targetClass) {
         this.targetClass = targetClass;
         this.collection = collection;
-        this.collectionBuilder = collectionBuilder;
+        this.collectibleScheme = new CollectibleScheme(targetClass);
     }
 
-
-    public void clear() {
-        collection.clear();
-        handleCollectionChange();
-    }
-
-    protected void handleCollectionChange() {
-        collection.incrementId();
-    }
-
-
-    public void removeFirst() throws NoSuchElementException {
-        this.collection.remove();
-        handleCollectionChange();
-    }
-
-    public void removeById(String strId) throws ElementIdException {
-        try {
-            long id = Long.parseLong(strId);
-            if (!collection.removeIf(collectible -> collectible.getId().equals(id)))
-                throw new ElementIdException(strId);
-            else handleCollectionChange();
-        } catch (NumberFormatException e) {
-            throw new ElementIdException(strId);
-        }
-
-    }
-
-    public void removeLower(RawCollectible<T> rawObject) {
-        if (collection.removeIf(collectible -> collectible.compareTo(rawObject) < 0)) handleCollectionChange();
-    }
 
     public long countByColor(String arg) throws IllegalArgumentException {
         Color color = Color.valueOf(arg);

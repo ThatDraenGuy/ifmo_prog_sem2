@@ -2,7 +2,6 @@ import collection.*;
 import collection.classes.DragonFactory;
 import collection.classes.MainCollectible;
 import collection.storage.database.DatabaseHandler;
-import collection.storage.FileStorageHandler;
 import collection.storage.JsonHandler;
 import collection.storage.StorageHandler;
 import commands.ServerCommandsHandler;
@@ -17,6 +16,7 @@ import web.UserDataHandler;
 import java.io.File;
 import java.io.IOException;
 import java.sql.SQLException;
+import java.time.ZonedDateTime;
 
 /**
  * A Main class, only consists of main() method.
@@ -26,28 +26,16 @@ public class Main {
     final static String defaultPath = "DefaultCollection.json";
 
     public static void main(String... args) {
+        System.out.println(ZonedDateTime.now());
         Logger logger = LoggerFactory.getLogger("loader");
         logger.info("Starting the server...");
+        StorageHandler storageHandler = null;
         try {
-            DatabaseHandler databaseHandler = new DatabaseHandler();
+            storageHandler = new DatabaseHandler();
         } catch (SQLException e) {
             logger.error(e.toString());
         }
 
-
-        String filePath;
-        if (args.length != 1) {
-            logger.warn("Filepath wasn't inputted; starting up with default collection");
-            filePath = defaultPath;
-        } else {
-            filePath = args[0];
-        }
-        File collectionFile = new File(filePath);
-        if (!collectionFile.isFile()) {
-            logger.warn("Couldn't find file \"" + filePath + "\". Starting up with empty collection...");
-            filePath = defaultPath;
-        }
-        StorageHandler storageHandler = new FileStorageHandler(new File(filePath), new JsonHandler());
         DragonFactory factory = new DragonFactory();
         ServerCommandsHandler cmdHandler = new ServerCommandsHandler();
         ServerHandler serverHandler = null;
@@ -58,7 +46,7 @@ public class Main {
             System.exit(1);
         }
         ServerCollectionHandler<Dragon> collectionHandler = new ServerCollectionHandler<>(storageHandler, serverHandler,
-                factory, new DragonCollectionBuilder(factory), Dragon.class);
+                factory, Dragon.class);
         UserDataHandler.setCollectionHandler(collectionHandler);
         CollectionBridge<Dragon> collectionBridge = new CollectionBridge<>(collectionHandler);
         collectionHandler.load();
@@ -68,7 +56,7 @@ public class Main {
                 new RemoveFirst(collectionHandler),
                 new RemoveById(collectionHandler),
                 new Add(collectionBridge),
-                new Update(collectionBridge),
+//                new Update(collectionBridge),
                 new Clear(collectionHandler),
                 new RemoveLower(collectionBridge),
                 new FetchServerData(),

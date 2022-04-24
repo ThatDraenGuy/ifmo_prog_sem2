@@ -2,6 +2,7 @@ package collection.classes;
 
 import annotations.*;
 import annotations.CollectibleField;
+import collection.meta.CollectibleModel;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -11,37 +12,32 @@ import java.time.ZonedDateTime;
 @Getter
 public class Dragon implements MainCollectible<Dragon> {
     @NotNull
-    @NonNull
     @LowerBounded
     private final Long id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
-    @NonNull
     @NotNull
     @UserAccessible
     private final String name; //Поле не может быть null, Строка не может быть пустой
     @NotNull
-    @NonNull
     @UserAccessible
     @CollectibleField
     private final Coordinates coordinates; //Поле не может быть null
-    @NotNull
-    @NonNull
-    private final ZonedDateTime creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
     @UserAccessible
     @LowerBounded
     private final Long age; //Значение поля должно быть больше 0, Поле может быть null
     @NotNull
-    @NonNull
     @UserAccessible
     private final Color color; //Поле не может быть null
     @UserAccessible
     private final DragonType type; //Поле может быть null
     @NotNull
-    @NonNull
     @UserAccessible
     private final DragonCharacter character; //Поле не может быть null
     @CollectibleField
     @UserAccessible
     private final DragonCave cave; //Поле может быть null
+    @NotNull
+    private final ZonedDateTime creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
+
 
     public Dragon(Long id, String name, Coordinates coordinates, ZonedDateTime creationDate, Long age, Color color, DragonType type, DragonCharacter character, DragonCave cave) {
         this.id = id;
@@ -61,8 +57,10 @@ public class Dragon implements MainCollectible<Dragon> {
         return this.name.compareTo(dragon.getName());
     }
 
-    public int compareTo(RawCollectible<Dragon> rawDragon) {
-        return this.name.compareTo(rawDragon.getName());
+
+    public int compareTo(CollectibleModel collectibleModel) {
+        String modelName = collectibleModel.getValues().get(name).getValue().toString();
+        return this.name.compareTo(modelName);
     }
 
     @Override

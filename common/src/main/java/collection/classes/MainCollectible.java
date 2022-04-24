@@ -1,5 +1,7 @@
 package collection.classes;
 
+import collection.meta.CollectibleModel;
+
 public interface MainCollectible<T> extends Collectible, Comparable<T> {
 
     Long getId();
@@ -10,5 +12,6 @@ public interface MainCollectible<T> extends Collectible, Comparable<T> {
 
     Long getAge();
 
-    int compareTo(RawCollectible<T> rawCollectible);
+
+    int compareTo(CollectibleModel collectibleModel);
 }

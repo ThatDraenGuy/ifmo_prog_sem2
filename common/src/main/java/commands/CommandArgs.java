@@ -1,8 +1,8 @@
 package commands;
 
 import collection.classes.MainCollectible;
-import collection.classes.RawCollectible;
 import collection.history.CollectionChange;
+import collection.meta.CollectibleModel;
 import lombok.Getter;
 import utility.QueueWithID;
 
@@ -17,7 +17,7 @@ public class CommandArgs implements Serializable {
     @Getter
     private final String args;
     @Getter
-    private RawCollectible<?> rawObject;
+    private CollectibleModel collectibleModel;
     @Getter
     private Queue<CollectionChange<? extends MainCollectible<?>>> collectionChanges;
     @Getter
@@ -28,8 +28,8 @@ public class CommandArgs implements Serializable {
     }
 
 
-    public CommandArgs(String args, RawCollectible<?> object) {
-        this.rawObject = object;
+    public CommandArgs(String args, CollectibleModel object) {
+        this.collectibleModel = object;
         this.args = args;
     }
 

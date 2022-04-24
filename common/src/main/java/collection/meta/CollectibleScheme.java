@@ -3,10 +3,11 @@ package collection.meta;
 import collection.classes.Collectible;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.HashMap;
 
-public class CollectibleScheme {
+public class CollectibleScheme implements Serializable {
     @Getter
     private final String simpleName;
     @Getter

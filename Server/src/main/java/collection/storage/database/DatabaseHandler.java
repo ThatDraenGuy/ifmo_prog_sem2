@@ -1,20 +1,21 @@
 package collection.storage.database;
 
-import collection.classes.Color;
 import collection.classes.Dragon;
-import collection.classes.MainCollectible;
-import collection.meta.CollectibleModel;
-import collection.meta.CollectibleScheme;
-import collection.meta.FieldData;
-import collection.meta.FieldModel;
+import collection.meta.*;
+import collection.storage.StorageHandler;
+import exceptions.StorageException;
+import exceptions.ValueNotValidException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import utility.ArrayListWithID;
+import utility.CollectionWithID;
 
 import java.sql.*;
+import java.time.ZonedDateTime;
 import java.util.*;
-import java.util.function.Function;
 
-public class DatabaseHandler {
+public class DatabaseHandler implements StorageHandler {
+    private int counter;
     private final Logger logger;
     private final Connection connection;
     private StatementCreator statementCreator;
@@ -22,6 +23,7 @@ public class DatabaseHandler {
     private PreparedStatement simpleQuery;
 
     public DatabaseHandler() throws SQLException {
+        counter = 1;
         logger = LoggerFactory.getLogger("DatabaseHandler");
         statementCreator = new StatementCreator(this);
         Properties info = new Properties();
@@ -31,7 +33,6 @@ public class DatabaseHandler {
         connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/progdb", info);
         connection.setAutoCommit(false);
         logger.info("Successfully established connection: " + connection);
-        debug();
     }
 
     private void debug() throws SQLException {
@@ -75,61 +76,104 @@ public class DatabaseHandler {
         return connection.prepareStatement(sql);
     }
 
-    public long insert(CollectibleModel object) throws SQLException {
-        connection.setSavepoint();
-        int counter = 1;
-        PreparedStatement insertStatement = statementCreator.getInsertStatement();
-        insertModel(object, insertStatement, counter);
-        ResultSet resultSet = insertStatement.executeQuery();
-        resultSet.next();
-        return resultSet.getLong(1);
+    public void removeById(long id) throws StorageException {
+        try {
+            connection.setSavepoint();
+            PreparedStatement statement = statementCreator.getRemoveByIdStatement();
+            statement.setLong(1, id);
+            statement.executeUpdate();
+            updateCollectionId();
+        } catch (SQLException e) {
+            throw new StorageException(e);
+        }
     }
 
-    private void insertModel(CollectibleModel model, PreparedStatement statement, int counter) throws SQLException {
+    public long insert(CollectibleModel object) throws StorageException {
+        try {
+            connection.setSavepoint();
+            counter = 1;
+            PreparedStatement insertStatement = statementCreator.getInsertStatement();
+            insertModel(object, insertStatement);
+            //TODO remove
+            System.out.println(insertStatement);
+            ResultSet resultSet = insertStatement.executeQuery();
+            resultSet.next();
+            long res = resultSet.getLong("id");
+            updateCollectionId();
+            return res;
+        } catch (SQLException e) {
+            throw new StorageException(e);
+        }
+    }
+
+    private void insertModel(CollectibleModel model, PreparedStatement statement) throws SQLException {
         for (FieldModel fieldModel : model.getValues().values()) {
             if (fieldModel.getFieldData().isCollectible()) {
-                insertModel(fieldModel.getCollectibleModel(), statement, counter);
+                insertModel(fieldModel.getCollectibleModel(), statement);
             }
         }
         for (FieldModel fieldModel : model.getValues().values()) {
             if (fieldModel.getFieldData().isCollectible()) continue;
-            if (fieldModel.getFieldData().getType().isEnum())
-                statement.setObject(counter, fieldModel.getValue().toString());
-            else statement.setObject(counter, fieldModel.getValue());
+            Object value = fieldModel.getValue();
+            Class<?> type = fieldModel.getFieldData().getType();
+            if (type.isEnum() || ZonedDateTime.class.isAssignableFrom(type)) {
+                if (value != null) statement.setObject(counter, value.toString());
+                else statement.setObject(counter, null);
+            } else statement.setObject(counter, value);
             counter++;
         }
+        System.out.println(statement);
     }
-//    private long insert(CollectibleModel collectibleModel) throws SQLException {
-//        if (!collectibleModel.getCollectibleScheme().equals(statementCreator.getTargetCollectibleScheme())) {
-//            statementCreator.setTargetCollectibleScheme(collectibleModel.getCollectibleScheme());
-//        } // TODO pulling and re-creating statements
-//        ArrayList<String> commands = statementCreator.getInsertStatement();
-//        connection.setSavepoint();
-//        long result = insertCycle(collectibleModel, commands.iterator());
-//        connection.commit();
-//        return result;
-//    }
-//    private long insertCycle(CollectibleModel collectibleModel, Iterator<String> statementIterator) throws SQLException {
-//        List<Long> collectibleIds = new LinkedList<>();
-//        for (FieldModel field : collectibleModel.getValues().values()) {
-//            if (field.getFieldData().isCollectible()) {
-//                collectibleIds.add(insertCycle(field.getCollectibleModel(), statementIterator));
-//            }
-//        }
-//        PreparedStatement preparedStatement = connection.prepareStatement(statementIterator.next());
-//        int i = 1;
-//        Iterator<Long> collectibleIdsIterator = collectibleIds.iterator();
-//        for (FieldModel field : collectibleModel.getValues().values()) {
-//            if (!field.getFieldData().isCollectible()) preparedStatement.setObject(i, field.getValue());
-//            else preparedStatement.setLong(i, collectibleIdsIterator.next());
-//        }
-//        preparedStatement.executeUpdate();
-//        preparedStatement.close();
-//        PreparedStatement idGetterStatement = connection.prepareStatement(statementIterator.next());
-//        ResultSet id = idGetterStatement.executeQuery();
-//        if (id.next()) return id.getLong(1);
-//        return 0; //TODO exception?
-//    }
 
+    public CollectionWithID<CollectibleModel> load(CollectibleScheme collectibleScheme) throws StorageException {
+        try {
+            if (!collectibleScheme.equals(statementCreator.getTargetCollectibleScheme()))
+                statementCreator.setTargetCollectibleScheme(collectibleScheme);
+            PreparedStatement statement = statementCreator.getLoadStatement();
+            ResultSet resultSet = statement.executeQuery();
+            Collection<CollectibleModel> collection = new ArrayList<>();
+            while (resultSet.next()) {
+                Map<String, InputtedValue> map = loadModel(collectibleScheme, resultSet);
+                System.out.println(map);
+                //TODO remove
+                collection.add(new CollectibleModel(collectibleScheme, map));
+            }
+            resultSet.close();
+            long id = getCollectionId();
+            CollectionWithID<CollectibleModel> collectibleModels = new ArrayListWithID<>(id);
+            collectibleModels.addAll(collection);
+            return collectibleModels;
+
+        } catch (SQLException | ValueNotValidException e) {
+            throw new StorageException(e);
+        }
+    }
+
+    private Map<String, InputtedValue> loadModel(CollectibleScheme collectibleScheme, ResultSet resultSet) throws SQLException {
+        Map<String, InputtedValue> map = new HashMap<>();
+        for (String field : collectibleScheme.getFieldsData().keySet()) {
+            FieldData fieldData = collectibleScheme.getFieldsData().get(field);
+            if (!fieldData.isCollectible()) map.put(field, new InputtedValue(resultSet.getObject(field)));
+            else map.put(field, new InputtedValue(loadModel(fieldData.getCollectibleScheme(), resultSet)));
+        }
+        return map;
+    }
+
+    public long getCollectionId() {
+        try {
+            PreparedStatement statement = statementCreator.getCollectionIdGetterStatement();
+            ResultSet resultSet = statement.executeQuery();
+            if (resultSet.next()) return resultSet.getLong("last_value");
+            return 0L;
+        } catch (SQLException ignored) {
+            return 0L;
+        }
+    }
+
+    private void updateCollectionId() throws SQLException {
+        PreparedStatement statement = statementCreator.getCollectionIdUpdateStatement();
+        statement.executeQuery();
+        connection.commit();
+    }
 
 }

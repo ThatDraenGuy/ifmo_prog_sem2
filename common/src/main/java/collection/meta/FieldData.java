@@ -6,9 +6,10 @@ import annotations.UserAccessible;
 import collection.classes.Collectible;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.lang.reflect.Field;
 
-public class FieldData {
+public class FieldData implements Serializable {
     @Getter
     private final boolean collectible;
     @Getter

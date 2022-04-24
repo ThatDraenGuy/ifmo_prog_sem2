@@ -20,7 +20,7 @@ public class RemoveLower extends AbstractCommand {
     @Override
     public ActionResult action(CommandArgs args) {
         try {
-            collectionBridge.removeLower(args.getRawObject());
+            collectionBridge.removeLower(args.getCollectibleModel());
             return new ActionResult(true, "Successfully removed all lower objects");
         } catch (IncorrectCollectibleTypeException e) {
             return new ActionResult(false, e.getMessage());

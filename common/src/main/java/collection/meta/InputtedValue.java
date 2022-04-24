@@ -14,6 +14,18 @@ public class InputtedValue {
     private final boolean complex;
 
     public InputtedValue(Object input) {
+        if (input == null) {
+            string = "";
+            complex = false;
+            return;
+        }
+        if (input instanceof InputtedValue inputtedValue) {
+            this.string = inputtedValue.getString();
+            this.inputtedValues = inputtedValue.getInputtedValues();
+            this.complex = inputtedValue.isComplex();
+            return;
+            //TODO another method (copy/clone?)
+        }
         complex = input instanceof Map<?, ?>;
         if (complex) {
             inputtedValues = new HashMap<>();
@@ -28,7 +40,7 @@ public class InputtedValue {
 
     @Override
     public String toString() {
-        //TODO think? (creation of inputted value from inputted value)
-        return string;
+        if (complex) return inputtedValues.toString();
+        else return string;
     }
 }

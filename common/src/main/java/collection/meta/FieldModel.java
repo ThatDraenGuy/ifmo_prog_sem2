@@ -4,9 +4,10 @@ import collection.Validator;
 import exceptions.ValueNotValidException;
 import lombok.Getter;
 
+import java.io.Serializable;
 import java.util.Map;
 
-public class FieldModel {
+public class FieldModel implements Serializable {
     @Getter
     private final FieldData fieldData;
     @Getter
@@ -29,5 +30,11 @@ public class FieldModel {
     public CollectibleModel getCollectibleModel() {
         if (fieldData.isCollectible()) return (CollectibleModel) value;
         return null;
+    }
+
+    @Override
+    public String toString() {
+        if (value != null) return value.toString();
+        return "";
     }
 }

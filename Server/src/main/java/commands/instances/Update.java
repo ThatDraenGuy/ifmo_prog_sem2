@@ -22,7 +22,7 @@ public class Update extends AbstractCommand {
     @Override
     public ActionResult action(CommandArgs args) {
         try {
-            collectionBridge.update(args.getArgs(), args.getRawObject());
+            collectionBridge.update(args.getArgs(), args.getCollectibleModel());
             return new ActionResult(true, "Successfully updated element with id " + args.getArgs());
         } catch (ElementIdException | IncorrectCollectibleTypeException e) {
             return new ActionResult(false, e.getMessage());

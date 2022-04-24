@@ -15,12 +15,12 @@ import java.util.List;
 public class StatementCreator {
     // statements:
     // + add (insert)
-    // - remove_by_id
+    // + remove_by_id
     // - update
     // - remove_lower
     // - remove_first
     // - clear
-    // +- load
+    // + load
     // + *init
     @Getter
     private CollectibleScheme targetCollectibleScheme;
@@ -29,11 +29,17 @@ public class StatementCreator {
     @Getter
     private PreparedStatement loadStatement;
     @Getter
+    private PreparedStatement collectionIdGetterStatement;
+    @Getter
+    private PreparedStatement collectionIdUpdateStatement;
+    @Getter
+    private PreparedStatement removeByIdStatement;
+    @Getter
     private final ArrayList<String> clearStatement;
     private final DatabaseHandler databaseHandler;
 
 
-    public StatementCreator(DatabaseHandler databaseHandler) throws SQLException {
+    public StatementCreator(DatabaseHandler databaseHandler) {
         this.databaseHandler = databaseHandler;
         clearStatement = new ArrayList<>();
     }
@@ -48,6 +54,14 @@ public class StatementCreator {
         generateInsert();
         generateLoad();
         generateInit();
+        generateRemoveById();
+        collectionIdGetterStatement = databaseHandler.prepareStatement("SELECT last_value FROM collection_id");
+        collectionIdUpdateStatement = databaseHandler.prepareStatement("SELECT nextval('collection_id')");
+    }
+
+    private void generateRemoveById() throws SQLException {
+        String name = targetCollectibleScheme.getSimpleName();
+        removeByIdStatement = databaseHandler.prepareStatement("DELETE FROM " + name + " WHERE id = ?");
     }
 
     private void generateInit() {
@@ -63,8 +77,8 @@ public class StatementCreator {
         }
         builder.append("CREATE TABLE ").append(collectibleScheme.getSimpleName()).append(" (\n");
         builder.append("id BIGSERIAL PRIMARY KEY,\n");
-        //TODO NOT NULL;
         for (String field : collectibleScheme.getFieldsData().keySet()) {
+            if (field.equals("id")) continue;
             FieldData fieldData = collectibleScheme.getFieldsData().get(field);
             builder.append(field).append(" ").append(getSqlType(fieldData.getType()));
             if (fieldData.isNotNull()) builder.append(" NOT NULL");
@@ -72,7 +86,6 @@ public class StatementCreator {
                 builder.append(" CHECK (").append(field).append(">").append(fieldData.getLowerBoundedValue()).append(")");
             if (fieldData.isCollectible())
                 builder.append(" REFERENCES ").append(fieldData.getCollectibleScheme().getSimpleName()).append("(id)");
-            //TODO
             builder.append(",\n");
         }
         builder.deleteCharAt(builder.length() - 1);
@@ -140,11 +153,13 @@ public class StatementCreator {
         String collectibleName = collectibleScheme.getSimpleName();
         builder.append(collectibleName).append("_id AS (\nINSERT INTO ").append(collectibleName).append(" (");
         for (String field : collectibleScheme.getFieldsData().keySet()) {
-            builder.append(field).append(",");
+            if (!field.equals("id")) builder.append(field).append(",");
         }
         builder.deleteCharAt(builder.length() - 1);
         builder.append(") VALUES (");
-        for (FieldData fieldData : collectibleScheme.getFieldsData().values()) {
+        for (String field : collectibleScheme.getFieldsData().keySet()) {
+            if (field.equals("id")) continue;
+            FieldData fieldData = collectibleScheme.getFieldsData().get(field);
             if (fieldData.isCollectible()) builder.append(idGetterIterator.next());
             else if (fieldData.getType().isEnum())
                 builder.append("(CAST(? AS ").append(fieldData.getType().getSimpleName()).append("))");

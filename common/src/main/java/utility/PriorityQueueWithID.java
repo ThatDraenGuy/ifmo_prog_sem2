@@ -14,6 +14,12 @@ public class PriorityQueueWithID<E> extends PriorityQueue<E> implements QueueWit
     public void incrementId() {
         id++;
     }
+
+
+    @Override
+    public String toString() {
+        return "id: " + id + "\n" + super.toString();
+    }
 //    @Override
 //    public boolean add(E object) {
 //        id++;

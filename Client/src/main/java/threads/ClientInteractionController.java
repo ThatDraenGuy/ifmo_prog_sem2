@@ -1,9 +1,6 @@
 package threads;
 
-import annotations.CollectibleField;
-import annotations.UserAccessible;
 import collection.Validator;
-import collection.classes.RawCollectible;
 import collection.meta.CollectibleModel;
 import collection.meta.CollectibleScheme;
 import collection.meta.FieldData;
@@ -21,7 +18,6 @@ import message.Response;
 
 import java.lang.reflect.Field;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.NoSuchElementException;
 
@@ -149,7 +145,7 @@ public class ClientInteractionController extends Thread {
 //            return commandsExecutor.getTargetClassHandler().getCurrentCollectionBuilder().rawBuild(map);
         } catch (ValueNotValidException e) {
             consoleHandler.errorMessage(e);
-            return null;
+            return promptComplexArgs();
         }
     }
 

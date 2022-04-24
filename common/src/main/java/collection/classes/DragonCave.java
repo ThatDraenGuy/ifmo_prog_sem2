@@ -5,13 +5,20 @@ import annotations.UserAccessible;
 import lombok.Builder;
 import lombok.Getter;
 
-@Builder
+import java.time.ZonedDateTime;
+
 public class DragonCave implements Collectible {
     @UserAccessible
     @NotNull
     @Getter
     private int depth;
+    @NotNull
+    private ZonedDateTime creationDate;
 
+    public DragonCave(int depth, ZonedDateTime creationDate) {
+        this.depth = depth;
+        this.creationDate = creationDate;
+    }
 
     @Override
     public String toString() {

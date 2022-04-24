@@ -1,13 +1,13 @@
 package collection.classes;
 
+import collection.meta.CollectibleModel;
+import exceptions.IncorrectCollectibleTypeException;
+
 import java.time.ZonedDateTime;
 
 public interface MainCollectibleFactory<T extends MainCollectible<T>> {
-    T getObject(RawCollectible<T> rawCollectible);
 
-    T getObject(RawCollectible<T> rawCollectible, long id);
+    T getObject(CollectibleModel collectibleModel, long id) throws IncorrectCollectibleTypeException;
 
-    T getObject(RawCollectible<T> rawCollectible, long id, ZonedDateTime creationDate);
-
-    void setNextId(Long id);
+    T getObject(CollectibleModel collectibleModel) throws IncorrectCollectibleTypeException;
 }

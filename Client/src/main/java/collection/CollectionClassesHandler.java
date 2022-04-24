@@ -3,6 +3,7 @@ package collection;
 import collection.classes.Dragon;
 import collection.classes.MainCollectible;
 import collection.history.CollectionChange;
+import collection.meta.CollectibleScheme;
 import exceptions.CollectionVersionIsBehindException;
 import lombok.Getter;
 import utility.QueueWithID;
@@ -88,7 +89,7 @@ public class CollectionClassesHandler {
         return currentCollectionHandler.getId();
     }
 
-    public CollectionBuilder<?> getCurrentCollectionBuilder() {
-        return currentCollectionHandler.getCollectionBuilder();
+    public CollectibleScheme getCurrentCollectibleScheme() {
+        return currentCollectionHandler.getCollectibleScheme();
     }
 }
