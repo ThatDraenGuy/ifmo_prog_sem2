@@ -7,6 +7,7 @@ import commands.CommandArgs;
 import commands.CommandArgsType;
 import exceptions.ElementIdException;
 import exceptions.IncorrectCollectibleTypeException;
+import exceptions.StorageException;
 
 /**
  * A command for updating element in collection. Invokes
@@ -26,6 +27,8 @@ public class Update extends AbstractCommand {
             return new ActionResult(true, "Successfully updated element with id " + args.getArgs());
         } catch (ElementIdException | IncorrectCollectibleTypeException e) {
             return new ActionResult(false, e.getMessage());
+        } catch (StorageException e) {
+            return new ActionResult(false, "A storage exception has occurred: " + e.getMessage());
         }
     }
 }

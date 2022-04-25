@@ -56,7 +56,7 @@ public class Main {
                 new RemoveFirst(collectionHandler),
                 new RemoveById(collectionHandler),
                 new Add(collectionBridge),
-//                new Update(collectionBridge),
+                new Update(collectionBridge),
                 new Clear(collectionHandler),
                 new RemoveLower(collectionBridge),
                 new FetchServerData(),

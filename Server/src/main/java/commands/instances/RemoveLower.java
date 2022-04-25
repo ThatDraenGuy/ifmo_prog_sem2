@@ -6,6 +6,7 @@ import commands.ActionResult;
 import commands.CommandArgs;
 import commands.CommandArgsType;
 import exceptions.IncorrectCollectibleTypeException;
+import exceptions.StorageException;
 
 /**
  */
@@ -24,6 +25,8 @@ public class RemoveLower extends AbstractCommand {
             return new ActionResult(true, "Successfully removed all lower objects");
         } catch (IncorrectCollectibleTypeException e) {
             return new ActionResult(false, e.getMessage());
+        } catch (StorageException e) {
+            return new ActionResult(false, "A storage exception has occurred: " + e.getMessage());
         }
     }
 }

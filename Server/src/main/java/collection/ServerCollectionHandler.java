@@ -17,7 +17,10 @@ import utility.CollectionWithID;
 import utility.PriorityQueueWithID;
 
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 
 public class ServerCollectionHandler<T extends MainCollectible<T>> extends CollectionHandler<T> {
     @Getter
@@ -42,17 +45,15 @@ public class ServerCollectionHandler<T extends MainCollectible<T>> extends Colle
         handleCollectionChange();
     }
 
-    public void update(String arg, CollectibleModel collectibleModel) throws ElementIdException {
-//        //TODO
-//        long id = Long.parseLong(arg);
-//        T newObject = factory.getObject(collectibleModel, id);
-//        boolean result = collection.removeIf(dragon -> dragon.getId().equals(id));
-//        if (result) {
-//            collection.add(newObject);
-//            handleCollectionChange();
-//        } else {
-//            throw new ElementIdException(arg);
-//        }
+    public void update(String arg, CollectibleModel collectibleModel) throws ElementIdException, StorageException, IncorrectCollectibleTypeException {
+        //TODO think
+        long id = Long.parseLong(arg);
+        if (!storageHandler.update(id, collectibleModel)) throw new ElementIdException(arg);
+
+        T newObject = factory.getObject(collectibleModel, id);
+        collection.removeIf(dragon -> dragon.getId().equals(id));
+        collection.add(newObject);
+        handleCollectionChange();
     }
 
     public void save() throws IOException {
@@ -82,14 +83,15 @@ public class ServerCollectionHandler<T extends MainCollectible<T>> extends Colle
     }
 
 
-    public void removeFirst() throws NoSuchElementException {
-        //TODO
+    public void removeFirst() throws NoSuchElementException, StorageException {
+        T element = this.collection.element();
+        long id = element.getId();
+        storageHandler.removeById(id);
         this.collection.remove();
         handleCollectionChange();
     }
 
     public void removeById(String strId) throws ElementIdException, StorageException {
-        //TODO
         try {
             long id = Long.parseLong(strId);
             storageHandler.removeById(id);
@@ -102,9 +104,13 @@ public class ServerCollectionHandler<T extends MainCollectible<T>> extends Colle
 
     }
 
-    public void removeLower(CollectibleModel collectibleModel) {
-        //TODO
-        if (collection.removeIf(collectible -> collectible.compareTo(collectibleModel) < 0)) handleCollectionChange();
+    public void removeLower(CollectibleModel collectibleModel) throws StorageException {
+        List<Long> ids = collection.stream().filter(collectible -> collectible.compareTo(collectibleModel) < 0).map(MainCollectible::getId).collect(Collectors.toCollection(ArrayList::new));
+        if (ids.size() > 0) {
+            storageHandler.removeABunch(ids);
+            this.collection.removeIf(collectible -> collectible.compareTo(collectibleModel) < 0);
+            handleCollectionChange();
+        }
     }
 
     protected void handleCollectionChange() {

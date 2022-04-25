@@ -6,11 +6,12 @@ import commands.AbstractCommand;
 import commands.ActionResult;
 import commands.CommandArgs;
 import commands.CommandArgsType;
+import exceptions.StorageException;
 
 import java.util.NoSuchElementException;
 
 /**
- * A command for removing first element from collection. Invokes {@link CollectionHandler#removeFirst()}
+ * A command for removing first element from collection. Invokes {@link ServerCollectionHandler#removeFirst()}
  */
 public class RemoveFirst extends AbstractCommand {
     private final ServerCollectionHandler<?> collectionHandler;
@@ -27,6 +28,8 @@ public class RemoveFirst extends AbstractCommand {
             return new ActionResult(true, "Successfully deleted first element");
         } catch (NoSuchElementException e) {
             return new ActionResult(false, "There are no elements in the collection!");
+        } catch (StorageException e) {
+            return new ActionResult(false, "A storage exception has occured: " + e.getMessage());
         }
     }
 }

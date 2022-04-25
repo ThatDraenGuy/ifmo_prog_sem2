@@ -76,13 +76,73 @@ public class DatabaseHandler implements StorageHandler {
         return connection.prepareStatement(sql);
     }
 
+    public boolean update(long id, CollectibleModel object) throws StorageException {
+        try {
+            connection.setSavepoint();
+            counter = 1;
+            PreparedStatement updateStatement = statementCreator.getUpdateStatement();
+            updateModel(id, object, updateStatement);
+            //TODO remove
+            System.out.println(updateStatement);
+            ResultSet resultSet = updateStatement.executeQuery();
+            boolean res = resultSet.next();
+            updateCollectionId();
+            return res;
+        } catch (SQLException e) {
+            throw new StorageException(e);
+        }
+    }
+
+    private void updateModel(long id, CollectibleModel model, PreparedStatement statement) throws SQLException {
+        inputValues(model, statement);
+        if (id != 0) {
+            statement.setLong(counter, id);
+            counter++;
+        }
+        for (FieldModel fieldModel : model.getValues().values()) {
+            if (fieldModel.getFieldData().isCollectible()) updateModel(0, fieldModel.getCollectibleModel(), statement);
+        }
+    }
+
+    private void inputValues(CollectibleModel model, PreparedStatement statement) throws SQLException {
+        for (FieldModel fieldModel : model.getValues().values()) {
+            if (fieldModel.getFieldData().isCollectible()) continue;
+            Object value = fieldModel.getValue();
+            Class<?> type = fieldModel.getFieldData().getType();
+            if (type.isEnum() || ZonedDateTime.class.isAssignableFrom(type)) {
+                if (value != null) statement.setObject(counter, value.toString());
+                else statement.setObject(counter, null);
+            } else statement.setObject(counter, value);
+            counter++;
+        }
+    }
+
+    @Override
+    public void removeABunch(Collection<Long> ids) throws StorageException {
+        try {
+            connection.setSavepoint();
+            for (long id : ids) remove(id);
+            updateCollectionId();
+        } catch (SQLException e) {
+            throw new StorageException(e);
+        }
+    }
+
     public void removeById(long id) throws StorageException {
         try {
             connection.setSavepoint();
+            remove(id);
+            updateCollectionId();
+        } catch (SQLException e) {
+            throw new StorageException(e);
+        }
+    }
+
+    private void remove(long id) throws StorageException {
+        try {
             PreparedStatement statement = statementCreator.getRemoveByIdStatement();
             statement.setLong(1, id);
             statement.executeUpdate();
-            updateCollectionId();
         } catch (SQLException e) {
             throw new StorageException(e);
         }
@@ -112,16 +172,7 @@ public class DatabaseHandler implements StorageHandler {
                 insertModel(fieldModel.getCollectibleModel(), statement);
             }
         }
-        for (FieldModel fieldModel : model.getValues().values()) {
-            if (fieldModel.getFieldData().isCollectible()) continue;
-            Object value = fieldModel.getValue();
-            Class<?> type = fieldModel.getFieldData().getType();
-            if (type.isEnum() || ZonedDateTime.class.isAssignableFrom(type)) {
-                if (value != null) statement.setObject(counter, value.toString());
-                else statement.setObject(counter, null);
-            } else statement.setObject(counter, value);
-            counter++;
-        }
+        inputValues(model, statement);
         System.out.println(statement);
     }
 

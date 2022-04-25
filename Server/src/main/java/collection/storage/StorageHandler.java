@@ -9,6 +9,7 @@ import utility.CollectionWithID;
 
 import java.io.IOException;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.Map;
 
 public interface StorageHandler {
@@ -18,7 +19,11 @@ public interface StorageHandler {
 
     long insert(CollectibleModel collectibleModel) throws StorageException;
 
+    boolean update(long id, CollectibleModel collectibleModel) throws StorageException;
+
     void removeById(long id) throws StorageException;
+
+    void removeABunch(Collection<Long> ids) throws StorageException;
 
     long getCollectionId();
 

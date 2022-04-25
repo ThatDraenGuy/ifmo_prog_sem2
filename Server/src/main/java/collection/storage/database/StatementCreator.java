@@ -11,14 +11,15 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 public class StatementCreator {
     // statements:
     // + add (insert)
     // + remove_by_id
-    // - update
-    // - remove_lower
-    // - remove_first
+    // + update
+    // + remove_lower
+    // + remove_first
     // - clear
     // + load
     // + *init
@@ -34,6 +35,8 @@ public class StatementCreator {
     private PreparedStatement collectionIdUpdateStatement;
     @Getter
     private PreparedStatement removeByIdStatement;
+    @Getter
+    private PreparedStatement updateStatement;
     @Getter
     private final ArrayList<String> clearStatement;
     private final DatabaseHandler databaseHandler;
@@ -55,8 +58,57 @@ public class StatementCreator {
         generateLoad();
         generateInit();
         generateRemoveById();
+        generateUpdate();
         collectionIdGetterStatement = databaseHandler.prepareStatement("SELECT last_value FROM collection_id");
         collectionIdUpdateStatement = databaseHandler.prepareStatement("SELECT nextval('collection_id')");
+    }
+
+    private void generateUpdate() throws SQLException {
+        StringBuilder builder = new StringBuilder();
+        builder.append("WITH ");
+        genUpdate(targetCollectibleScheme, builder, true, "", "");
+        builder.deleteCharAt(builder.length() - 2);
+        builder.append("(SELECT id FROM ").append(targetCollectibleScheme.getSimpleName()).append("_ids)");
+        String result = builder.toString();
+        System.out.println(result);
+        updateStatement = databaseHandler.prepareStatement(result);
+    }
+
+    private void genUpdate(CollectibleScheme collectibleScheme, StringBuilder builder, boolean isFirst, String previousName, String fieldName) {
+        builder.append(collectibleScheme.getSimpleName()).append("_ids AS (\n");
+        builder.append("UPDATE ").append(collectibleScheme.getSimpleName()).append(" SET (");
+        for (String field : collectibleScheme.getFieldsData().keySet()) {
+            if (field.equals("id")) continue;
+            FieldData fieldData = collectibleScheme.getFieldsData().get(field);
+            if (fieldData.isCollectible()) continue;
+            builder.append(field).append(",");
+        }
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append(") = (");
+        for (String field : collectibleScheme.getFieldsData().keySet()) {
+            if (field.equals("id")) continue;
+            FieldData fieldData = collectibleScheme.getFieldsData().get(field);
+            if (fieldData.isCollectible()) continue;
+            if (fieldData.getType().isEnum())
+                builder.append("(CAST(? AS ").append(fieldData.getType().getSimpleName()).append("))");
+            else builder.append("?");
+            builder.append(",");
+        }
+        builder.deleteCharAt(builder.length() - 1);
+        builder.append(") WHERE id = ");
+        if (isFirst) builder.append("?");
+        else builder.append("(SELECT ").append(fieldName).append(" FROM ").append(previousName).append("_ids)");
+        builder.append(" RETURNING ");
+        for (String field : collectibleScheme.getFieldsData().keySet()) {
+            FieldData fieldData = collectibleScheme.getFieldsData().get(field);
+            if (fieldData.isCollectible()) builder.append(field).append(",");
+        }
+        builder.append("id\n), ");
+        for (String field : collectibleScheme.getFieldsData().keySet()) {
+            FieldData fieldData = collectibleScheme.getFieldsData().get(field);
+            if (fieldData.isCollectible())
+                genUpdate(fieldData.getCollectibleScheme(), builder, false, collectibleScheme.getSimpleName(), field);
+        }
     }
 
     private void generateRemoveById() throws SQLException {
