@@ -15,31 +15,37 @@ import java.util.Queue;
  */
 public class CommandArgs implements Serializable {
     @Getter
-    private final String args;
+    private final CommandArgsType argsType;
+    @Getter
+    private String args;
+    @Getter
+    private String[] longArgs;
     @Getter
     private CollectibleModel collectibleModel;
-    @Getter
-    private Queue<CollectionChange<? extends MainCollectible<?>>> collectionChanges;
-    @Getter
-    private QueueWithID<? extends MainCollectible<?>> fullCollection;
+
+    public CommandArgs() {
+        this.argsType = CommandArgsType.NO_ARGS;
+    }
 
     public CommandArgs(String args) {
         this.args = args;
+        this.argsType = CommandArgsType.SIMPLE_ARG;
     }
 
+    public CommandArgs(String[] longArgs) {
+        this.args = longArgs[0];
+        this.longArgs = longArgs;
+        this.argsType = CommandArgsType.LONG_ARG;
+    }
+
+    public CommandArgs(CollectibleModel object) {
+        this.collectibleModel = object;
+        this.argsType = CommandArgsType.COMPLEX_ARG;
+    }
 
     public CommandArgs(String args, CollectibleModel object) {
         this.collectibleModel = object;
         this.args = args;
-    }
-
-    public CommandArgs(String args, Queue<CollectionChange<? extends MainCollectible<?>>> collectionChanges) {
-        this.args = args;
-        this.collectionChanges = collectionChanges;
-    }
-
-    public CommandArgs(String args, QueueWithID<? extends MainCollectible<?>> fullCollection) {
-        this.args = args;
-        this.fullCollection = fullCollection;
+        this.argsType = CommandArgsType.BOTH_ARG;
     }
 }

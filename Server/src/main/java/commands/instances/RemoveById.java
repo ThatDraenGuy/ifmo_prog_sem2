@@ -2,17 +2,14 @@ package commands.instances;
 
 import collection.CollectionHandler;
 import collection.ServerCollectionHandler;
-import commands.AbstractCommand;
-import commands.ActionResult;
-import commands.CommandArgs;
-import commands.CommandArgsType;
+import commands.*;
 import exceptions.ElementIdException;
 import exceptions.StorageException;
 
 /**
- * A command for removing element by its id. Invokes {@link ServerCollectionHandler#removeById(String)}
+ * A command for removing element by its id. Invokes {@link ServerCollectionHandler#removeById(String, String)}
  */
-public class RemoveById extends AbstractCommand {
+public class RemoveById extends AbstractComplicatedCommand {
     private final ServerCollectionHandler<?> collectionHandler;
 
     public RemoveById(ServerCollectionHandler<?> collectionHandler) {
@@ -21,9 +18,10 @@ public class RemoveById extends AbstractCommand {
     }
 
     @Override
-    public ActionResult action(CommandArgs args) {
+    public ActionResult complicatedAction(ExecutionPayload executionPayload) {
+        CommandArgs args = executionPayload.getCommandArgs();
         try {
-            collectionHandler.removeById(args.getArgs());
+            collectionHandler.removeById(args.getArgs(), executionPayload.getAccount().getUsername());
             return new ActionResult(true, "Successfully deleted element with id " + args.getArgs());
         } catch (ElementIdException e) {
             return new ActionResult(false, e.getMessage());

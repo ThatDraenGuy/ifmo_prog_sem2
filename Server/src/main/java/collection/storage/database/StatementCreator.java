@@ -38,13 +38,12 @@ public class StatementCreator {
     @Getter
     private PreparedStatement updateStatement;
     @Getter
-    private final ArrayList<String> clearStatement;
+    private PreparedStatement clearStatement;
     private final DatabaseHandler databaseHandler;
 
 
     public StatementCreator(DatabaseHandler databaseHandler) {
         this.databaseHandler = databaseHandler;
-        clearStatement = new ArrayList<>();
     }
 
     public void setTargetCollectibleScheme(CollectibleScheme collectibleScheme) throws SQLException {
@@ -62,6 +61,12 @@ public class StatementCreator {
         collectionIdGetterStatement = databaseHandler.prepareStatement("SELECT last_value FROM collection_id");
         collectionIdUpdateStatement = databaseHandler.prepareStatement("SELECT nextval('collection_id')");
     }
+
+    private void generateClear() throws SQLException {
+        String name = targetCollectibleScheme.getSimpleName();
+        clearStatement = databaseHandler.prepareStatement("DELETE FROM " + name + " WHERE owner = ?");
+    }
+
 
     private void generateUpdate() throws SQLException {
         StringBuilder builder = new StringBuilder();
@@ -96,7 +101,7 @@ public class StatementCreator {
         }
         builder.deleteCharAt(builder.length() - 1);
         builder.append(") WHERE id = ");
-        if (isFirst) builder.append("?");
+        if (isFirst) builder.append("? AND owner = ?");
         else builder.append("(SELECT ").append(fieldName).append(" FROM ").append(previousName).append("_ids)");
         builder.append(" RETURNING ");
         for (String field : collectibleScheme.getFieldsData().keySet()) {
@@ -113,7 +118,7 @@ public class StatementCreator {
 
     private void generateRemoveById() throws SQLException {
         String name = targetCollectibleScheme.getSimpleName();
-        removeByIdStatement = databaseHandler.prepareStatement("DELETE FROM " + name + " WHERE id = ?");
+        removeByIdStatement = databaseHandler.prepareStatement("DELETE FROM " + name + " WHERE id = ? AND owner = ?");
     }
 
     private void generateInit() {
@@ -221,30 +226,6 @@ public class StatementCreator {
         builder.deleteCharAt(builder.length() - 1);
         builder.append(") RETURNING id\n),");
         return "(SELECT id FROM " + collectibleName + "_id)";
-//        WITH coordinates_id AS  (
-//                INSERT INTO coordinates (x,y) VALUES (13, 13)
-//                RETURNING coordinates_id
-//        ), dragoncave_id AS (
-//                INSERT INTO dragoncave (depth) VALUES (140)
-//                RETURNING cave_id
-//        ), dragon_id AS (
-//                INSERT INTO dragon (name, coordinates, creationdate, age, color, type, character, cave)
-//                VALUES ('Smaug', (SELECT coordinates_id FROM coordinates_id), 'now', 10000, 'GREEN', 'WATER', 'WISE',
-//                (SELECT cave_id FROM dragoncave_id))
-//                RETURNING id
-//        ) SELECT id FROM dragon_id
     }
 
-
-    private void generateClear() {
-        clearStatement.clear();
-        genClear(targetCollectibleScheme);
-    }
-
-    private void genClear(CollectibleScheme collectibleScheme) {
-        clearStatement.add("TRUNCATE TABLE " + collectibleScheme.getSimpleName());
-        for (FieldData fieldData : collectibleScheme.getFieldsData().values()) {
-            if (fieldData.isCollectible()) genClear(fieldData.getCollectibleScheme());
-        }
-    }
 }

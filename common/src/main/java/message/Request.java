@@ -2,6 +2,8 @@ package message;
 
 import commands.CommandArgs;
 import commands.CommandData;
+import commands.ExecutionPayload;
+import security.Account;
 
 import java.io.Serializable;
 
@@ -11,12 +13,13 @@ import java.io.Serializable;
 public interface Request extends Serializable {
     CommandData getCommandData();
 
-    CommandArgs getCommandArgs();
+    ExecutionPayload getExecutionPayload();
 
     UserData getUserData();
 
     void setUserData(UserData userData);
 
     ServerData getServerData();
+
 
 }

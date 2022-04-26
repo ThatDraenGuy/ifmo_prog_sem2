@@ -1,10 +1,7 @@
 package commands.instances;
 
 import collection.CollectionBridge;
-import commands.AbstractCommand;
-import commands.ActionResult;
-import commands.CommandArgs;
-import commands.CommandArgsType;
+import commands.*;
 import exceptions.ElementIdException;
 import exceptions.IncorrectCollectibleTypeException;
 import exceptions.StorageException;
@@ -12,7 +9,7 @@ import exceptions.StorageException;
 /**
  * A command for updating element in collection. Invokes
  */
-public class Update extends AbstractCommand {
+public class Update extends AbstractComplicatedCommand {
     private final CollectionBridge<?> collectionBridge;
 
     public Update(CollectionBridge<?> collectionBridge) {
@@ -21,9 +18,10 @@ public class Update extends AbstractCommand {
     }
 
     @Override
-    public ActionResult action(CommandArgs args) {
+    public ActionResult complicatedAction(ExecutionPayload executionPayload) {
+        CommandArgs args = executionPayload.getCommandArgs();
         try {
-            collectionBridge.update(args.getArgs(), args.getCollectibleModel());
+            collectionBridge.update(args.getArgs(), executionPayload.getAccount().getUsername(), args.getCollectibleModel());
             return new ActionResult(true, "Successfully updated element with id " + args.getArgs());
         } catch (ElementIdException | IncorrectCollectibleTypeException e) {
             return new ActionResult(false, e.getMessage());

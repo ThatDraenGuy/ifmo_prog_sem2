@@ -12,6 +12,8 @@ public interface MainCollectible<T> extends Collectible, Comparable<T> {
 
     Long getAge();
 
+    String getOwner();
+
 
     int compareTo(CollectibleModel collectibleModel);
 }

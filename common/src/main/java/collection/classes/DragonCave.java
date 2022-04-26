@@ -11,13 +11,16 @@ public class DragonCave implements Collectible {
     @UserAccessible
     @NotNull
     @Getter
-    private int depth;
+    private final int depth;
     @NotNull
-    private ZonedDateTime creationDate;
+    private final ZonedDateTime creationDate;
+    @NotNull
+    private final String owner;
 
-    public DragonCave(int depth, ZonedDateTime creationDate) {
+    public DragonCave(int depth, ZonedDateTime creationDate, String owner) {
         this.depth = depth;
         this.creationDate = creationDate;
+        this.owner = owner;
     }
 
     @Override

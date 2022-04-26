@@ -70,8 +70,6 @@ public class ServerHandler implements Runnable {
             users.forEach(UserHandler::forceDisconnect);
             users.clear();
             closeChannel();
-            logger.info("Saving collection...");
-            commandsHandler.executeCommand(new CommandRequest(commandsHandler.getSaveCommandData(), new CommandArgs("")));
             logger.info("exiting...");
         };
         Thread stopThread = new Thread(stopServer, "stoppingThread");

@@ -2,18 +2,15 @@ package commands.instances;
 
 import collection.CollectionHandler;
 import collection.ServerCollectionHandler;
-import commands.AbstractCommand;
-import commands.ActionResult;
-import commands.CommandArgs;
-import commands.CommandArgsType;
+import commands.*;
 import exceptions.StorageException;
 
 import java.util.NoSuchElementException;
 
 /**
- * A command for removing first element from collection. Invokes {@link ServerCollectionHandler#removeFirst()}
+ * A command for removing first element from collection. Invokes {@link ServerCollectionHandler#removeFirst(String)}
  */
-public class RemoveFirst extends AbstractCommand {
+public class RemoveFirst extends AbstractComplicatedCommand {
     private final ServerCollectionHandler<?> collectionHandler;
 
     public RemoveFirst(ServerCollectionHandler<?> collectionHandler) {
@@ -22,9 +19,9 @@ public class RemoveFirst extends AbstractCommand {
     }
 
     @Override
-    public ActionResult action(CommandArgs args) {
+    public ActionResult complicatedAction(ExecutionPayload executionPayload) {
         try {
-            collectionHandler.removeFirst();
+            collectionHandler.removeFirst(executionPayload.getAccount().getUsername());
             return new ActionResult(true, "Successfully deleted first element");
         } catch (NoSuchElementException e) {
             return new ActionResult(false, "There are no elements in the collection!");

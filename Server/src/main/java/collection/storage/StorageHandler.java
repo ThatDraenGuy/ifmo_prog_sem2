@@ -19,11 +19,13 @@ public interface StorageHandler {
 
     long insert(CollectibleModel collectibleModel) throws StorageException;
 
-    boolean update(long id, CollectibleModel collectibleModel) throws StorageException;
+    boolean update(long id, String owner, CollectibleModel collectibleModel) throws StorageException;
 
-    void removeById(long id) throws StorageException;
+    boolean removeById(long id, String owner) throws StorageException;
 
-    void removeABunch(Collection<Long> ids) throws StorageException;
+    boolean removeABunch(Collection<Long> ids, String owner) throws StorageException;
+
+    void clear(String owner) throws StorageException;
 
     long getCollectionId();
 

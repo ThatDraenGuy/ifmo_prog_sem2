@@ -18,14 +18,14 @@ public class CollectionBridge<T extends MainCollectible<T>> {
         collectionHandler.add(collectibleModel);
     }
 
-    public void update(String arg, CollectibleModel collectibleModel) throws IncorrectCollectibleTypeException, ElementIdException, StorageException {
+    public void update(String arg, String owner, CollectibleModel collectibleModel) throws IncorrectCollectibleTypeException, ElementIdException, StorageException {
         check(collectibleModel);
-        collectionHandler.update(arg, collectibleModel);
+        collectionHandler.update(arg, owner, collectibleModel);
     }
 
-    public void removeLower(CollectibleModel collectibleModel) throws IncorrectCollectibleTypeException, StorageException {
+    public void removeLower(CollectibleModel collectibleModel, String owner) throws IncorrectCollectibleTypeException, StorageException {
         check(collectibleModel);
-        collectionHandler.removeLower(collectibleModel);
+        collectionHandler.removeLower(collectibleModel, owner);
     }
 
     private void check(CollectibleModel collectibleModel) {

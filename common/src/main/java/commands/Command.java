@@ -5,10 +5,10 @@ public interface Command {
     /**
      * Performs command's action
      *
-     * @param args command's arguments/parameters needed to perform its action
+     * @param executionPayload command's arguments/parameters needed to perform its action
      * @return command's action result
      */
-    ActionResult action(CommandArgs args);
+    ActionResult execute(ExecutionPayload executionPayload);
 
     CommandData getData();
 }

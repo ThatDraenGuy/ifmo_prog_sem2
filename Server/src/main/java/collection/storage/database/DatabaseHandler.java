@@ -3,10 +3,13 @@ package collection.storage.database;
 import collection.classes.Dragon;
 import collection.meta.*;
 import collection.storage.StorageHandler;
+import commands.CommandAccessLevel;
 import exceptions.StorageException;
+import exceptions.UnknownAccountException;
 import exceptions.ValueNotValidException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import security.AccountData;
 import utility.ArrayListWithID;
 import utility.CollectionWithID;
 
@@ -15,15 +18,15 @@ import java.time.ZonedDateTime;
 import java.util.*;
 
 public class DatabaseHandler implements StorageHandler {
-    private int counter;
+    private final ThreadLocal<Integer> counter;
+
     private final Logger logger;
     private final Connection connection;
-    private StatementCreator statementCreator;
+    private final StatementCreator statementCreator;
 
-    private PreparedStatement simpleQuery;
 
     public DatabaseHandler() throws SQLException {
-        counter = 1;
+        counter = ThreadLocal.withInitial(() -> 1);
         logger = LoggerFactory.getLogger("DatabaseHandler");
         statementCreator = new StatementCreator(this);
         Properties info = new Properties();
@@ -35,53 +38,60 @@ public class DatabaseHandler implements StorageHandler {
         logger.info("Successfully established connection: " + connection);
     }
 
-    private void debug() throws SQLException {
-        simpleQuery = connection.prepareStatement("SELECT * FROM dragon");
-        ResultSet results = simpleQuery.executeQuery();
-        if (results.next()) logger.debug(Integer.valueOf(results.getInt(1)).toString());
-        simpleQuery.close();
-        PreparedStatement testStatement = connection.prepareStatement("INSERT INTO dragonCave (depth) VALUES (-20)");
-        testStatement.executeUpdate();
-        statementCreator.setTargetCollectibleScheme(new CollectibleScheme(Dragon.class));
-        PreparedStatement preparedStatement = connection.prepareStatement("" +
-                "WITH coordinates_id AS  (\n" +
-                "                INSERT INTO coordinates (x,y) VALUES (?, ?)\n" +
-                "                RETURNING coordinates_id\n" +
-                "        ), dragoncave_id AS (\n" +
-                "                INSERT INTO dragoncave (depth) VALUES (?)\n" +
-                "                RETURNING cave_id\n" +
-                "        ), dragon_id AS (\n" +
-                "                INSERT INTO dragon (name, coordinates, creationdate, age, color, type, character, cave)\n" +
-                "                VALUES (?, (SELECT coordinates_id FROM coordinates_id), ?, ?, (CAST(? AS color)), (CAST(? AS type)), (CAST (? AS dragoncharacter)),\n" +
-                "                (SELECT cave_id FROM dragoncave_id))\n" +
-                "                RETURNING id\n" +
-                "        ) SELECT id FROM dragon_id");
+    public void addAccount(String username, AccountData accountData) throws StorageException {
+        try {
+            connection.setSavepoint();
+            PreparedStatement preparedStatement = connection.prepareStatement("INSERT INTO accounts VALUES(?, ?, ?, (CAST(? AS accessLevel)))");
+            preparedStatement.setString(1, username);
+            preparedStatement.setString(2, accountData.getPasswordHash());
+            preparedStatement.setString(3, accountData.getSalt());
+            preparedStatement.setString(4, accountData.getAccessLevel().toString());
+            preparedStatement.executeUpdate();
+            connection.commit();
+        } catch (SQLException e) {
+            throw new StorageException(e);
+        }
+    }
 
-        preparedStatement.setObject(1, 10);
-        preparedStatement.setLong(2, 20);
-        preparedStatement.setInt(3, 140);
-        preparedStatement.setString(4, "Preparator2.0");
-        preparedStatement.setString(5, "long time ago");
-        preparedStatement.setLong(6, 10000);
-        preparedStatement.setObject(7, "YELLOW");
-        preparedStatement.setObject(8, "WATER");
-        preparedStatement.setObject(9, "WISE");
-        ResultSet testRes = preparedStatement.executeQuery();
-        testRes.next();
-        logger.debug(String.valueOf(testRes.getLong(1)));
-        connection.commit();
+    public AccountData getAccountData(String username) throws UnknownAccountException, StorageException {
+        try {
+            PreparedStatement preparedStatement = connection.prepareStatement("SELECT * FROM accounts WHERE username = ?");
+            preparedStatement.setString(1, username);
+            ResultSet resultSet = preparedStatement.executeQuery();
+            if (resultSet.next()) {
+                String passHash = resultSet.getString("passwordHash");
+                String salt = resultSet.getString("salt");
+                CommandAccessLevel accessLevel = CommandAccessLevel.valueOf(resultSet.getString("accessLevel"));
+                return new AccountData(passHash, salt, accessLevel);
+            } else {
+                throw new UnknownAccountException("Account with username " + username + " doesn't exist");
+            }
+        } catch (SQLException e) {
+            throw new StorageException(e);
+        }
     }
 
     public PreparedStatement prepareStatement(String sql) throws SQLException {
         return connection.prepareStatement(sql);
     }
 
-    public boolean update(long id, CollectibleModel object) throws StorageException {
+    public void clear(String owner) throws StorageException {
         try {
             connection.setSavepoint();
-            counter = 1;
+            PreparedStatement clearStatement = statementCreator.getClearStatement();
+            clearStatement.setString(1, owner);
+            clearStatement.executeUpdate();
+        } catch (SQLException e) {
+            throw new StorageException(e);
+        }
+    }
+
+    public boolean update(long id, String owner, CollectibleModel object) throws StorageException {
+        try {
+            connection.setSavepoint();
+            counter.set(1);
             PreparedStatement updateStatement = statementCreator.getUpdateStatement();
-            updateModel(id, object, updateStatement);
+            updateModel(id, owner, object, updateStatement);
             //TODO remove
             System.out.println(updateStatement);
             ResultSet resultSet = updateStatement.executeQuery();
@@ -93,14 +103,17 @@ public class DatabaseHandler implements StorageHandler {
         }
     }
 
-    private void updateModel(long id, CollectibleModel model, PreparedStatement statement) throws SQLException {
+    private void updateModel(long id, String owner, CollectibleModel model, PreparedStatement statement) throws SQLException {
         inputValues(model, statement);
         if (id != 0) {
-            statement.setLong(counter, id);
-            counter++;
+            statement.setLong(counter.get(), id);
+            counter.set(counter.get() + 1);
+            statement.setString(counter.get(), owner);
+            counter.set(counter.get() + 1);
         }
         for (FieldModel fieldModel : model.getValues().values()) {
-            if (fieldModel.getFieldData().isCollectible()) updateModel(0, fieldModel.getCollectibleModel(), statement);
+            if (fieldModel.getFieldData().isCollectible())
+                updateModel(0, "", fieldModel.getCollectibleModel(), statement);
         }
     }
 
@@ -110,39 +123,47 @@ public class DatabaseHandler implements StorageHandler {
             Object value = fieldModel.getValue();
             Class<?> type = fieldModel.getFieldData().getType();
             if (type.isEnum() || ZonedDateTime.class.isAssignableFrom(type)) {
-                if (value != null) statement.setObject(counter, value.toString());
-                else statement.setObject(counter, null);
-            } else statement.setObject(counter, value);
-            counter++;
+                if (value != null) statement.setObject(counter.get(), value.toString());
+                else statement.setObject(counter.get(), null);
+            } else statement.setObject(counter.get(), value);
+            counter.set(counter.get() + 1);
         }
     }
 
     @Override
-    public void removeABunch(Collection<Long> ids) throws StorageException {
+    public boolean removeABunch(Collection<Long> ids, String owner) throws StorageException {
         try {
             connection.setSavepoint();
-            for (long id : ids) remove(id);
+            boolean result = false;
+            for (long id : ids) {
+                boolean res = remove(id, owner);
+                if (res) result = true;
+            }
             updateCollectionId();
+            return result;
         } catch (SQLException e) {
             throw new StorageException(e);
         }
     }
 
-    public void removeById(long id) throws StorageException {
+    public boolean removeById(long id, String owner) throws StorageException {
         try {
             connection.setSavepoint();
-            remove(id);
+            boolean res = remove(id, owner);
             updateCollectionId();
+            return res;
         } catch (SQLException e) {
             throw new StorageException(e);
         }
     }
 
-    private void remove(long id) throws StorageException {
+    private boolean remove(long id, String owner) throws StorageException {
         try {
             PreparedStatement statement = statementCreator.getRemoveByIdStatement();
             statement.setLong(1, id);
-            statement.executeUpdate();
+            statement.setString(2, owner);
+            int res = statement.executeUpdate();
+            return res != 0;
         } catch (SQLException e) {
             throw new StorageException(e);
         }
@@ -151,7 +172,7 @@ public class DatabaseHandler implements StorageHandler {
     public long insert(CollectibleModel object) throws StorageException {
         try {
             connection.setSavepoint();
-            counter = 1;
+            counter.set(1);
             PreparedStatement insertStatement = statementCreator.getInsertStatement();
             insertModel(object, insertStatement);
             //TODO remove

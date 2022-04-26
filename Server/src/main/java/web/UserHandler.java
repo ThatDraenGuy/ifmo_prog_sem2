@@ -2,12 +2,12 @@ package web;
 
 import collection.classes.MainCollectible;
 import collection.history.CollectionChange;
-import commands.CommandArgs;
 import commands.ServerCommandsHandler;
 import lombok.Getter;
 import message.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import security.Account;
 import utility.QueueWithID;
 
 import java.io.EOFException;
@@ -26,6 +26,7 @@ public class UserHandler extends Thread {
     private final Logger logger;
     private final ServerCommandsHandler commandsHandler;
     private UserData userData;
+    private Account userAccount;
     //
     private final SocketChannel userChannel;
 
@@ -43,7 +44,7 @@ public class UserHandler extends Thread {
 
     @Override
     public synchronized void run() {
-        sendRequest(new CommandRequest(commandsHandler.getFetchServerDataCommand().getData(), new CommandArgs(""), commandsHandler.getServerData()));
+        sendRequest(commandsHandler.formulateFetchServerDataRequest(userAccount));
         while (userChannel.isOpen()) {
             try {
                 Message<Request> requestMessage = readMessage();
@@ -82,7 +83,7 @@ public class UserHandler extends Thread {
     }
 
     public void forceDisconnect() {
-        sendRequest(new CommandRequest(userData.getDisconnectCommandData(), new CommandArgs("")));
+        sendRequest(commandsHandler.formulateDisconnectRequest(userData, userAccount));
         closeSocket();
     }
 
@@ -94,9 +95,10 @@ public class UserHandler extends Thread {
     public Message<Response> handleMessage(Message<Request> message) {
         Request request = message.getData();
         userData = request.getUserData();
+        userAccount = request.getExecutionPayload().getAccount();
         UserDataHandler.handleUserData(this, userData);
         logger.info("got a request from user");
-        return new Message<>(commandsHandler.executeCommand(request));
+        return new Message<>(commandsHandler.executeCommand(request, this));
 
     }
 
@@ -115,13 +117,15 @@ public class UserHandler extends Thread {
     }
 
     public void sendCollectionChangeRequest(Queue<CollectionChange<? extends MainCollectible<?>>> collectionChanges) {
-        Request request = new CommandRequest(userData.getApplyCollectionChangeCommandData(), new CommandArgs("", collectionChanges));
-        sendRequest(request);
+        sendRequest(commandsHandler.formulateCollectionChangeRequest(userData, userAccount, collectionChanges));
     }
 
     public void sendFullCollectionChangeRequest(QueueWithID<? extends MainCollectible<?>> collection) {
+        sendRequest(commandsHandler.formulateFullCollectionChangeRequest(userData, userAccount, collection));
         logger.info("Sent full collection to user");
-        Request request = new CommandRequest(userData.getApplyFullCollectionCommandData(), new CommandArgs("", collection));
-        sendRequest(request);
+    }
+
+    public void sendAccountChangeRequest(Account account) {
+        sendRequest(commandsHandler.formulateSetAccountRequest(userData, account));
     }
 }

@@ -20,6 +20,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 public class ServerCollectionHandler<T extends MainCollectible<T>> extends CollectionHandler<T> {
@@ -45,10 +46,10 @@ public class ServerCollectionHandler<T extends MainCollectible<T>> extends Colle
         handleCollectionChange();
     }
 
-    public void update(String arg, CollectibleModel collectibleModel) throws ElementIdException, StorageException, IncorrectCollectibleTypeException {
+    public void update(String arg, String owner, CollectibleModel collectibleModel) throws ElementIdException, StorageException, IncorrectCollectibleTypeException {
         //TODO think
         long id = Long.parseLong(arg);
-        if (!storageHandler.update(id, collectibleModel)) throw new ElementIdException(arg);
+        if (!storageHandler.update(id, owner, collectibleModel)) throw new ElementIdException(arg);
 
         T newObject = factory.getObject(collectibleModel, id);
         collection.removeIf(dragon -> dragon.getId().equals(id));
@@ -76,40 +77,44 @@ public class ServerCollectionHandler<T extends MainCollectible<T>> extends Colle
         }
     }
 
-    public void clear() {
-        //TODO
-        collection.clear();
+    public void clear(String owner) throws StorageException {
+        storageHandler.clear(owner);
+        collection.removeIf(x -> x.getOwner().equals(owner));
         handleCollectionChange();
     }
 
 
-    public void removeFirst() throws NoSuchElementException, StorageException {
-        T element = this.collection.element();
-        long id = element.getId();
-        storageHandler.removeById(id);
-        this.collection.remove();
+    public void removeFirst(String owner) throws NoSuchElementException, StorageException {
+        Optional<T> element = this.collection.stream().filter(collectible -> collectible.getOwner().equals(owner)).findFirst();
+        if (element.isEmpty()) throw new NoSuchElementException();
+        T collectible = element.get();
+        long id = collectible.getId();
+        storageHandler.removeById(id, owner);
+        this.collection.remove(collectible);
         handleCollectionChange();
     }
 
-    public void removeById(String strId) throws ElementIdException, StorageException {
+    public void removeById(String strId, String owner) throws ElementIdException, StorageException {
         try {
             long id = Long.parseLong(strId);
-            storageHandler.removeById(id);
-            if (!collection.removeIf(collectible -> collectible.getId().equals(id)))
-                throw new ElementIdException(strId);
-            else handleCollectionChange();
+            boolean res = storageHandler.removeById(id, owner);
+            if (!res) throw new ElementIdException(strId);
+            collection.removeIf(collectible -> collectible.getId().equals(id) && collectible.getOwner().equals(owner));
+            handleCollectionChange();
         } catch (NumberFormatException e) {
             throw new ElementIdException(strId);
         }
 
     }
 
-    public void removeLower(CollectibleModel collectibleModel) throws StorageException {
-        List<Long> ids = collection.stream().filter(collectible -> collectible.compareTo(collectibleModel) < 0).map(MainCollectible::getId).collect(Collectors.toCollection(ArrayList::new));
+    public void removeLower(CollectibleModel collectibleModel, String owner) throws StorageException {
+        List<Long> ids = collection.stream().filter(collectible -> collectible.compareTo(collectibleModel) < 0 && collectible.getOwner().equals(owner))
+                .map(MainCollectible::getId).collect(Collectors.toCollection(ArrayList::new));
         if (ids.size() > 0) {
-            storageHandler.removeABunch(ids);
-            this.collection.removeIf(collectible -> collectible.compareTo(collectibleModel) < 0);
-            handleCollectionChange();
+            if (storageHandler.removeABunch(ids, owner)) {
+                this.collection.removeIf(collectible -> collectible.compareTo(collectibleModel) < 0 && collectible.getOwner().equals(owner));
+                handleCollectionChange();
+            }
         }
     }
 

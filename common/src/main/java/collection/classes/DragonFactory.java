@@ -38,8 +38,9 @@ public class DragonFactory implements MainCollectibleFactory<Dragon> {
         if (collectibleModel.getValues().get("coordinates").getFieldData().isCollectible()) {
             cave = getCave(collectibleModel.getValues().get("cave").getCollectibleModel());
         } else throw new IncorrectCollectibleTypeException();
+        String owner = getValue("owner", collectibleModel, String.class);
         return new Dragon(id, name, coordinates, creationDate,
-                age, color, type, character, cave);
+                age, color, type, character, cave, owner);
     }
 
     private <T> T getValue(String key, CollectibleModel collectibleModel, Class<T> target) throws IncorrectCollectibleTypeException {
@@ -53,12 +54,14 @@ public class DragonFactory implements MainCollectibleFactory<Dragon> {
         int x = getValue("x", collectibleModel, int.class);
         long y = getValue("y", collectibleModel, Long.class);
         ZonedDateTime creationDate = getValue("creationDate", collectibleModel, ZonedDateTime.class);
-        return new Coordinates(x, y, creationDate);
+        String owner = getValue("owner", collectibleModel, String.class);
+        return new Coordinates(x, y, creationDate, owner);
     }
 
     private DragonCave getCave(CollectibleModel collectibleModel) throws IncorrectCollectibleTypeException {
         int depth = getValue("depth", collectibleModel, int.class);
         ZonedDateTime creationDate = getValue("creationDate", collectibleModel, ZonedDateTime.class);
-        return new DragonCave(depth, creationDate);
+        String owner = getValue("owner", collectibleModel, String.class);
+        return new DragonCave(depth, creationDate, owner);
     }
 }

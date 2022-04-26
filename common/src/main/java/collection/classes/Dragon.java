@@ -37,9 +37,11 @@ public class Dragon implements MainCollectible<Dragon> {
     private final DragonCave cave; //Поле может быть null
     @NotNull
     private final ZonedDateTime creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
+    @NotNull
+    private final String owner;
 
 
-    public Dragon(Long id, String name, Coordinates coordinates, ZonedDateTime creationDate, Long age, Color color, DragonType type, DragonCharacter character, DragonCave cave) {
+    public Dragon(Long id, String name, Coordinates coordinates, ZonedDateTime creationDate, Long age, Color color, DragonType type, DragonCharacter character, DragonCave cave, String owner) {
         this.id = id;
         this.name = name;
         this.coordinates = coordinates;
@@ -49,7 +51,7 @@ public class Dragon implements MainCollectible<Dragon> {
         this.type = type;
         this.character = character;
         this.cave = cave;
-
+        this.owner = owner;
     }
 
 
@@ -72,6 +74,7 @@ public class Dragon implements MainCollectible<Dragon> {
         if (type != null) str.append(type).append(" ");
         str.append(character).append(" dragon. He was created at ").append(creationDate).append(" and is currently at ").append(coordinates);
         if (cave != null) str.append(". His cave ").append(cave);
+        str.append("; Owner - ").append(owner);
         return str.toString();
     }
 

@@ -14,7 +14,16 @@ public abstract class AbstractCommand implements Command {
         this.data = new CommandData(name, desc, type, accessLevel);
     }
 
-    public abstract ActionResult action(CommandArgs args);
+    public ActionResult execute(ExecutionPayload executionPayload) {
+        if (checkArgsType(executionPayload))
+            return new ActionResult(false, "Incorrect argsType");
+        return action(executionPayload.getCommandArgs());
+    }
 
+    protected abstract ActionResult action(CommandArgs commandArgs);
+
+    protected boolean checkArgsType(ExecutionPayload executionPayload) {
+        return !executionPayload.getCommandArgs().getArgsType().equals(data.getCommandArgsType());
+    }
 
 }

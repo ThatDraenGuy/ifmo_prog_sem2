@@ -2,15 +2,13 @@ package commands.instances;
 
 import collection.CollectionHandler;
 import collection.ServerCollectionHandler;
-import commands.AbstractCommand;
-import commands.ActionResult;
-import commands.CommandArgs;
-import commands.CommandArgsType;
+import commands.*;
+import exceptions.StorageException;
 
 /**
- * A command for clearing the collection. Invokes {@link CollectionHandler#clear()}
+ * A command for clearing the collection. Invokes {@link ServerCollectionHandler#clear(String)}
  */
-public class Clear extends AbstractCommand {
+public class Clear extends AbstractComplicatedCommand {
     private final ServerCollectionHandler<?> collectionHandler;
 
     public Clear(ServerCollectionHandler<?> collectionHandler) {
@@ -19,8 +17,12 @@ public class Clear extends AbstractCommand {
     }
 
     @Override
-    public ActionResult action(CommandArgs args) {
-        collectionHandler.clear();
-        return new ActionResult(true, "Successfully cleared collection");
+    public ActionResult complicatedAction(ExecutionPayload executionPayload) {
+        try {
+            collectionHandler.clear(executionPayload.getAccount().getUsername());
+            return new ActionResult(true, "Successfully cleared your collectibles");
+        } catch (StorageException e) {
+            return new ActionResult(false, "A storage exception has occurred: " + e.getMessage());
+        }
     }
 }

@@ -17,9 +17,7 @@ import message.Response;
 
 
 import java.lang.reflect.Field;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.NoSuchElementException;
+import java.util.*;
 
 public class ClientInteractionController extends Thread {
     private final ExecutionController commandsExecutor;
@@ -61,52 +59,53 @@ public class ClientInteractionController extends Thread {
     private Request parseInput(String input) throws CommandNonExistentException, CommandArgsAmountException {
         input = input.strip();
         CommandData commandData;
-        CommandArgs cmdArgs = new CommandArgs("");
+        String initialArgs = "";
         if (input.contains(" ")) {
             String[] str = input.split(" ");
             input = str[0];
-            cmdArgs = parseArgs(str[1]);
+            initialArgs = str[1];
             if (str.length > 2) {
                 throw new CommandArgsAmountException();
             }
         }
         commandData = parseCommandData(input);
-        return (createRequest(commandData, cmdArgs));
+        return (createRequest(commandData, initialArgs));
     }
 
-    private Request createRequest(CommandData commandData, CommandArgs arguments) throws CommandArgsAmountException {
+    private Request createRequest(CommandData commandData, String initialArgs) throws CommandArgsAmountException {
         CommandArgsType type = commandData.getCommandArgsType();
-        String argumentString = arguments.getArgs();
-        boolean isEmpty = argumentString.equals("");
+        boolean isEmpty = initialArgs.equals("");
+        CommandArgs args;
         switch (type) {
-            case NO_ARGS:
-                if (!isEmpty) {
+            case NO_ARGS -> {
+                if (!isEmpty)
                     throw new CommandArgsAmountException("Command \"" + commandData.getName() + "\" does not need arguments!");
-                }
-                break;
-            case COMPLEX_ARG:
-                if (!isEmpty) {
+                args = new CommandArgs();
+            }
+            case COMPLEX_ARG -> {
+                if (!isEmpty)
                     throw new CommandArgsAmountException("Command \"" + commandData.getName() + "\" needs a complex argument, not a simple one!");
-                } else {
-                    CollectibleModel newArgs = promptComplexArgs();
-                    arguments = new CommandArgs("", newArgs);
-                }
-                break;
-            case SIMPLE_ARG:
-                if (isEmpty) {
-                    throw new CommandArgsAmountException(commandData.getName() + " needs an argument!");
-                }
-                break;
-            case BOTH_ARG:
-                if (isEmpty) {
+                CollectibleModel newArgs = promptComplexArgs();
+                args = new CommandArgs(newArgs);
+            }
+            case SIMPLE_ARG -> {
+                if (isEmpty) throw new CommandArgsAmountException(commandData.getName() + " needs an argument!");
+                args = new CommandArgs(initialArgs);
+            }
+            case LONG_ARG -> {
+                if (!isEmpty)
+                    throw new CommandArgsAmountException("This commands needs a long argument that is not inputted on the same line");
+                args = new CommandArgs(promptLongArgs(commandData.getArgsNames()));
+            }
+            case BOTH_ARG -> {
+                if (isEmpty)
                     throw new CommandArgsAmountException("Command \"" + commandData.getName() + "\" needs an in-line (simple) argument!");
-                } else {
-                    CollectibleModel complexArgs = promptComplexArgs();
-                    arguments = new CommandArgs(argumentString, complexArgs);
-                }
-
+                CollectibleModel complexArgs = promptComplexArgs();
+                args = new CommandArgs(initialArgs, complexArgs);
+            }
+            default -> args = new CommandArgs();
         }
-        return commandsExecutor.createRequest(commandData, arguments);
+        return commandsExecutor.createRequest(commandData, args);
     }
 
     /**
@@ -128,14 +127,13 @@ public class ClientInteractionController extends Thread {
         }
     }
 
-
-    /**
-     * A method that gets a String and returns a CmdArgs object created with it
-     */
-    private CommandArgs parseArgs(String input) {
-        return new CommandArgs(input);
+    private String[] promptLongArgs(String[] argsNames) {
+        List<String> args = new ArrayList<>();
+        for (String argName : argsNames) {
+            args.add(consoleHandler.promptInput("Please input " + argName + ": "));
+        }
+        return args.toArray(new String[argsNames.length]);
     }
-
 
     private CollectibleModel promptComplexArgs() {
         CollectibleScheme collectibleScheme = commandsExecutor.getTargetClassHandler().getCurrentCollectibleScheme();

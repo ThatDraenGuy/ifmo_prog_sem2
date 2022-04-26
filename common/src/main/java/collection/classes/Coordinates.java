@@ -13,19 +13,22 @@ public class Coordinates implements Collectible {
     @UserAccessible
     @NotNull
     @Getter
-    private int x;
+    private final int x;
     @UserAccessible
     @NotNull
     @LowerBounded(value = -255)
     @Getter
-    private Long y; //Значение поля должно быть больше -255, Поле не может быть null
+    private final Long y; //Значение поля должно быть больше -255, Поле не может быть null
     @NotNull
-    private ZonedDateTime creationDate;
+    private final ZonedDateTime creationDate;
+    @NotNull
+    private final String owner;
 
-    public Coordinates(int x, long y, ZonedDateTime creationDate) {
+    public Coordinates(int x, long y, ZonedDateTime creationDate, String owner) {
         this.x = x;
         this.y = y;
         this.creationDate = creationDate;
+        this.owner = owner;
     }
 
     @Override

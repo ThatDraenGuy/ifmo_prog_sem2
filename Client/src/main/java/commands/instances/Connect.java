@@ -30,7 +30,7 @@ public class Connect extends AbstractCommand {
             int port = Integer.parseInt(splitStr[1]);
             connectionHandler.connect(host, port);
             threadHandler.reloadMessageReader();
-            executionController.setUserAccessLevel(CommandAccessLevel.DEV);
+            executionController.setUserAccessLevel(CommandAccessLevel.GUEST);
             //TODO normal level changing
             return new ActionResult(true, "You have been successfully connected");
         } catch (NumberFormatException e) {

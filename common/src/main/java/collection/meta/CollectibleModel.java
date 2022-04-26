@@ -3,6 +3,7 @@ package collection.meta;
 import collection.classes.Collectible;
 import exceptions.ValueNotValidException;
 import lombok.Getter;
+import security.CurrentAccount;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
@@ -47,6 +48,7 @@ public class CollectibleModel implements Serializable {
 
     public void complete() throws ValueNotValidException {
         put("creationDate", new InputtedValue(ZonedDateTime.now()));
+        put("owner", new InputtedValue(CurrentAccount.getAccount().getUsername()));
         for (String field : collectibleScheme.getFieldsData().keySet()) {
             if (collectibleScheme.getFieldsData().get(field).isNotNull() && !values.containsKey(field) && !field.equals("id"))
                 throw new ValueNotValidException(field + " cannot be null!");

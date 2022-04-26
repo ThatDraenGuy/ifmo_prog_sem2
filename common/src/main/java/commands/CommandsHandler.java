@@ -52,16 +52,21 @@ public class CommandsHandler {
 
     public Response executeCommand(Request request) {
         CommandData commandData = request.getCommandData();
-        CommandArgs cmdArgs = request.getCommandArgs();
+        ExecutionPayload executionPayload = request.getExecutionPayload();
+        return execute(commandData, executionPayload);
+
+    }
+
+    protected Response execute(CommandData commandData, ExecutionPayload executionPayload) {
         try {
             Command command = getCommand(commandData);
-            ActionResult result = command.action(cmdArgs);
+            ActionResult result = command.execute(executionPayload);
             return createResponse(result);
         } catch (CommandNonExistentException e) {
             return createResponse(new ActionResult(false, e.getMessage()));
         }
-
     }
+
 
     protected Response createResponse(ActionResult actionResult) {
         return new CommandResponse(actionResult);

@@ -65,6 +65,12 @@ public class CollectionHandler<T extends MainCollectible<T>> {
         return str.toString();
     }
 
+    public String filterByOwner(String owner) {
+        StringBuilder builder = new StringBuilder();
+        collection.stream().filter(collectible -> collectible.getOwner().equals(owner)).forEach(x -> builder.append(x).append("\n"));
+        return builder.toString();
+    }
+
     public long getId() {
         return collection.getId();
     }

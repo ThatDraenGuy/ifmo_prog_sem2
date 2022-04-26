@@ -12,16 +12,28 @@ public class CommandData implements Serializable {
     @Getter
     private final CommandArgsType commandArgsType;
     @Getter
-    private CommandAccessLevel accessLevel = CommandAccessLevel.USER;
+    private String[] argsNames;
+    @Getter
+    private final CommandAccessLevel accessLevel;
 
     public CommandData(String name, String desc, CommandArgsType type) {
         this.name = name;
         this.description = desc;
         this.commandArgsType = type;
+        checkType();
+        this.accessLevel = CommandAccessLevel.USER;
     }
 
     public CommandData(String name, String desc, CommandArgsType type, CommandAccessLevel accessLevel) {
-        this(name, desc, type);
+        this.name = name;
+        this.description = desc;
+        this.commandArgsType = type;
+        checkType();
         this.accessLevel = accessLevel;
     }
+
+    private void checkType() {
+        if (commandArgsType.equals(CommandArgsType.LONG_ARG)) argsNames = commandArgsType.getArgsNames();
+    }
+
 }

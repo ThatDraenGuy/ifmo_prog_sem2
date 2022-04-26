@@ -3,7 +3,7 @@ package commands.instances;
 import collection.CollectionClassesHandler;
 import commands.*;
 
-public class ApplyFullCollection extends AbstractCommand {
+public class ApplyFullCollection extends AbstractComplicatedCommand {
     private final CollectionClassesHandler targetClassHandler;
 
     public ApplyFullCollection(CollectionClassesHandler targetClassHandler) {
@@ -12,10 +12,8 @@ public class ApplyFullCollection extends AbstractCommand {
     }
 
     @Override
-    public ActionResult action(CommandArgs args) {
-        targetClassHandler.applyFullCollection(args.getFullCollection());
-//        System.out.println("Collection was changed (new collection)" + args.getFullCollection());
-//        System.out.println(targetClassHandler.getCurrentCollectionHandler());
+    public ActionResult complicatedAction(ExecutionPayload executionPayload) {
+        targetClassHandler.applyFullCollection(executionPayload.getCollection());
         return new ActionResult(true, "successfully applied changes");
     }
 }

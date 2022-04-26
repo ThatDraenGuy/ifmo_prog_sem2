@@ -2,42 +2,52 @@ import collection.*;
 import collection.classes.DragonFactory;
 import collection.classes.MainCollectible;
 import collection.storage.database.DatabaseHandler;
-import collection.storage.JsonHandler;
-import collection.storage.StorageHandler;
+import commands.CommandAccessLevel;
 import commands.ServerCommandsHandler;
 import commands.instances.*;
 import collection.classes.Dragon;
+import exceptions.IncorrectAccountDataException;
+import exceptions.StorageException;
+import exceptions.UnknownAccountException;
 import message.ServerData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import security.Account;
+import security.AccountsHandler;
+import security.CurrentAccount;
 import web.ServerHandler;
 import web.UserDataHandler;
 
-import java.io.File;
 import java.io.IOException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.time.ZonedDateTime;
 
 /**
  * A Main class, only consists of main() method.
  */
 public class Main {
     final static Class<? extends MainCollectible<?>> target = Dragon.class;
-    final static String defaultPath = "DefaultCollection.json";
 
     public static void main(String... args) {
-        System.out.println(ZonedDateTime.now());
         Logger logger = LoggerFactory.getLogger("loader");
         logger.info("Starting the server...");
-        StorageHandler storageHandler = null;
+        CurrentAccount.setAccount(new Account("server", "temp", CommandAccessLevel.DEV));
+        //TODO config file?
+        DatabaseHandler databaseHandler = null;
+        AccountsHandler accountsHandler = null;
         try {
-            storageHandler = new DatabaseHandler();
-        } catch (SQLException e) {
+            databaseHandler = new DatabaseHandler();
+            accountsHandler = new AccountsHandler(databaseHandler);
+            accountsHandler.validate("guest", "guest");
+            //TODO remove above
+        } catch (SQLException | NoSuchAlgorithmException e) {
             logger.error(e.toString());
+        } catch (IncorrectAccountDataException | UnknownAccountException | StorageException e) {
+            e.printStackTrace();
         }
 
         DragonFactory factory = new DragonFactory();
-        ServerCommandsHandler cmdHandler = new ServerCommandsHandler();
+        ServerCommandsHandler cmdHandler = new ServerCommandsHandler(accountsHandler);
         ServerHandler serverHandler = null;
         try {
             serverHandler = new ServerHandler(cmdHandler);
@@ -45,7 +55,7 @@ public class Main {
             logger.error("Error occurred while trying to start the server: " + e);
             System.exit(1);
         }
-        ServerCollectionHandler<Dragon> collectionHandler = new ServerCollectionHandler<>(storageHandler, serverHandler,
+        ServerCollectionHandler<Dragon> collectionHandler = new ServerCollectionHandler<>(databaseHandler, serverHandler,
                 factory, Dragon.class);
         UserDataHandler.setCollectionHandler(collectionHandler);
         CollectionBridge<Dragon> collectionBridge = new CollectionBridge<>(collectionHandler);
@@ -61,7 +71,9 @@ public class Main {
                 new RemoveLower(collectionBridge),
                 new FetchServerData(),
                 new StopServer(serverHandler),
-                new Shutdown(serverHandler));
+                new Shutdown(serverHandler),
+                new Login(accountsHandler),
+                new Register(accountsHandler));
         logger.info("Successfully loaded commands");
         ServerData serverData = new ServerData(cmdHandler.getCommandsData(), target);
         cmdHandler.setServerData(serverData);

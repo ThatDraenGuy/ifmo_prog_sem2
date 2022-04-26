@@ -2,6 +2,7 @@ package commands;
 
 
 import collection.CollectionClassesHandler;
+import security.CurrentAccount;
 import threads.ThreadHandler;
 import console.ConsoleHandler;
 import exceptions.CommandArgsAmountException;
@@ -70,7 +71,7 @@ public class ExecutionController {
     }
 
     public boolean isClientCommand(String name) {
-        return accessibleClientCommands.containsKey(name);
+        return clientCommands.containsKey(name);
     }
 
     public boolean isClientCommand(Request request) {
@@ -82,7 +83,7 @@ public class ExecutionController {
         if (!request.getCommandData().getAccessLevel().equals(CommandAccessLevel.INTERNAL))
             history.add(request.getCommandData());
         Response response;
-        consoleHandler.debugMessage("executing command...");
+        consoleHandler.debugMessage("executing command..." + request.getExecutionPayload().getAccount() + " " + CurrentAccount.getAccount());
         if (isClientCommand(request)) response = clientCommandsHandler.executeCommand(request);
         else response = threadHandler.sendRequest(request);
         return handleResponse(response);
@@ -90,7 +91,7 @@ public class ExecutionController {
 
     public Request createRequest(CommandData commandData, CommandArgs commandArgs) {
         userData = createUserData();
-        return new CommandRequest(commandData, commandArgs, userData);
+        return new CommandRequest(commandData, new ExecutionPayload(commandArgs), userData);
     }
 
     private void handleRequest(Request request) {
@@ -117,6 +118,7 @@ public class ExecutionController {
     }
 
     private UserData createUserData() {
-        return new UserData(targetClassHandler.getCurrentId(), clientCommandsHandler.getDisconnectCommandData(), clientCommandsHandler.getApplyCollectionChangeCommandData(), clientCommandsHandler.getApplyFullCollectionCommandData());
+        return new UserData(targetClassHandler.getCurrentId(), clientCommandsHandler.getDisconnectCommandData(), clientCommandsHandler.getApplyCollectionChangeCommandData(),
+                clientCommandsHandler.getApplyFullCollectionCommandData(), clientCommandsHandler.getSetAccountCommandData());
     }
 }
