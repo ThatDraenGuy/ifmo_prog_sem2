@@ -6,7 +6,7 @@ import collection.history.CollectionChange;
 import collection.meta.CollectibleScheme;
 import exceptions.CollectionVersionIsBehindException;
 import lombok.Getter;
-import utility.QueueWithID;
+import utility.ListAndId;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -45,7 +45,7 @@ public class CollectionClassesHandler {
         return castedClass;
     }
 
-    public void createCollection(Class<?> targetClass, QueueWithID<? extends MainCollectible<?>> queue) {
+    public void createCollection(Class<?> targetClass, ListAndId<? extends MainCollectible<?>> queue) {
         checkClassSupport(targetClass);
         currentCollectionHandler = supportedClasses.get(targetClass).setup(queue);
         currentClass = castClass(targetClass);
@@ -64,8 +64,8 @@ public class CollectionClassesHandler {
         }
     }
 
-    public void applyFullCollection(QueueWithID<? extends MainCollectible<?>> queue) {
-        Optional<?> element = queue.stream().findAny();
+    public void applyFullCollection(ListAndId<? extends MainCollectible<?>> queue) {
+        Optional<?> element = queue.getList().stream().findAny();
         if (element.isPresent()) {
             Class<?> targetClass = element.get().getClass();
             checkClassSupport(targetClass);

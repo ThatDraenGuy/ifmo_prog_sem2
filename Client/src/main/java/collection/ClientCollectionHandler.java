@@ -3,15 +3,14 @@ package collection;
 import collection.classes.MainCollectible;
 import collection.history.CollectionChange;
 import exceptions.CollectionVersionIsBehindException;
-import utility.PriorityQueueWithID;
-import utility.QueueWithID;
+import utility.ListAndId;
 
 public class ClientCollectionHandler<T extends MainCollectible<T>> extends CollectionHandler<T> {
     public ClientCollectionHandler(Class<T> targetClass) {
-        super(new PriorityQueueWithID<>(), targetClass);
+        super(targetClass);
     }
 
-    public ClientCollectionHandler(Class<T> targetClass, QueueWithID<T> collection) {
+    public ClientCollectionHandler(Class<T> targetClass, ListAndId<T> collection) {
         this(targetClass);
         this.collection = collection;
     }
@@ -28,9 +27,9 @@ public class ClientCollectionHandler<T extends MainCollectible<T>> extends Colle
         castedCollectionChange.apply(collection);
     }
 
-    public void setCollection(QueueWithID<? extends MainCollectible<?>> collection) {
+    public void setCollection(ListAndId<? extends MainCollectible<?>> collection) {
         @SuppressWarnings({"unchecked"})
-        QueueWithID<T> castedCollection = (QueueWithID<T>) collection;
+        ListAndId<T> castedCollection = (ListAndId<T>) collection;
         this.collection = castedCollection;
     }
 }

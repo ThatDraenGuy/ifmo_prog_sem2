@@ -4,6 +4,7 @@ import collection.classes.MainCollectible;
 import collection.history.CollectionChange;
 import commands.CommandArgs;
 import commands.ServerCommandsHandler;
+import lombok.Getter;
 import message.CommandRequest;
 import org.slf4j.LoggerFactory;
 
@@ -14,12 +15,16 @@ import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Queue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 import org.slf4j.Logger;
 
 public class ServerHandler implements Runnable {
     private final List<UserHandler> users;
     private final ServerCommandsHandler commandsHandler;
+    @Getter
+    private final ExecutorService requestHandlerService;
     private final Logger logger;
     final private int port = 2525;
     //
@@ -28,6 +33,7 @@ public class ServerHandler implements Runnable {
     public ServerHandler(ServerCommandsHandler commandsHandler) throws IOException {
         this.commandsHandler = commandsHandler;
         this.users = new ArrayList<>();
+        this.requestHandlerService = Executors.newFixedThreadPool(10);
         logger = LoggerFactory.getLogger("server");
         serverSocketChannel = ServerSocketChannel.open();
         serverSocketChannel.configureBlocking(true);

@@ -3,6 +3,7 @@ package collection.classes;
 import annotations.*;
 import annotations.CollectibleField;
 import collection.meta.CollectibleModel;
+import collection.meta.FieldModel;
 import lombok.Getter;
 import lombok.NonNull;
 
@@ -61,8 +62,11 @@ public class Dragon implements MainCollectible<Dragon> {
 
 
     public int compareTo(CollectibleModel collectibleModel) {
-        String modelName = collectibleModel.getValues().get(name).getValue().toString();
-        return this.name.compareTo(modelName);
+        FieldModel fieldModel = collectibleModel.getValues().get("name");
+        if (fieldModel != null) {
+            String modelName = fieldModel.getValue().toString();
+            return this.name.compareTo(modelName);
+        } else return 1;
     }
 
     @Override

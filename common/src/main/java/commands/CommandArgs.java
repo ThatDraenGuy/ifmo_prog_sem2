@@ -1,13 +1,9 @@
 package commands;
 
-import collection.classes.MainCollectible;
-import collection.history.CollectionChange;
 import collection.meta.CollectibleModel;
 import lombok.Getter;
-import utility.QueueWithID;
 
 import java.io.Serializable;
-import java.util.Queue;
 
 /**
  * A class that represents arguments command needs to perform its action. As of now it uses separated fields for

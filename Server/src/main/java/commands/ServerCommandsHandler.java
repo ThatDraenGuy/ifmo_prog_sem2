@@ -9,7 +9,7 @@ import lombok.Setter;
 import message.*;
 import security.Account;
 import security.AccountsHandler;
-import utility.QueueWithID;
+import utility.ListAndId;
 import web.UserHandler;
 
 import java.util.Queue;
@@ -60,7 +60,7 @@ public class ServerCommandsHandler extends CommandsHandler {
         return new CommandRequest(userData.getApplyCollectionChangeCommandData(), new ExecutionPayload(new CommandArgs(), account, collectionChanges));
     }
 
-    public Request formulateFullCollectionChangeRequest(UserData userData, Account account, QueueWithID<? extends MainCollectible<?>> collection) {
+    public Request formulateFullCollectionChangeRequest(UserData userData, Account account, ListAndId<? extends MainCollectible<?>> collection) {
         return new CommandRequest(userData.getApplyFullCollectionCommandData(), new ExecutionPayload(new CommandArgs(), account, collection));
     }
 

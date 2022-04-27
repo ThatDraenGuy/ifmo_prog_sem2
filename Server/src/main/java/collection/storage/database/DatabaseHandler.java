@@ -1,6 +1,5 @@
 package collection.storage.database;
 
-import collection.classes.Dragon;
 import collection.meta.*;
 import collection.storage.StorageHandler;
 import commands.CommandAccessLevel;
@@ -10,8 +9,7 @@ import exceptions.ValueNotValidException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import security.AccountData;
-import utility.ArrayListWithID;
-import utility.CollectionWithID;
+import utility.ListAndId;
 
 import java.sql.*;
 import java.time.ZonedDateTime;
@@ -25,17 +23,17 @@ public class DatabaseHandler implements StorageHandler {
     private final StatementCreator statementCreator;
 
 
-    public DatabaseHandler() throws SQLException {
+    public DatabaseHandler(Properties properties) throws SQLException {
         counter = ThreadLocal.withInitial(() -> 1);
         logger = LoggerFactory.getLogger("DatabaseHandler");
         statementCreator = new StatementCreator(this);
-        Properties info = new Properties();
-        info.put("user", "server");
-        info.put("password", "aboba");
+        String link = properties.getProperty("db_link");
+        String user = properties.getProperty("db_user");
+        String password = properties.getProperty("db_password");
         //TODO config
-        connection = DriverManager.getConnection("jdbc:postgresql://localhost:5432/progdb", info);
+        connection = DriverManager.getConnection("jdbc:postgresql://" + link, user, password);
         connection.setAutoCommit(false);
-        logger.info("Successfully established connection: " + connection);
+        logger.info("Successfully established connection: " + link);
     }
 
     public void addAccount(String username, AccountData accountData) throws StorageException {
@@ -81,6 +79,7 @@ public class DatabaseHandler implements StorageHandler {
             PreparedStatement clearStatement = statementCreator.getClearStatement();
             clearStatement.setString(1, owner);
             clearStatement.executeUpdate();
+            updateCollectionId();
         } catch (SQLException e) {
             throw new StorageException(e);
         }
@@ -92,8 +91,6 @@ public class DatabaseHandler implements StorageHandler {
             counter.set(1);
             PreparedStatement updateStatement = statementCreator.getUpdateStatement();
             updateModel(id, owner, object, updateStatement);
-            //TODO remove
-            System.out.println(updateStatement);
             ResultSet resultSet = updateStatement.executeQuery();
             boolean res = resultSet.next();
             updateCollectionId();
@@ -175,8 +172,6 @@ public class DatabaseHandler implements StorageHandler {
             counter.set(1);
             PreparedStatement insertStatement = statementCreator.getInsertStatement();
             insertModel(object, insertStatement);
-            //TODO remove
-            System.out.println(insertStatement);
             ResultSet resultSet = insertStatement.executeQuery();
             resultSet.next();
             long res = resultSet.getLong("id");
@@ -194,10 +189,9 @@ public class DatabaseHandler implements StorageHandler {
             }
         }
         inputValues(model, statement);
-        System.out.println(statement);
     }
 
-    public CollectionWithID<CollectibleModel> load(CollectibleScheme collectibleScheme) throws StorageException {
+    public ListAndId<CollectibleModel> load(CollectibleScheme collectibleScheme) throws StorageException {
         try {
             if (!collectibleScheme.equals(statementCreator.getTargetCollectibleScheme()))
                 statementCreator.setTargetCollectibleScheme(collectibleScheme);
@@ -206,15 +200,12 @@ public class DatabaseHandler implements StorageHandler {
             Collection<CollectibleModel> collection = new ArrayList<>();
             while (resultSet.next()) {
                 Map<String, InputtedValue> map = loadModel(collectibleScheme, resultSet);
-                System.out.println(map);
-                //TODO remove
                 collection.add(new CollectibleModel(collectibleScheme, map));
             }
             resultSet.close();
             long id = getCollectionId();
-            CollectionWithID<CollectibleModel> collectibleModels = new ArrayListWithID<>(id);
-            collectibleModels.addAll(collection);
-            return collectibleModels;
+            List<CollectibleModel> collectibleModels = new ArrayList<>(collection);
+            return new ListAndId<>(id, collectibleModels);
 
         } catch (SQLException | ValueNotValidException e) {
             throw new StorageException(e);

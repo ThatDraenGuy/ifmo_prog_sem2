@@ -8,7 +8,7 @@ import message.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import security.Account;
-import utility.QueueWithID;
+import utility.ListAndId;
 
 import java.io.EOFException;
 import java.io.IOException;
@@ -16,12 +16,15 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.channels.SocketChannel;
 import java.util.Queue;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
 
 
 public class UserHandler extends Thread {
     private final ServerHandler myServerHandler;
     private final ObjectInputStream in;
     private final ObjectOutputStream out;
+    private final MessageSender messageSender;
     @Getter
     private final Logger logger;
     private final ServerCommandsHandler commandsHandler;
@@ -39,6 +42,7 @@ public class UserHandler extends Thread {
         in = new ObjectInputStream(userChannel.socket().getInputStream());
         out = new ObjectOutputStream(userChannel.socket().getOutputStream());
         out.flush();
+        messageSender = new MessageSender(out);
         start();
     }
 
@@ -94,34 +98,45 @@ public class UserHandler extends Thread {
 
     public Message<Response> handleMessage(Message<Request> message) {
         Request request = message.getData();
+        Future<Response> responseFuture = myServerHandler.getRequestHandlerService().submit(new RequestHandler(request, this, commandsHandler));
         userData = request.getUserData();
         userAccount = request.getExecutionPayload().getAccount();
         UserDataHandler.handleUserData(this, userData);
         logger.info("got a request from user");
-        return new Message<>(commandsHandler.executeCommand(request, this));
-
-    }
-
-    public void sendRequest(Request request) {
-        Message<Request> requestMessage = new Message<>(request);
         try {
-            sendMessage(requestMessage);
-            logger.info("Sent a request to user");
-        } catch (IOException e) {
-            logger.error("Couldn't send request to user: " + e);
+            Response response = responseFuture.get();
+            return new Message<>(response);
+        } catch (InterruptedException e) {
+            logger.warn("Thread was interrupted while waiting for response, attempting to re-do operation...");
+            return handleMessage(message);
+        } catch (ExecutionException e) {
+            logger.error(e.getMessage());
+            return handleMessage(message);
         }
+
     }
 
-    private void sendMessage(Message<?> message) throws IOException {
-        out.writeObject(message);
+    private void sendRequest(Request request) {
+        silentSendRequest(request);
+        logger.info("Sent a request to user");
+    }
+
+    private void silentSendRequest(Request request) {
+        Message<Request> requestMessage = new Message<>(request);
+        sendMessage(requestMessage);
+    }
+
+    private void sendMessage(Message<?> message) {
+        messageSender.sendMessage(message);
     }
 
     public void sendCollectionChangeRequest(Queue<CollectionChange<? extends MainCollectible<?>>> collectionChanges) {
-        sendRequest(commandsHandler.formulateCollectionChangeRequest(userData, userAccount, collectionChanges));
+        silentSendRequest(commandsHandler.formulateCollectionChangeRequest(userData, userAccount, collectionChanges));
+        logger.debug("Sent collection changes to user");
     }
 
-    public void sendFullCollectionChangeRequest(QueueWithID<? extends MainCollectible<?>> collection) {
-        sendRequest(commandsHandler.formulateFullCollectionChangeRequest(userData, userAccount, collection));
+    public void sendFullCollectionChangeRequest(ListAndId<? extends MainCollectible<?>> collection) {
+        silentSendRequest(commandsHandler.formulateFullCollectionChangeRequest(userData, userAccount, collection));
         logger.info("Sent full collection to user");
     }
 

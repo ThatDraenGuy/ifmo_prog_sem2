@@ -83,7 +83,7 @@ public class ExecutionController {
         if (!request.getCommandData().getAccessLevel().equals(CommandAccessLevel.INTERNAL))
             history.add(request.getCommandData());
         Response response;
-        consoleHandler.debugMessage("executing command..." + request.getExecutionPayload().getAccount() + " " + CurrentAccount.getAccount());
+        consoleHandler.debugMessage("executing command: " + request.getCommandData().getName() + " " + request.getExecutionPayload().getAccount() + " " + CurrentAccount.getAccount());
         if (isClientCommand(request)) response = clientCommandsHandler.executeCommand(request);
         else response = threadHandler.sendRequest(request);
         return handleResponse(response);

@@ -33,10 +33,7 @@ public class AccountsHandler {
     public Account validate(String username, String password) throws UnknownAccountException, StorageException, IncorrectAccountDataException {
         AccountData accountData = databaseHandler.getAccountData(username);
         String inputtedPassword = hash(password, accountData.getSalt());
-        System.out.println(username + ": " + inputtedPassword);
-        //TODO remove above
         if (inputtedPassword.equals(accountData.getPasswordHash())) {
-            //TODO
             return new Account(username, password, accountData.getAccessLevel());
         }
         throw new IncorrectAccountDataException("Wrong username/password");

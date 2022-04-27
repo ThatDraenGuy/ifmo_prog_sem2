@@ -75,7 +75,6 @@ public class StatementCreator {
         builder.deleteCharAt(builder.length() - 2);
         builder.append("(SELECT id FROM ").append(targetCollectibleScheme.getSimpleName()).append("_ids)");
         String result = builder.toString();
-        System.out.println(result);
         updateStatement = databaseHandler.prepareStatement(result);
     }
 
@@ -124,7 +123,6 @@ public class StatementCreator {
     private void generateInit() {
         StringBuilder builder = new StringBuilder();
         genInit(targetCollectibleScheme, builder);
-        System.out.println(builder);
     }
 
     private void genInit(CollectibleScheme collectibleScheme, StringBuilder builder) {
@@ -173,7 +171,6 @@ public class StatementCreator {
         builder.append("SELECT * FROM ").append(targetCollectibleScheme.getSimpleName());
         genLoad(targetCollectibleScheme, builder);
         String result = builder.toString();
-        System.out.println(result);
         loadStatement = databaseHandler.prepareStatement(result);
     }
 
@@ -196,8 +193,6 @@ public class StatementCreator {
         builder.deleteCharAt(builder.length() - 1);
         builder.append(" ").append(finalString);
         String result = builder.toString();
-        System.out.println(result);
-        //TODO remove print
         insertStatement = databaseHandler.prepareStatement(result);
     }
 

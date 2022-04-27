@@ -1,8 +1,7 @@
 package collection.history;
 
 import collection.classes.MainCollectible;
-import utility.PriorityQueueWithID;
-import utility.QueueWithID;
+import utility.ListAndId;
 import web.ServerHandler;
 import utility.LimitedCollection;
 import web.UserHandler;
@@ -11,27 +10,27 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class CollectionHistoryHandler<T extends MainCollectible<T>> {
-    private final QueueWithID<T> currentCollection;
+    private final ListAndId<T> currentCollection;
     private final LimitedCollection<CollectionChange<T>> changeHistory;
     private final ServerHandler serverHandler;
     private final Class<T> targetClass;
 
-    public CollectionHistoryHandler(QueueWithID<T> currentCollection, ServerHandler serverHandler, Class<T> targetClass) {
-        this.currentCollection = new PriorityQueueWithID<>();
-        this.currentCollection.addAll(currentCollection);
+    public CollectionHistoryHandler(ListAndId<T> currentCollection, ServerHandler serverHandler, Class<T> targetClass) {
+        this.currentCollection = new ListAndId<>();
+        this.currentCollection.getList().addAll(currentCollection.getList());
         this.currentCollection.setId(currentCollection.getId());
         this.serverHandler = serverHandler;
         this.changeHistory = new LimitedCollection<>(10);
         this.targetClass = targetClass;
     }
 
-    public void saveChange(QueueWithID<T> newCollection) {
-        Collection<T> addedElements = newCollection.stream().filter(x -> !currentCollection.contains(x)).collect(Collectors.toCollection(ArrayList::new));
-        Collection<T> removedElements = currentCollection.stream().filter(x -> !newCollection.contains(x)).collect(Collectors.toCollection(ArrayList::new));
+    public void saveChange(ListAndId<T> newCollection) {
+        Collection<T> addedElements = newCollection.getList().stream().filter(x -> !currentCollection.getList().contains(x)).collect(Collectors.toCollection(ArrayList::new));
+        Collection<T> removedElements = currentCollection.getList().stream().filter(x -> !newCollection.getList().contains(x)).collect(Collectors.toCollection(ArrayList::new));
         CollectionChange<T> change = new CollectionChange<>(addedElements, removedElements, newCollection.getId(), targetClass);
         changeHistory.add(change);
-        currentCollection.clear();
-        currentCollection.addAll(newCollection);
+        currentCollection.getList().clear();
+        currentCollection.getList().addAll(newCollection.getList());
         currentCollection.setId(newCollection.getId());
         Deque<CollectionChange<? extends MainCollectible<?>>> changes = new ArrayDeque<>(1);
         changes.add(change);

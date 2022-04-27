@@ -5,7 +5,7 @@ import collection.history.CollectionChange;
 import lombok.Getter;
 import security.Account;
 import security.CurrentAccount;
-import utility.QueueWithID;
+import utility.ListAndId;
 
 import java.io.Serializable;
 import java.util.Queue;
@@ -18,7 +18,7 @@ public class ExecutionPayload implements Serializable {
     @Getter
     private Queue<CollectionChange<? extends MainCollectible<?>>> collectionChanges;
     @Getter
-    private QueueWithID<? extends MainCollectible<?>> collection;
+    private ListAndId<? extends MainCollectible<?>> collection;
 
 
     public ExecutionPayload(CommandArgs commandArgs) {
@@ -36,7 +36,7 @@ public class ExecutionPayload implements Serializable {
         this.collectionChanges = collectionChanges;
     }
 
-    public ExecutionPayload(CommandArgs commandArgs, Account account, QueueWithID<? extends MainCollectible<?>> collection) {
+    public ExecutionPayload(CommandArgs commandArgs, Account account, ListAndId<? extends MainCollectible<?>> collection) {
         this(commandArgs, account);
         this.collection = collection;
     }

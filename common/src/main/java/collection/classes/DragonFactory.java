@@ -9,12 +9,6 @@ import lombok.Setter;
 import java.time.ZonedDateTime;
 
 public class DragonFactory implements MainCollectibleFactory<Dragon> {
-    @Setter
-    private Long nextId;
-
-    public DragonFactory() {
-        nextId = 1L;
-    }
 
     public Dragon getObject(CollectibleModel collectibleModel) throws IncorrectCollectibleTypeException {
         long id = getValue("id", collectibleModel, Long.class);
@@ -22,8 +16,6 @@ public class DragonFactory implements MainCollectibleFactory<Dragon> {
     }
 
     public Dragon getObject(CollectibleModel collectibleModel, long id) throws IncorrectCollectibleTypeException {
-        System.out.println(collectibleModel);
-        //TODO remove
         String name = getValue("name", collectibleModel, String.class);
         Coordinates coordinates;
         if (collectibleModel.getValues().get("coordinates").getFieldData().isCollectible()) {

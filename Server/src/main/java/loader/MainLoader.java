@@ -1,3 +1,5 @@
+package loader;
+
 import collection.*;
 import collection.classes.DragonFactory;
 import collection.classes.MainCollectible;
@@ -21,29 +23,32 @@ import web.UserDataHandler;
 import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
+import java.util.Properties;
+import java.util.concurrent.locks.Condition;
+import java.util.concurrent.locks.Lock;
 
 /**
- * A Main class, only consists of main() method.
+ * A loader.Main class, only consists of main() method.
  */
-public class Main {
+public class MainLoader {
     final static Class<? extends MainCollectible<?>> target = Dragon.class;
 
     public static void main(String... args) {
         Logger logger = LoggerFactory.getLogger("loader");
         logger.info("Starting the server...");
-        CurrentAccount.setAccount(new Account("server", "temp", CommandAccessLevel.DEV));
+        ConfigLoader configLoader = new ConfigLoader();
+        Properties config = configLoader.load();
+        CurrentAccount.setAccount(new Account(config.getProperty("username"), config.getProperty("password"), CommandAccessLevel.DEV));
         //TODO config file?
         DatabaseHandler databaseHandler = null;
         AccountsHandler accountsHandler = null;
         try {
-            databaseHandler = new DatabaseHandler();
+            databaseHandler = new DatabaseHandler(config);
             accountsHandler = new AccountsHandler(databaseHandler);
-            accountsHandler.validate("guest", "guest");
             //TODO remove above
         } catch (SQLException | NoSuchAlgorithmException e) {
             logger.error(e.toString());
-        } catch (IncorrectAccountDataException | UnknownAccountException | StorageException e) {
-            e.printStackTrace();
+            System.exit(1);
         }
 
         DragonFactory factory = new DragonFactory();

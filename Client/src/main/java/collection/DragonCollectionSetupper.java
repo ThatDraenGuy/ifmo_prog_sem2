@@ -1,9 +1,8 @@
 package collection;
 
 import collection.classes.Dragon;
-import collection.classes.DragonFactory;
 import collection.classes.MainCollectible;
-import utility.QueueWithID;
+import utility.ListAndId;
 
 public class DragonCollectionSetupper implements CollectionSetupper<Dragon> {
 
@@ -16,9 +15,9 @@ public class DragonCollectionSetupper implements CollectionSetupper<Dragon> {
     }
 
     @Override
-    public ClientCollectionHandler<Dragon> setup(QueueWithID<? extends MainCollectible<?>> collection) {
+    public ClientCollectionHandler<Dragon> setup(ListAndId<? extends MainCollectible<?>> collection) {
         @SuppressWarnings({"unchecked"})
-        QueueWithID<Dragon> dragonCollection = (QueueWithID<Dragon>) collection;
+        ListAndId<Dragon> dragonCollection = (ListAndId<Dragon>) collection;
         return new ClientCollectionHandler<>(Dragon.class, dragonCollection);
     }
 }

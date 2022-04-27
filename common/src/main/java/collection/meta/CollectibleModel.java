@@ -10,7 +10,7 @@ import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
-public class CollectibleModel implements Serializable {
+public class CollectibleModel implements Serializable, Comparable<CollectibleModel> {
     @Getter
     private final CollectibleScheme collectibleScheme;
     @Getter
@@ -34,7 +34,6 @@ public class CollectibleModel implements Serializable {
             throw new ValueNotValidException("No such field: " + field);
         FieldData fieldData = collectibleScheme.getFieldsData().get(field);
         if (!values.containsKey(field)) {
-            System.out.println("Inputting " + field + " as " + value);
             values.put(field, new FieldModel(fieldData, value));
         }
     }
@@ -61,5 +60,10 @@ public class CollectibleModel implements Serializable {
     public String toString() {
         return values.toString();
         //TODO ?
+    }
+
+    @Override
+    public int compareTo(CollectibleModel c) {
+        return this.values.keySet().size() - c.values.keySet().size();
     }
 }

@@ -2,7 +2,7 @@ package collection.history;
 
 import collection.classes.MainCollectible;
 import lombok.Getter;
-import utility.CollectionWithID;
+import utility.ListAndId;
 
 import java.io.Serializable;
 import java.util.Collection;
@@ -22,9 +22,9 @@ public class CollectionChange<T extends MainCollectible<T>> implements Serializa
         this.elementClass = elementClass;
     }
 
-    public void apply(CollectionWithID<T> collection) {
-        collection.addAll(addedElements);
-        collection.removeAll(removedElements);
+    public void apply(ListAndId<T> collection) {
+        collection.getList().addAll(addedElements);
+        collection.getList().removeAll(removedElements);
         collection.setId(newCollectionId);
     }
 
