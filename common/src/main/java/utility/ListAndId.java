@@ -7,6 +7,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Just an object to store list & id. Name is self-explanatory
+ */
 public class ListAndId<E> implements Serializable {
     @Getter
     @Setter
@@ -23,7 +26,8 @@ public class ListAndId<E> implements Serializable {
         this.list = list;
     }
 
-    public List<E> getList() {
+    public synchronized List<E> getList() {
+        //yes, calling sort everytime you try to get a list isn't good, but it was the easiest and the least messy way.
         list.sort(null);
         return list;
     }

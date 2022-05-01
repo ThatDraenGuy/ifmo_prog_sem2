@@ -1,24 +1,23 @@
 package security;
 
+import annotations.UserAccessible;
+import collection.classes.Collectible;
 import commands.CommandAccessLevel;
 import lombok.Getter;
 
-import java.io.Serializable;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.util.Random;
 
-
-public class Account implements Serializable {
+public class Account implements Collectible {
     @Getter
-    private final String username;
-    @Getter
+    @UserAccessible
     private final String password;
+    @Getter
+    @UserAccessible
+    private final String name;
     @Getter
     private final CommandAccessLevel accessLevel;
 
-    public Account(String username, String password, CommandAccessLevel accessLevel) {
-        this.username = username;
+    public Account(String name, String password, CommandAccessLevel accessLevel) {
+        this.name = name;
         this.password = password;
         this.accessLevel = accessLevel;
     }
@@ -26,7 +25,7 @@ public class Account implements Serializable {
     @Override
     public String toString() {
         return "Account{" +
-                "username='" + username + '\'' +
+                "username='" + name + '\'' +
                 ", accessLevel=" + accessLevel +
                 '}';
     }

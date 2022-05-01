@@ -73,7 +73,8 @@ public class ClientInteractionController extends Thread {
     }
 
     private Request createRequest(CommandData commandData, String initialArgs) throws CommandArgsAmountException {
-        CommandArgsType type = commandData.getCommandArgsType();
+        CommandArgsInfo argsInfo = commandData.getCommandArgsInfo();
+        CommandArgsType type = argsInfo.getType();
         boolean isEmpty = initialArgs.equals("");
         CommandArgs args;
         switch (type) {
@@ -85,22 +86,17 @@ public class ClientInteractionController extends Thread {
             case COMPLEX_ARG -> {
                 if (!isEmpty)
                     throw new CommandArgsAmountException("Command \"" + commandData.getName() + "\" needs a complex argument, not a simple one!");
-                CollectibleModel newArgs = promptComplexArgs();
+                CollectibleModel newArgs = promptComplexArgs(argsInfo.getTargetScheme());
                 args = new CommandArgs(newArgs);
             }
             case SIMPLE_ARG -> {
                 if (isEmpty) throw new CommandArgsAmountException(commandData.getName() + " needs an argument!");
                 args = new CommandArgs(initialArgs);
             }
-            case LONG_ARG -> {
-                if (!isEmpty)
-                    throw new CommandArgsAmountException("This commands needs a long argument that is not inputted on the same line");
-                args = new CommandArgs(promptLongArgs(commandData.getArgsNames()));
-            }
             case BOTH_ARG -> {
                 if (isEmpty)
                     throw new CommandArgsAmountException("Command \"" + commandData.getName() + "\" needs an in-line (simple) argument!");
-                CollectibleModel complexArgs = promptComplexArgs();
+                CollectibleModel complexArgs = promptComplexArgs(argsInfo.getTargetScheme());
                 args = new CommandArgs(initialArgs, complexArgs);
             }
             default -> args = new CommandArgs();
@@ -127,23 +123,14 @@ public class ClientInteractionController extends Thread {
         }
     }
 
-    private String[] promptLongArgs(String[] argsNames) {
-        List<String> args = new ArrayList<>();
-        for (String argName : argsNames) {
-            args.add(consoleHandler.promptInput("Please input " + argName + ": "));
-        }
-        return args.toArray(new String[argsNames.length]);
-    }
-
-    private CollectibleModel promptComplexArgs() {
-        CollectibleScheme collectibleScheme = commandsExecutor.getTargetClassHandler().getCurrentCollectibleScheme();
+    private CollectibleModel promptComplexArgs(CollectibleScheme collectibleScheme) {
         Map<String, InputtedValue> map = promptComplexArgsMap(collectibleScheme);
         try {
             return new CollectibleModel(collectibleScheme, map);
 //            return commandsExecutor.getTargetClassHandler().getCurrentCollectionBuilder().rawBuild(map);
         } catch (ValueNotValidException e) {
             consoleHandler.errorMessage(e);
-            return promptComplexArgs();
+            return promptComplexArgs(collectibleScheme);
         }
     }
 

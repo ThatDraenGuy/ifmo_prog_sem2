@@ -13,14 +13,15 @@ public class Connect extends AbstractCommand {
     private final ExecutionController executionController;
 
     public Connect(ConnectionHandler connectionHandler, ExecutionController executionController, ThreadHandler threadHandler) {
-        super("connect", "подключиться к серверу", CommandArgsType.SIMPLE_ARG, CommandAccessLevel.DISCONNECTED);
+        super("connect", "подключиться к серверу", new CommandArgsInfo(CommandArgsType.SIMPLE_ARG), CommandAccessLevel.DISCONNECTED);
         this.connectionHandler = connectionHandler;
         this.executionController = executionController;
         this.threadHandler = threadHandler;
     }
 
     @Override
-    public ActionResult action(CommandArgs args) {
+    public ActionResult action(ExecutionPayload executionPayload) {
+        CommandArgs args = executionPayload.getCommandArgs();
         try {
             String address = args.getArgs();
             String[] splitStr = address.split(":");

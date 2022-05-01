@@ -8,7 +8,6 @@ import utility.ListAndId;
 import java.util.Collection;
 
 public interface StorageHandler {
-//    <T extends MainCollectible<T>> void save(CollectionWithID<T> collection, Class<T> target) throws IOException;
 
     ListAndId<CollectibleModel> load(CollectibleScheme collectibleScheme) throws StorageException;
 

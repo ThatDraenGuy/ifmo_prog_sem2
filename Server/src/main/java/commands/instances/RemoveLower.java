@@ -1,29 +1,27 @@
 package commands.instances;
 
-import collection.CollectionBridge;
+import collection.ServerCollectionHandler;
 import commands.*;
-import exceptions.IncorrectCollectibleTypeException;
 import exceptions.StorageException;
 
 /**
  *
  */
-public class RemoveLower extends AbstractComplicatedCommand {
-    private final CollectionBridge<?> collectionBridge;
+public class RemoveLower extends AbstractCommand {
+    private final ServerCollectionHandler<?> serverCollectionHandler;
 
-    public RemoveLower(CollectionBridge<?> collectionBridge) {
-        super("remove_lower", "удалить из коллекции все элементы, меньшие, чем заданный", CommandArgsType.COMPLEX_ARG);
-        this.collectionBridge = collectionBridge;
+    public RemoveLower(ServerCollectionHandler<?> serverCollectionHandler) {
+        super("remove_lower", "удалить из коллекции все элементы, меньшие, чем заданный",
+                new CommandArgsInfo(CommandArgsType.COMPLEX_ARG, serverCollectionHandler.getCollectibleScheme()));
+        this.serverCollectionHandler = serverCollectionHandler;
     }
 
     @Override
-    public ActionResult complicatedAction(ExecutionPayload executionPayload) {
+    public ActionResult action(ExecutionPayload executionPayload) {
         CommandArgs args = executionPayload.getCommandArgs();
         try {
-            collectionBridge.removeLower(args.getCollectibleModel(), executionPayload.getAccount().getUsername());
+            serverCollectionHandler.removeLower(args.getCollectibleModel(), executionPayload.getAccount().getName());
             return new ActionResult(true, "Successfully removed all lower objects");
-        } catch (IncorrectCollectibleTypeException e) {
-            return new ActionResult(false, e.getMessage());
         } catch (StorageException e) {
             return new ActionResult(false, "A storage exception has occurred: " + e.getMessage());
         }

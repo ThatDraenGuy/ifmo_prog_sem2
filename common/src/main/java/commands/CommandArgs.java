@@ -15,8 +15,6 @@ public class CommandArgs implements Serializable {
     @Getter
     private String args;
     @Getter
-    private String[] longArgs;
-    @Getter
     private CollectibleModel collectibleModel;
 
     public CommandArgs() {
@@ -26,12 +24,6 @@ public class CommandArgs implements Serializable {
     public CommandArgs(String args) {
         this.args = args;
         this.argsType = CommandArgsType.SIMPLE_ARG;
-    }
-
-    public CommandArgs(String[] longArgs) {
-        this.args = longArgs[0];
-        this.longArgs = longArgs;
-        this.argsType = CommandArgsType.LONG_ARG;
     }
 
     public CommandArgs(CollectibleModel object) {

@@ -12,12 +12,12 @@ public class Save extends AbstractCommand {
     private final ServerCollectionHandler<?> collectionHandler;
 
     public Save(ServerCollectionHandler<?> collectionHandler) {
-        super("save", "сохранить коллекцию в файл", CommandArgsType.NO_ARGS, CommandAccessLevel.DEV);
+        super("save", "сохранить коллекцию в файл", new CommandArgsInfo(CommandArgsType.NO_ARGS), CommandAccessLevel.DEV);
         this.collectionHandler = collectionHandler;
     }
 
     @Override
-    public ActionResult action(CommandArgs args) {
+    public ActionResult action(ExecutionPayload executionPayload) {
         try {
             collectionHandler.save();
             return new ActionResult(true, "Successfully saved collection");

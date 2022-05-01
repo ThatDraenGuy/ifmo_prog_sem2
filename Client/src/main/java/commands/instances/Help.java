@@ -11,12 +11,12 @@ public class Help extends AbstractCommand {
     private final ExecutionController commandsExecutor;
 
     public Help(ExecutionController commandsExecutor) {
-        super("help", "вывести справку по доступным командам", CommandArgsType.NO_ARGS, CommandAccessLevel.DISCONNECTED);
+        super("help", "вывести справку по доступным командам", new CommandArgsInfo(CommandArgsType.NO_ARGS), CommandAccessLevel.DISCONNECTED);
         this.commandsExecutor = commandsExecutor;
     }
 
     @Override
-    public ActionResult action(CommandArgs args) {
+    public ActionResult action(ExecutionPayload executionPayload) {
         String message = createMessage();
         return new ActionResult(true, message);
     }

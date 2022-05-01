@@ -73,8 +73,9 @@ public class ServerHandler implements Runnable {
             }
             logger.info("Stopping the server...");
             logger.info("Disconnecting all users...");
-            users.forEach(UserHandler::forceDisconnect);
+            users.forEach(UserHandler::sendDisconnectRequest);
             users.clear();
+            requestHandlerService.shutdown();
             closeChannel();
             logger.info("exiting...");
         };

@@ -5,7 +5,7 @@ import exceptions.IncorrectCollectibleTypeException;
 
 import java.time.ZonedDateTime;
 
-public interface MainCollectibleFactory<T extends MainCollectible<T>> {
+public interface MainCollectibleFactory<T extends MainCollectible<T>> extends CollectibleFactory<T> {
 
     T getObject(CollectibleModel collectibleModel, long id) throws IncorrectCollectibleTypeException;
 

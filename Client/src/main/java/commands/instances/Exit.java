@@ -12,12 +12,12 @@ public class Exit extends AbstractCommand {
     private final ThreadHandler threadHandler;
 
     public Exit(ConsoleHandler consoleHandler, ThreadHandler threadHandler) {
-        super("exit", "выйти из приложения", CommandArgsType.NO_ARGS, CommandAccessLevel.DISCONNECTED);
+        super("exit", "выйти из приложения", new CommandArgsInfo(CommandArgsType.NO_ARGS), CommandAccessLevel.DISCONNECTED);
         this.consoleHandler = consoleHandler;
         this.threadHandler = threadHandler;
     }
 
-    public ActionResult action(CommandArgs args) {
+    public ActionResult action(ExecutionPayload executionPayload) {
         if (consoleHandler.promptAgreement("Are you sure you want to exit?")) {
             threadHandler.stop();
             return new ActionResult(true, "exiting...");

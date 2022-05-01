@@ -1,6 +1,5 @@
 package collection.meta;
 
-import collection.classes.Collectible;
 import exceptions.ValueNotValidException;
 import lombok.Getter;
 import security.CurrentAccount;
@@ -38,6 +37,15 @@ public class CollectibleModel implements Serializable, Comparable<CollectibleMod
         }
     }
 
+    private void putIfPossible(String field, InputtedValue value) throws ValueNotValidException {
+        if (collectibleScheme.getFieldsData().containsKey(field)) {
+            FieldData fieldData = collectibleScheme.getFieldsData().get(field);
+            if (!values.containsKey(field)) {
+                values.put(field, new FieldModel(fieldData, value));
+            }
+        }
+    }
+
     public void put(Map<String, InputtedValue> values) throws ValueNotValidException {
         for (String field : values.keySet()) {
             put(field, values.get(field));
@@ -46,8 +54,8 @@ public class CollectibleModel implements Serializable, Comparable<CollectibleMod
     }
 
     public void complete() throws ValueNotValidException {
-        put("creationDate", new InputtedValue(ZonedDateTime.now()));
-        put("owner", new InputtedValue(CurrentAccount.getAccount().getUsername()));
+        putIfPossible("creationDate", new InputtedValue(ZonedDateTime.now()));
+        putIfPossible("owner", new InputtedValue(CurrentAccount.getAccount().getName()));
         for (String field : collectibleScheme.getFieldsData().keySet()) {
             if (collectibleScheme.getFieldsData().get(field).isNotNull() && !values.containsKey(field) && !field.equals("id"))
                 throw new ValueNotValidException(field + " cannot be null!");

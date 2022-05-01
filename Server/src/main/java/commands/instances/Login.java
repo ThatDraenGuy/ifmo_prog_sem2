@@ -1,35 +1,37 @@
 package commands.instances;
 
+import collection.meta.CollectibleModel;
+import collection.meta.CollectibleScheme;
 import commands.*;
 import exceptions.IncorrectAccountDataException;
 import exceptions.StorageException;
 import exceptions.UnknownAccountException;
 import security.Account;
+import security.AccountFactory;
 import security.AccountsHandler;
 
-public class Login extends AbstractComplicatedCommand {
+public class Login extends AbstractCommand {
     private final AccountsHandler accountsHandler;
+    private final AccountFactory accountFactory;
 
     public Login(AccountsHandler accountsHandler) {
-        super("login", "log into your account", CommandArgsType.LONG_ARG.setArgsNames(new String[]{"login", "password"}), CommandAccessLevel.GUEST);
+        super("login", "log into your account", new CommandArgsInfo(CommandArgsType.COMPLEX_ARG, Account.class), CommandAccessLevel.GUEST);
         this.accountsHandler = accountsHandler;
+        this.accountFactory = new AccountFactory();
     }
 
     @Override
-    protected ActionResult complicatedAction(ExecutionPayload executionPayload) {
-        CommandArgs args = executionPayload.getCommandArgs();
-        //TODO safe stuff?
+    protected ActionResult action(ExecutionPayload executionPayload) {
         try {
-            String[] longArgs = args.getLongArgs();
-            String username = longArgs[0];
-            String password = longArgs[1];
-            Account loggedAccount = accountsHandler.validate(username, password);
+            CollectibleModel model = executionPayload.getCommandArgs().getCollectibleModel();
+            Account account = accountFactory.getObject(model);
+            Account loggedAccount = accountsHandler.validate(account);
             if (executionPayload instanceof ServerExecutionPayload serverExecutionPayload) {
                 serverExecutionPayload.getUserHandler().sendAccountChangeRequest(loggedAccount);
                 return new ActionResult(true, "Successfully logged into account");
             } else return new ActionResult(false, "An exception occurred");
-        } catch (UnknownAccountException | StorageException | IncorrectAccountDataException e) {
-            return new ActionResult(false, e.getMessage());
+        } catch (Exception e) {
+            return new ActionResult(false, e.toString());
         }
     }
 }

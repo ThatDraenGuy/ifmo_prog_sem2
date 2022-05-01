@@ -1,6 +1,8 @@
 package console;
 
 
+import exceptions.ValueNotValidException;
+
 import java.io.InputStream;
 import java.io.PrintStream;
 import java.util.*;
@@ -15,10 +17,13 @@ public class ConsoleHandler {
     final private PrintStream out;
     final private PrintStream err;
 
+    final private AgreementHandler agreementHandler;
+
     public ConsoleHandler(InputStream in, PrintStream out, PrintStream err) {
         inputScanner = new Scanner(in);
         this.out = out;
         this.err = err;
+        this.agreementHandler = new AgreementHandler();
     }
 
 
@@ -44,13 +49,10 @@ public class ConsoleHandler {
     public boolean promptAgreement(String message) {
         while (true) {
             String answer = promptInput(message + " (Y/N)");
-            switch (answer) {
-                case "Y":
-                    return true;
-                case "N":
-                    return false;
-                default:
-                    out.println("Please input \"Y\" or \"N\"");
+            try {
+                return agreementHandler.getAgreement(answer);
+            } catch (ValueNotValidException e) {
+                message("Please input \"Y\" or \"N\" (or some other sensible representation of your agreement/disagreement)");
             }
         }
     }

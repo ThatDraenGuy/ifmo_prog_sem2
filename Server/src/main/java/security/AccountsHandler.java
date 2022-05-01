@@ -24,10 +24,11 @@ public class AccountsHandler {
         pepper = "AB0b4Su2Syb4Ka<T>";
     }
 
-    public void validate(Account account) throws IncorrectAccountDataException, UnknownAccountException, StorageException, InvalidAccessLevelException {
-        Account validated = validate(account.getUsername(), account.getPassword());
-        if (!validated.getAccessLevel().equals(account.getAccessLevel()))
+    public Account validate(Account account) throws IncorrectAccountDataException, UnknownAccountException, StorageException, InvalidAccessLevelException {
+        Account validated = validate(account.getName(), account.getPassword());
+        if (validated.getAccessLevel().compareTo(account.getAccessLevel()) < 0)
             throw new InvalidAccessLevelException("Your account's access level and the one presented by you don't match. Either something went wrong or you're a cheeky little bastard");
+        return validated;
     }
 
     public Account validate(String username, String password) throws UnknownAccountException, StorageException, IncorrectAccountDataException {
@@ -60,8 +61,6 @@ public class AccountsHandler {
         if (checkIfExists(username)) throw new IncorrectAccountDataException("This username is already taken");
         String salt = generateSalt();
         String hashedPassword = hash(password, salt);
-        System.out.println(username + ": " + password + " " + salt + " " + hashedPassword);
-        //TODO remove above
         AccountData accountData = new AccountData(hashedPassword, salt, CommandAccessLevel.USER);
         databaseHandler.addAccount(username, accountData);
     }

@@ -24,7 +24,7 @@ public class DatabaseHandler implements StorageHandler {
     //TODO remove getter
     private final Connection connection;
     private final StatementCreator statementCreator;
-    private final TableHandler tableHandler;
+    private final TableChecker tableChecker;
 
 
     public DatabaseHandler(Properties properties) throws SQLException {
@@ -34,12 +34,19 @@ public class DatabaseHandler implements StorageHandler {
         String link = properties.getProperty("db_link");
         String user = properties.getProperty("db_user");
         String password = properties.getProperty("db_password");
-        //TODO config
+        logger.info("Attempting to establish connection with database...");
         connection = DriverManager.getConnection("jdbc:postgresql://" + link, user, password);
         connection.setAutoCommit(false);
         logger.info("Successfully established connection: " + link);
-        tableHandler = new TableHandler(this);
-        tableHandler.checkMetaData();
+        tableChecker = new TableChecker(this);
+    }
+
+    private void handleSQLException(SQLException e) throws StorageException {
+        try {
+            connection.rollback();
+        } catch (SQLException ignored) {
+        }
+        throw new StorageException(e);
     }
 
     public void addAccount(String username, AccountData accountData) throws StorageException {
@@ -53,7 +60,7 @@ public class DatabaseHandler implements StorageHandler {
             preparedStatement.executeUpdate();
             connection.commit();
         } catch (SQLException e) {
-            throw new StorageException(e);
+            handleSQLException(e);
         }
     }
 
@@ -87,7 +94,7 @@ public class DatabaseHandler implements StorageHandler {
             clearStatement.executeUpdate();
             updateCollectionId();
         } catch (SQLException e) {
-            throw new StorageException(e);
+            handleSQLException(e);
         }
     }
 
@@ -102,7 +109,8 @@ public class DatabaseHandler implements StorageHandler {
             updateCollectionId();
             return res;
         } catch (SQLException e) {
-            throw new StorageException(e);
+            handleSQLException(e);
+            return false;
         }
     }
 
@@ -145,7 +153,8 @@ public class DatabaseHandler implements StorageHandler {
             updateCollectionId();
             return result;
         } catch (SQLException e) {
-            throw new StorageException(e);
+            handleSQLException(e);
+            return false;
         }
     }
 
@@ -156,7 +165,8 @@ public class DatabaseHandler implements StorageHandler {
             updateCollectionId();
             return res;
         } catch (SQLException e) {
-            throw new StorageException(e);
+            handleSQLException(e);
+            return false;
         }
     }
 
@@ -168,7 +178,8 @@ public class DatabaseHandler implements StorageHandler {
             int res = statement.executeUpdate();
             return res != 0;
         } catch (SQLException e) {
-            throw new StorageException(e);
+            handleSQLException(e);
+            return false;
         }
     }
 
@@ -184,7 +195,8 @@ public class DatabaseHandler implements StorageHandler {
             updateCollectionId();
             return res;
         } catch (SQLException e) {
-            throw new StorageException(e);
+            handleSQLException(e);
+            return 0;
         }
     }
 
@@ -197,10 +209,25 @@ public class DatabaseHandler implements StorageHandler {
         inputValues(model, statement);
     }
 
-    public ListAndId<CollectibleModel> load(CollectibleScheme collectibleScheme) throws StorageException {
+    private void initialize(CollectibleScheme collectibleScheme) throws SQLException {
         try {
             if (!collectibleScheme.equals(statementCreator.getTargetCollectibleScheme()))
                 statementCreator.setTargetCollectibleScheme(collectibleScheme);
+            tableChecker.checkMetaData(collectibleScheme);
+        } catch (StorageException e) {
+            logger.error(e.getMessage());
+            logger.warn("Attempting to create needed tablespace...");
+            connection.setSavepoint();
+            PreparedStatement initStatement = statementCreator.getInitStatement();
+            System.out.println(initStatement);
+            initStatement.executeUpdate();
+            connection.commit();
+        }
+    }
+
+    public ListAndId<CollectibleModel> load(CollectibleScheme collectibleScheme) throws StorageException {
+        try {
+            initialize(collectibleScheme);
             PreparedStatement statement = statementCreator.getLoadStatement();
             ResultSet resultSet = statement.executeQuery();
             Collection<CollectibleModel> collection = new ArrayList<>();
@@ -213,7 +240,10 @@ public class DatabaseHandler implements StorageHandler {
             List<CollectibleModel> collectibleModels = new ArrayList<>(collection);
             return new ListAndId<>(id, collectibleModels);
 
-        } catch (SQLException | ValueNotValidException e) {
+        } catch (SQLException e) {
+            handleSQLException(e);
+            return null;
+        } catch (ValueNotValidException e) {
             throw new StorageException(e);
         }
     }

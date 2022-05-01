@@ -17,13 +17,14 @@ public class ExecuteScript extends AbstractCommand {
     private final HashSet<String> scriptHistory;
 
     public ExecuteScript(ClientInteractionController clientInteractionController) {
-        super("execute_script", "считать и исполнить скрипт из указанного файла", CommandArgsType.SIMPLE_ARG);
+        super("execute_script", "считать и исполнить скрипт из указанного файла", new CommandArgsInfo(CommandArgsType.SIMPLE_ARG));
         this.app = clientInteractionController;
         this.scriptHistory = new HashSet<>();
     }
 
     @Override
-    public ActionResult action(CommandArgs args) {
+    public ActionResult action(ExecutionPayload executionPayload) {
+        CommandArgs args = executionPayload.getCommandArgs();
         try {
             File scriptFile = new File(args.getArgs());
             String path = scriptFile.getAbsolutePath();

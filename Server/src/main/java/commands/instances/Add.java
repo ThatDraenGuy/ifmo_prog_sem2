@@ -1,10 +1,7 @@
 package commands.instances;
 
-import collection.CollectionBridge;
-import commands.AbstractCommand;
-import commands.ActionResult;
-import commands.CommandArgs;
-import commands.CommandArgsType;
+import collection.ServerCollectionHandler;
+import commands.*;
 import exceptions.IncorrectCollectibleTypeException;
 import exceptions.StorageException;
 
@@ -12,17 +9,17 @@ import exceptions.StorageException;
  * A command for adding new elements to collection. Receives a deconstructed object on the form of a complex arg and calls
  */
 public class Add extends AbstractCommand {
-    private final CollectionBridge<?> collectionBridge;
+    private final ServerCollectionHandler<?> serverCollectionHandler;
 
-    public Add(CollectionBridge<?> collectionBridge) {
-        super("add", "добавить новый элемент в коллекцию", CommandArgsType.COMPLEX_ARG);
-        this.collectionBridge = collectionBridge;
+    public Add(ServerCollectionHandler<?> serverCollectionHandler) {
+        super("add", "добавить новый элемент в коллекцию", new CommandArgsInfo(CommandArgsType.COMPLEX_ARG, serverCollectionHandler.getCollectibleScheme()));
+        this.serverCollectionHandler = serverCollectionHandler;
     }
 
     @Override
-    public ActionResult action(CommandArgs args) {
+    public ActionResult action(ExecutionPayload executionPayload) {
         try {
-            collectionBridge.add(args.getCollectibleModel());
+            serverCollectionHandler.add(executionPayload.getCommandArgs().getCollectibleModel());
             return new ActionResult(true, "Successfully added new dragon to collection");
         } catch (IncorrectCollectibleTypeException | StorageException e) {
             return new ActionResult(false, e.getMessage());

@@ -58,22 +58,22 @@ public class MainLoader {
             serverHandler = new ServerHandler(cmdHandler);
         } catch (IOException e) {
             logger.error("Error occurred while trying to start the server: " + e);
+            e.printStackTrace();
             System.exit(1);
         }
         ServerCollectionHandler<Dragon> collectionHandler = new ServerCollectionHandler<>(databaseHandler, serverHandler,
                 factory, Dragon.class);
         UserDataHandler.setCollectionHandler(collectionHandler);
-        CollectionBridge<Dragon> collectionBridge = new CollectionBridge<>(collectionHandler);
         collectionHandler.load();
 
         cmdHandler.addCommands(
                 new Save(collectionHandler),
                 new RemoveFirst(collectionHandler),
                 new RemoveById(collectionHandler),
-                new Add(collectionBridge),
-                new Update(collectionBridge),
+                new Add(collectionHandler),
+                new Update(collectionHandler),
                 new Clear(collectionHandler),
-                new RemoveLower(collectionBridge),
+                new RemoveLower(collectionHandler),
                 new FetchServerData(),
                 new StopServer(serverHandler),
                 new Shutdown(serverHandler),

@@ -10,16 +10,6 @@ import lombok.Setter;
 public enum CommandArgsType {
     NO_ARGS,
     SIMPLE_ARG,
-    LONG_ARG,
     COMPLEX_ARG,
-    BOTH_ARG;
-
-    // for use with LONG_ARG
-    @Getter
-    private String[] argsNames;
-
-    public CommandArgsType setArgsNames(String[] args) {
-        this.argsNames = args;
-        return this;
-    }
+    BOTH_ARG
 }
