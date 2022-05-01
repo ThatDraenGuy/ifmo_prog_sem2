@@ -8,7 +8,7 @@ public class Disconnect extends AbstractCommand {
     private final ExecutionController executionController;
 
     public Disconnect(ConnectionHandler connectionHandler, ExecutionController executionController) {
-        super("disconnect", "disconnects user form the server", CommandArgsType.NO_ARGS, CommandAccessLevel.INTERNAL);
+        super("disconnect_internal", "disconnects user form the server", CommandArgsType.NO_ARGS, CommandAccessLevel.INTERNAL);
         this.connectionHandler = connectionHandler;
         this.executionController = executionController;
     }

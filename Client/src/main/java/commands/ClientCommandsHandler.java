@@ -2,7 +2,7 @@ package commands;
 
 public class ClientCommandsHandler extends CommandsHandler {
     public CommandData getDisconnectCommandData() {
-        return this.getCommandsData().get("disconnect");
+        return this.getCommandsData().get("disconnect_internal");
     }
 
     public CommandData getApplyCollectionChangeCommandData() {

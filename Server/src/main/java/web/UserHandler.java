@@ -32,9 +32,11 @@ public class UserHandler extends Thread {
     private Account userAccount;
     //
     private final SocketChannel userChannel;
+    private boolean disconnected;
 
     public UserHandler(SocketChannel userChannel, ServerCommandsHandler commandsHandler, ServerHandler serverHandler) throws IOException {
         super(userChannel.socket().getInetAddress().toString());
+        disconnected = false;
         this.userChannel = userChannel;
         this.commandsHandler = commandsHandler;
         this.logger = LoggerFactory.getLogger("server." + userChannel.getRemoteAddress());
@@ -56,9 +58,9 @@ public class UserHandler extends Thread {
                 sendMessage(responseMessage);
                 logger.info("successfully sent response");
             } catch (EOFException e) {
-                logger.warn("Lost connection with user");
+                if (!disconnected) logger.warn("Lost connection with user");
                 silentDisconnect();
-                return;
+//                return;
             } catch (IOException | ClassNotFoundException e) {
                 if (userChannel.isOpen()) {
                     logger.error(e.toString());
@@ -66,6 +68,8 @@ public class UserHandler extends Thread {
                 }
             }
         }
+        messageSender.setStopped(true);
+        logger.info("This thread ended its duty");
     }
 
     private void closeSocket() {
@@ -143,4 +147,11 @@ public class UserHandler extends Thread {
     public void sendAccountChangeRequest(Account account) {
         sendRequest(commandsHandler.formulateSetAccountRequest(userData, account));
     }
+
+    public void sendDisconnectRequest() {
+        silentSendRequest(commandsHandler.formulateDisconnectRequest(userData, userAccount));
+        disconnected = true;
+        logger.info("Disconnecting the user");
+    }
+
 }

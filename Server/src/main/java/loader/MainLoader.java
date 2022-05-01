@@ -78,7 +78,8 @@ public class MainLoader {
                 new StopServer(serverHandler),
                 new Shutdown(serverHandler),
                 new Login(accountsHandler),
-                new Register(accountsHandler));
+                new Register(accountsHandler),
+                new Disconnect());
         logger.info("Successfully loaded commands");
         ServerData serverData = new ServerData(cmdHandler.getCommandsData(), target);
         cmdHandler.setServerData(serverData);

@@ -90,4 +90,8 @@ public class ConnectionHandler {
     public boolean isConnectionOpen() {
         return !socket.isClosed() && socket.isConnected();
     }
+
+    public boolean isConnectionClosed() {
+        return socket.isClosed();
+    }
 }

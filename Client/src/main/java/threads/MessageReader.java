@@ -52,7 +52,7 @@ public class MessageReader implements Runnable {
                     }
                 }
             } catch (EOFException e) {
-                connectionHandler.handleLostConnection();
+                if (!connectionHandler.isConnectionClosed()) connectionHandler.handleLostConnection();
             } catch (SocketException ignored) {
                 consoleHandler.message("(connection terminated)");
             } catch (IOException | ClassNotFoundException e) {

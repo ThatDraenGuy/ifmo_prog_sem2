@@ -6,6 +6,7 @@ import commands.CommandAccessLevel;
 import exceptions.StorageException;
 import exceptions.UnknownAccountException;
 import exceptions.ValueNotValidException;
+import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import security.AccountData;
@@ -19,8 +20,11 @@ public class DatabaseHandler implements StorageHandler {
     private final ThreadLocal<Integer> counter;
 
     private final Logger logger;
+    @Getter
+    //TODO remove getter
     private final Connection connection;
     private final StatementCreator statementCreator;
+    private final TableHandler tableHandler;
 
 
     public DatabaseHandler(Properties properties) throws SQLException {
@@ -34,6 +38,8 @@ public class DatabaseHandler implements StorageHandler {
         connection = DriverManager.getConnection("jdbc:postgresql://" + link, user, password);
         connection.setAutoCommit(false);
         logger.info("Successfully established connection: " + link);
+        tableHandler = new TableHandler(this);
+        tableHandler.checkMetaData();
     }
 
     public void addAccount(String username, AccountData accountData) throws StorageException {
