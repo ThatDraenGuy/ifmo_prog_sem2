@@ -32,7 +32,6 @@ public class Connect extends AbstractCommand {
             connectionHandler.connect(host, port);
             threadHandler.reloadMessageReader();
             executionController.setUserAccessLevel(CommandAccessLevel.GUEST);
-            //TODO normal level changing
             return new ActionResult(true, "You have been successfully connected");
         } catch (NumberFormatException e) {
             return new ActionResult(false, "Couldn't parse port");

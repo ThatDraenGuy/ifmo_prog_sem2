@@ -42,7 +42,6 @@ public class ServerCollectionHandler<T extends MainCollectible<T>> extends Colle
     }
 
     public synchronized void update(String arg, String owner, CollectibleModel collectibleModel) throws ElementIdException, StorageException, IncorrectCollectibleTypeException {
-        //TODO think
         long id = Long.parseLong(arg);
         if (!storageHandler.update(id, owner, collectibleModel)) throw new ElementIdException(arg);
 

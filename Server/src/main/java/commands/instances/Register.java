@@ -22,7 +22,6 @@ public class Register extends AbstractCommand {
     @Override
     protected ActionResult action(ExecutionPayload executionPayload) {
         try {
-            //TODO safe stuff?
             CollectibleModel model = executionPayload.getCommandArgs().getCollectibleModel();
             Account account = accountFactory.getObject(model);
             accountsHandler.register(account.getName(), account.getPassword());

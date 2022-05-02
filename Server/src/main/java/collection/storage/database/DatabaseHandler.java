@@ -20,8 +20,6 @@ public class DatabaseHandler implements StorageHandler {
     private final ThreadLocal<Integer> counter;
 
     private final Logger logger;
-    @Getter
-    //TODO remove getter
     private final Connection connection;
     private final StatementCreator statementCreator;
     private final TableChecker tableChecker;
@@ -38,7 +36,7 @@ public class DatabaseHandler implements StorageHandler {
         connection = DriverManager.getConnection("jdbc:postgresql://" + link, user, password);
         connection.setAutoCommit(false);
         logger.info("Successfully established connection: " + link);
-        tableChecker = new TableChecker(this);
+        tableChecker = new TableChecker(connection.getMetaData());
     }
 
     private void handleSQLException(SQLException e) throws StorageException {

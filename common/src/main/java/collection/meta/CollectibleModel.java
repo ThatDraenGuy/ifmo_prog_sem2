@@ -67,7 +67,6 @@ public class CollectibleModel implements Serializable, Comparable<CollectibleMod
     @Override
     public String toString() {
         return values.toString();
-        //TODO ?
     }
 
     @Override

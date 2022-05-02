@@ -6,6 +6,7 @@ import lombok.Getter;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.HashMap;
+import java.util.Objects;
 
 public class CollectibleScheme implements Serializable {
     @Getter
@@ -20,5 +21,26 @@ public class CollectibleScheme implements Serializable {
         for (Field field : fields) {
             fieldsData.put(field.getName(), new FieldData(field));
         }
+    }
+
+    @Override
+    public String toString() {
+        return "CollectibleScheme{" +
+                "simpleName='" + simpleName + '\'' +
+                ", fieldsData=" + fieldsData +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        CollectibleScheme that = (CollectibleScheme) o;
+        return simpleName.equals(that.simpleName) && fieldsData.equals(that.fieldsData);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(simpleName, fieldsData);
     }
 }

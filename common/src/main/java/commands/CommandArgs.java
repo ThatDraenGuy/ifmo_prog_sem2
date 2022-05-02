@@ -36,4 +36,13 @@ public class CommandArgs implements Serializable {
         this.args = args;
         this.argsType = CommandArgsType.BOTH_ARG;
     }
+
+    @Override
+    public String toString() {
+        return "CommandArgs{" +
+                "argsType=" + argsType +
+                ", args='" + args + '\'' +
+                ", collectibleModel=" + collectibleModel +
+                '}';
+    }
 }

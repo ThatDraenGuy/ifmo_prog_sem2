@@ -24,7 +24,6 @@ public class InputtedValue {
             this.inputtedValues = inputtedValue.getInputtedValues();
             this.complex = inputtedValue.isComplex();
             return;
-            //TODO another method (copy/clone?)
         }
         complex = input instanceof Map<?, ?>;
         if (complex) {

@@ -5,6 +5,7 @@ import collection.meta.FieldData;
 import exceptions.StorageException;
 import lombok.Getter;
 
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -18,8 +19,8 @@ import java.util.Optional;
 public class TableChecker {
     private final DatabaseMetaData metaData;
 
-    public TableChecker(DatabaseHandler databaseHandler) throws SQLException {
-        this.metaData = databaseHandler.getConnection().getMetaData();
+    public TableChecker(DatabaseMetaData metaData) throws SQLException {
+        this.metaData = metaData;
     }
 
     public void checkMetaData(CollectibleScheme collectibleScheme) throws SQLException, StorageException {

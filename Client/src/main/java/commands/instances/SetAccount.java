@@ -14,7 +14,6 @@ public class SetAccount extends AbstractCommand {
 
     @Override
     protected ActionResult action(ExecutionPayload executionPayload) {
-        //TODO safe stuff?
         Account newAccount = executionPayload.getAccount();
         CurrentAccount.setAccount(newAccount);
         executionController.setUserAccessLevel(newAccount.getAccessLevel());

@@ -8,6 +8,7 @@ import lombok.Getter;
 
 import java.io.Serializable;
 import java.lang.reflect.Field;
+import java.util.Objects;
 
 public class FieldData implements Serializable {
     @Getter
@@ -40,5 +41,35 @@ public class FieldData implements Serializable {
             Class<Collectible> castedType = (Class<Collectible>) type;
             collectibleScheme = new CollectibleScheme(castedType);
         }
+    }
+
+
+    @Override
+    public String toString() {
+        return "FieldData{" +
+                "collectible=" + collectible +
+                ", collectibleScheme=" + collectibleScheme +
+                ", notNull=" + notNull +
+                ", userAccessible=" + userAccessible +
+                ", lowerBounded=" + lowerBounded +
+                ", lowerBoundedValue=" + lowerBoundedValue +
+                ", simpleName='" + simpleName + '\'' +
+                ", type=" + type +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        FieldData fieldData = (FieldData) o;
+        return collectible == fieldData.collectible && notNull == fieldData.notNull && userAccessible == fieldData.userAccessible &&
+                lowerBounded == fieldData.lowerBounded && Double.compare(fieldData.lowerBoundedValue, lowerBoundedValue) == 0 &&
+                Objects.equals(collectibleScheme, fieldData.collectibleScheme) && simpleName.equals(fieldData.simpleName) && type.equals(fieldData.type);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(collectible, collectibleScheme, notNull, userAccessible, lowerBounded, lowerBoundedValue, simpleName, type);
     }
 }

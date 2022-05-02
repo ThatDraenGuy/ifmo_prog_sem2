@@ -25,4 +25,12 @@ public class CommandArgsInfo implements Serializable {
         this.type = type;
         this.targetScheme = scheme;
     }
+
+    @Override
+    public String toString() {
+        return "CommandArgsInfo{" +
+                "type=" + type +
+                ", targetScheme=" + targetScheme +
+                '}';
+    }
 }

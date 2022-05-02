@@ -39,10 +39,8 @@ public class ServerCommandsHandler extends CommandsHandler {
             accountsHandler.validate(request.getExecutionPayload().getAccount());
             if (request.getExecutionPayload().getAccount().getAccessLevel().compareTo(request.getCommandData().getAccessLevel()) < 0)
                 throw new InvalidAccessLevelException("You don't have access to this command");
-            //TODO think?
         } catch (Exception e) {
             return createResponse(new ActionResult(false, e.getMessage()));
-            //TODO think?
         }
         return super.execute(request.getCommandData(), new ServerExecutionPayload(request.getExecutionPayload(), userHandler));
     }

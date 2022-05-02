@@ -39,13 +39,11 @@ public class MainLoader {
         ConfigLoader configLoader = new ConfigLoader();
         Properties config = configLoader.load();
         CurrentAccount.setAccount(new Account(config.getProperty("username"), config.getProperty("password"), CommandAccessLevel.DEV));
-        //TODO config file?
         DatabaseHandler databaseHandler = null;
         AccountsHandler accountsHandler = null;
         try {
             databaseHandler = new DatabaseHandler(config);
             accountsHandler = new AccountsHandler(databaseHandler);
-            //TODO remove above
         } catch (SQLException | NoSuchAlgorithmException e) {
             logger.error(e.toString());
             System.exit(1);
