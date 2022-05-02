@@ -7,7 +7,7 @@ import utility.ListAndId;
 import java.io.Serializable;
 import java.util.Collection;
 
-public class CollectionChange<T extends MainCollectible<T>> implements Serializable {
+public class CollectionChange<T extends MainCollectible<?>> implements Serializable {
     @Getter
     private final long newCollectionId;
     private final Collection<T> addedElements;

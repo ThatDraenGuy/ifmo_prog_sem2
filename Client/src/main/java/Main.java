@@ -25,7 +25,7 @@ public class Main {
         try {
             ConnectionHandler connectionHandler = new ConnectionHandler(consoleHandler);
             ClientCommandsHandler clientCommandsHandler = new ClientCommandsHandler();
-            CollectionClassesHandler collectionClassesHandler = new CollectionClassesHandler();
+            CollectionClassesHandler collectionClassesHandler = new CollectionClassesHandler(consoleHandler);
             ExecutionController executionController = new ExecutionController(clientCommandsHandler, consoleHandler, collectionClassesHandler);
             ClientInteractionController app = new ClientInteractionController(executionController, consoleHandler);
             ThreadHandler threadHandler = new ThreadHandler(connectionHandler, executionController, app, consoleHandler);

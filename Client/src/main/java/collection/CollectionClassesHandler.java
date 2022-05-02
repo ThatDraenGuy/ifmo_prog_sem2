@@ -1,16 +1,13 @@
 package collection;
 
-import collection.classes.Dragon;
 import collection.classes.MainCollectible;
 import collection.history.CollectionChange;
-import collection.meta.CollectibleScheme;
+import console.ConsoleHandler;
 import exceptions.CollectionVersionIsBehindException;
+import exceptions.IncorrectCollectibleTypeException;
 import lombok.Getter;
 import utility.ListAndId;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
 import java.util.Queue;
 
 public class CollectionClassesHandler {
@@ -18,66 +15,48 @@ public class CollectionClassesHandler {
     volatile private ClientCollectionHandler<?> currentCollectionHandler;
     @Getter
     private Class<? extends MainCollectible<?>> currentClass;
-    private final Map<Class<?>, CollectionSetupper<?>> supportedClasses;
+    @Getter
+    private final ConsoleHandler consoleHandler;
 
-    public CollectionClassesHandler() {
-        supportedClasses = new HashMap<>();
-        supportedClasses.put(Dragon.class, new DragonCollectionSetupper());
+    public CollectionClassesHandler(ConsoleHandler consoleHandler) {
         currentCollectionHandler = null;
+        this.consoleHandler = consoleHandler;
     }
 
-    public void createCollection(Class<?> targetClass) {
-        checkClassSupport(targetClass);
-        currentCollectionHandler = supportedClasses.get(targetClass).setup();
-        currentClass = castClass(targetClass);
-//        System.out.println("created empty collection: " + currentCollectionHandler);
+    private <T extends MainCollectible<?>> void createCollection(Class<T> targetClass) {
+        currentCollectionHandler = new ClientCollectionHandler<>(targetClass);
+        currentClass = targetClass;
+        consoleHandler.debugMessage("created empty collection: " + currentCollectionHandler);
     }
 
-    public void handleTargetClass(Class<?> targetClass) {
+    public void handleTargetClass(Class<? extends MainCollectible<?>> targetClass) {
         if (targetClass == null) return;
-        checkClassSupport(targetClass);
         if (!isCurrentClass(targetClass)) createCollection(targetClass);
     }
 
-    private Class<? extends MainCollectible<?>> castClass(Class<?> targetClass) {
-        @SuppressWarnings({"unchecked"})
-        Class<? extends MainCollectible<?>> castedClass = (Class<? extends MainCollectible<?>>) targetClass;
-        return castedClass;
+    private <T extends MainCollectible<?>> void createCollection(Class<T> targetClass, ListAndId<T> listAndId) {
+        currentCollectionHandler = new ClientCollectionHandler<>(targetClass, listAndId);
+        currentClass = targetClass;
+        consoleHandler.debugMessage("created collection from server collection: " + currentCollectionHandler);
     }
 
-    public void createCollection(Class<?> targetClass, ListAndId<? extends MainCollectible<?>> queue) {
-        checkClassSupport(targetClass);
-        currentCollectionHandler = supportedClasses.get(targetClass).setup(queue);
-        currentClass = castClass(targetClass);
-//        System.out.println("created collection from server collection: " + currentCollectionHandler);
-    }
-
-    public void applyCollectionChanges(Queue<CollectionChange<? extends MainCollectible<?>>> collectionChanges) {
+    public void applyCollectionChanges(Queue<CollectionChange<? extends MainCollectible<?>>> collectionChanges) throws IncorrectCollectibleTypeException {
         try {
             for (CollectionChange<? extends MainCollectible<?>> collectionChange : collectionChanges) {
-                checkClassSupport(collectionChange.getElementClass());
                 currentCollectionHandler.applyChange(collectionChange);
-//                System.out.println("applied collectionChange: " + collectionChange);
+                consoleHandler.debugMessage("applied collectionChange: " + collectionChange);
             }
         } catch (CollectionVersionIsBehindException e) {
             e.printStackTrace();
         }
     }
 
-    public void applyFullCollection(ListAndId<? extends MainCollectible<?>> queue) {
-        Optional<?> element = queue.getList().stream().findAny();
-        if (element.isPresent()) {
-            Class<?> targetClass = element.get().getClass();
-            checkClassSupport(targetClass);
-            if (isCurrentClass(targetClass)) currentCollectionHandler.setCollection(queue);
-            else createCollection(targetClass, queue);
-        }
-
+    public <T extends MainCollectible<?>> void applyFullCollection(ListAndId<T> listAndId) throws IncorrectCollectibleTypeException {
+        Class<T> targetClass = listAndId.getTargetClass();
+        if (isCurrentClass(targetClass)) currentCollectionHandler.setCollection(listAndId);
+        else createCollection(targetClass, listAndId);
     }
 
-    private void checkClassSupport(Class<?> targetClass) {
-        if (!supportedClasses.containsKey(targetClass)) System.exit(1);
-    }
 
     private boolean isCurrentClass(Class<?> targetClass) {
         if (currentClass == null) return false;
@@ -87,9 +66,5 @@ public class CollectionClassesHandler {
     public long getCurrentId() {
         if (currentCollectionHandler == null) return 0L;
         return currentCollectionHandler.getId();
-    }
-
-    public CollectibleScheme getCurrentCollectibleScheme() {
-        return currentCollectionHandler.getCollectibleScheme();
     }
 }

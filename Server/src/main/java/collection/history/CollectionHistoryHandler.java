@@ -16,7 +16,7 @@ public class CollectionHistoryHandler<T extends MainCollectible<T>> {
     private final Class<T> targetClass;
 
     public CollectionHistoryHandler(ListAndId<T> currentCollection, ServerHandler serverHandler, Class<T> targetClass) {
-        this.currentCollection = new ListAndId<>();
+        this.currentCollection = new ListAndId<>(targetClass);
         this.currentCollection.getList().addAll(currentCollection.getList());
         this.currentCollection.setId(currentCollection.getId());
         this.serverHandler = serverHandler;

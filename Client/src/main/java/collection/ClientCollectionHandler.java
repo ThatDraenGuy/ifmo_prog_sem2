@@ -3,9 +3,10 @@ package collection;
 import collection.classes.MainCollectible;
 import collection.history.CollectionChange;
 import exceptions.CollectionVersionIsBehindException;
+import exceptions.IncorrectCollectibleTypeException;
 import utility.ListAndId;
 
-public class ClientCollectionHandler<T extends MainCollectible<T>> extends CollectionHandler<T> {
+public class ClientCollectionHandler<T extends MainCollectible<?>> extends CollectionHandler<T> {
     public ClientCollectionHandler(Class<T> targetClass) {
         super(targetClass);
     }
@@ -15,21 +16,38 @@ public class ClientCollectionHandler<T extends MainCollectible<T>> extends Colle
         this.collection = collection;
     }
 
-    public void applyChange(CollectionChange<? extends MainCollectible<?>> collectionChange) throws CollectionVersionIsBehindException {
+    public void applyChange(CollectionChange<? extends MainCollectible<?>> collectionChange) throws CollectionVersionIsBehindException, IncorrectCollectibleTypeException {
         final long newCollectionId = collectionChange.getNewCollectionId();
         if (!(newCollectionId - collection.getId() == 1)) {
             if (newCollectionId != collection.getId())
                 throw new CollectionVersionIsBehindException("Local collection is behind");
             return;
         }
-        @SuppressWarnings({"unchecked"})
-        CollectionChange<T> castedCollectionChange = (CollectionChange<T>) collectionChange;
+        CollectionChange<T> castedCollectionChange = castCollectionChange(collectionChange);
         castedCollectionChange.apply(collection);
     }
 
-    public void setCollection(ListAndId<? extends MainCollectible<?>> collection) {
-        @SuppressWarnings({"unchecked"})
-        ListAndId<T> castedCollection = (ListAndId<T>) collection;
-        this.collection = castedCollection;
+    public void setCollection(ListAndId<? extends MainCollectible<?>> collection) throws IncorrectCollectibleTypeException {
+        this.collection = castCollection(collection);
+    }
+
+    private ListAndId<T> castCollection(ListAndId<? extends MainCollectible<?>> collection) throws IncorrectCollectibleTypeException {
+        Class<? extends MainCollectible<?>> collectionClass = collection.getTargetClass();
+        if (collectionClass.equals(targetClass)) {
+            @SuppressWarnings({"unchecked"})
+            ListAndId<T> castedCollection = (ListAndId<T>) collection;
+            return castedCollection;
+        }
+        throw new IncorrectCollectibleTypeException();
+    }
+
+    private CollectionChange<T> castCollectionChange(CollectionChange<? extends MainCollectible<?>> collectionChange) throws IncorrectCollectibleTypeException {
+        Class<? extends MainCollectible<?>> changeClass = collectionChange.getElementClass();
+        if (changeClass.equals(targetClass)) {
+            @SuppressWarnings({"unchecked"})
+            CollectionChange<T> castedCollectionChange = (CollectionChange<T>) collectionChange;
+            return castedCollectionChange;
+        }
+        throw new IncorrectCollectibleTypeException();
     }
 }

@@ -8,7 +8,7 @@ import utility.ListAndId;
 
 import java.util.*;
 
-public class CollectionHandler<T extends MainCollectible<T>> {
+public class CollectionHandler<T extends MainCollectible<?>> {
     protected final Class<T> targetClass;
     @Getter
     protected final CollectibleScheme collectibleScheme;
@@ -17,7 +17,7 @@ public class CollectionHandler<T extends MainCollectible<T>> {
     public CollectionHandler(Class<T> targetClass) {
         this.targetClass = targetClass;
         List<T> synchronizedList = Collections.synchronizedList(new ArrayList<>());
-        this.collection = new ListAndId<>(0, synchronizedList);
+        this.collection = new ListAndId<>(0, synchronizedList, targetClass);
         this.collectibleScheme = new CollectibleScheme(targetClass);
     }
 

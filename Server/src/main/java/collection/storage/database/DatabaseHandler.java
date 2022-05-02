@@ -236,7 +236,7 @@ public class DatabaseHandler implements StorageHandler {
             resultSet.close();
             long id = getCollectionId();
             List<CollectibleModel> collectibleModels = new ArrayList<>(collection);
-            return new ListAndId<>(id, collectibleModels);
+            return new ListAndId<>(id, collectibleModels, CollectibleModel.class);
 
         } catch (SQLException e) {
             handleSQLException(e);

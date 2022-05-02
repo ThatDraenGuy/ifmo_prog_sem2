@@ -1,5 +1,6 @@
 package message;
 
+import collection.classes.MainCollectible;
 import commands.CommandData;
 import lombok.Getter;
 
@@ -10,9 +11,9 @@ public class ServerData implements Serializable {
     @Getter
     private final HashMap<String, CommandData> serverCommands;
     @Getter
-    private final Class<?> targetClass;
+    private final Class<? extends MainCollectible<?>> targetClass;
 
-    public ServerData(HashMap<String, CommandData> serverCommands, Class<?> targetClass) {
+    public ServerData(HashMap<String, CommandData> serverCommands, Class<? extends MainCollectible<?>> targetClass) {
         this.serverCommands = serverCommands;
         this.targetClass = targetClass;
     }

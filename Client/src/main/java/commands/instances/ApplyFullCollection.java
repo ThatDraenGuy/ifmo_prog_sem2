@@ -2,6 +2,7 @@ package commands.instances;
 
 import collection.CollectionClassesHandler;
 import commands.*;
+import exceptions.IncorrectCollectibleTypeException;
 
 public class ApplyFullCollection extends AbstractCommand {
     private final CollectionClassesHandler targetClassHandler;
@@ -13,7 +14,11 @@ public class ApplyFullCollection extends AbstractCommand {
 
     @Override
     public ActionResult action(ExecutionPayload executionPayload) {
-        targetClassHandler.applyFullCollection(executionPayload.getCollection());
-        return new ActionResult(true, "successfully applied changes");
+        try {
+            targetClassHandler.applyFullCollection(executionPayload.getCollection());
+            return new ActionResult(true, "successfully applied changes");
+        } catch (IncorrectCollectibleTypeException e) {
+            return new ActionResult(false, e.getMessage());
+        }
     }
 }

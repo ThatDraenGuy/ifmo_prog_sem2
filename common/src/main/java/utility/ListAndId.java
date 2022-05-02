@@ -16,14 +16,18 @@ public class ListAndId<E> implements Serializable {
     private volatile long id;
 
     private final List<E> list;
+    @Getter
+    private final Class<E> targetClass;
 
-    public ListAndId() {
+    public ListAndId(Class<E> targetClass) {
         list = new ArrayList<>();
+        this.targetClass = targetClass;
     }
 
-    public ListAndId(long id, List<E> list) {
+    public ListAndId(long id, List<E> list, Class<E> targetClass) {
         this.id = id;
         this.list = list;
+        this.targetClass = targetClass;
     }
 
     public synchronized List<E> getList() {
