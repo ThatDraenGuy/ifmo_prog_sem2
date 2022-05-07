@@ -23,6 +23,7 @@ public class RequestHandler implements Callable<Response> {
 
     @Override
     public Response call() {
+        logger.debug("Handling request...");
         return commandsHandler.executeCommand(request, userHandler);
     }
 }

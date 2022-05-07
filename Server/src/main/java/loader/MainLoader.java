@@ -8,9 +8,6 @@ import commands.CommandAccessLevel;
 import commands.ServerCommandsHandler;
 import commands.instances.*;
 import collection.classes.Dragon;
-import exceptions.IncorrectAccountDataException;
-import exceptions.StorageException;
-import exceptions.UnknownAccountException;
 import message.ServerData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,8 +21,6 @@ import java.io.IOException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
 import java.util.Properties;
-import java.util.concurrent.locks.Condition;
-import java.util.concurrent.locks.Lock;
 
 /**
  * A loader.Main class, only consists of main() method.
@@ -53,10 +48,13 @@ public class MainLoader {
         ServerCommandsHandler cmdHandler = new ServerCommandsHandler(accountsHandler);
         ServerHandler serverHandler = null;
         try {
-            serverHandler = new ServerHandler(cmdHandler);
+            serverHandler = new ServerHandler(cmdHandler, config.getProperty("port"));
         } catch (IOException e) {
             logger.error("Error occurred while trying to start the server: " + e);
             e.printStackTrace();
+            System.exit(1);
+        } catch (NumberFormatException e) {
+            logger.error("Port is not valid: " + config.getProperty("port"));
             System.exit(1);
         }
         ServerCollectionHandler<Dragon> collectionHandler = new ServerCollectionHandler<>(databaseHandler, serverHandler,

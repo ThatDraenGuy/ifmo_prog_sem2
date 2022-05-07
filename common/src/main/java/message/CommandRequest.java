@@ -1,12 +1,9 @@
 package message;
 
-import commands.CommandArgs;
 import commands.CommandData;
 import commands.ExecutionPayload;
 import lombok.Getter;
 import lombok.Setter;
-import security.Account;
-import security.CurrentAccount;
 
 public class CommandRequest implements Request {
     @Getter

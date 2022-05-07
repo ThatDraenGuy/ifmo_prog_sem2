@@ -11,7 +11,6 @@ import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Class that handles all statements needed to work with database.
@@ -122,11 +121,11 @@ public class StatementCreator {
     private void generateInit() throws SQLException {
         StringBuilder builder = new StringBuilder();
         builder.append("""
-                DROP SEQUENCE is exists collection_id;
+                DROP SEQUENCE if exists collection_id;
                 CREATE SEQUENCE collection_id;
-                DROP TYPE is exists accessLevel;
+                DROP TYPE if exists accessLevel;
                 CREATE TYPE accessLevel AS ENUM ('DISCONNECTED', 'GUEST', 'USER', 'INTERNAL', 'DEV');
-                DROP TABLE is exists accounts;
+                DROP TABLE if exists accounts;
                 CREATE TABLE accounts (
                     username VARCHAR(99) PRIMARY KEY,
                     passwordHash CHAR(128) NOT NULL,
@@ -144,7 +143,7 @@ public class StatementCreator {
     }
 
     private void genInit(CollectibleScheme collectibleScheme, StringBuilder builder) {
-        builder.append("DROP TABLE is exists ").append(collectibleScheme.getSimpleName()).append(";\n");
+        builder.append("DROP TABLE if exists ").append(collectibleScheme.getSimpleName()).append(";\n");
         for (FieldData fieldData : collectibleScheme.getFieldsData().values()) {
             if (fieldData.isCollectible()) genInit(fieldData.getCollectibleScheme(), builder);
             else if (fieldData.getType().isEnum()) genEnumInit(fieldData.getType(), builder);
@@ -169,7 +168,7 @@ public class StatementCreator {
     }
 
     private <T> void genEnumInit(Class<T> target, StringBuilder builder) {
-        builder.append("DROP TYPE if exists ").append(target.getSimpleName());
+        builder.append("DROP TYPE if exists ").append(target.getSimpleName()).append(";\n");
         builder.append("CREATE TYPE ").append(target.getSimpleName()).append(" AS ENUM (");
         for (T value : target.getEnumConstants()) {
             builder.append("'").append(value).append("',");

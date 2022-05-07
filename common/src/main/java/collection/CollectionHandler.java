@@ -2,7 +2,6 @@ package collection;
 
 import collection.classes.*;
 import collection.meta.CollectibleScheme;
-import exceptions.InvalidCollectionException;
 import lombok.Getter;
 import utility.ListAndId;
 
@@ -41,17 +40,6 @@ public class CollectionHandler<T extends MainCollectible<?>> {
         return str.toString();
     }
 
-    public Long checkIds(Collection<T> collection) throws InvalidCollectionException {
-        Set<Long> ids = new HashSet<>();
-        long highestId = 0L;
-        for (MainCollectible<?> collectible : collection) {
-            long id = collectible.getId();
-            boolean res = ids.add(id);
-            if (!res) throw new InvalidCollectionException();
-            if (id > highestId) highestId = id;
-        }
-        return highestId;
-    }
 
     public String info() {
         return "This collection's type is a " + collection.getClass().getName() + ", it contains " + collection.getList().size() + " elements.";

@@ -5,7 +5,6 @@ import collection.meta.FieldData;
 import exceptions.StorageException;
 import lombok.Getter;
 
-import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,7 +18,7 @@ import java.util.Optional;
 public class TableChecker {
     private final DatabaseMetaData metaData;
 
-    public TableChecker(DatabaseMetaData metaData) throws SQLException {
+    public TableChecker(DatabaseMetaData metaData) {
         this.metaData = metaData;
     }
 
@@ -66,12 +65,6 @@ public class TableChecker {
         private final String type;
         @Getter
         private final boolean notNull;
-
-        public ColumnInfo(String name, String type, boolean notNull) {
-            this.name = name;
-            this.type = type;
-            this.notNull = notNull;
-        }
 
         public ColumnInfo(String name, String type, int nullable) {
             this.name = name;

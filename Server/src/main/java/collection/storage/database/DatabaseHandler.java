@@ -6,7 +6,6 @@ import commands.CommandAccessLevel;
 import exceptions.StorageException;
 import exceptions.UnknownAccountException;
 import exceptions.ValueNotValidException;
-import lombok.Getter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import security.AccountData;

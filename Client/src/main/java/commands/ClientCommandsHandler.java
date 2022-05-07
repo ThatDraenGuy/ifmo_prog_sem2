@@ -1,19 +1,28 @@
 package commands;
 
+import commands.instances.ApplyCollectionChange;
+import commands.instances.ApplyFullCollection;
+import commands.instances.Disconnect;
+import commands.instances.SetAccount;
+import lombok.Getter;
+
 public class ClientCommandsHandler extends CommandsHandler {
-    public CommandData getDisconnectCommandData() {
-        return this.getCommandsData().get("disconnect_internal");
-    }
+    @Getter
+    private CommandData disconnectCommandData;
+    @Getter
+    private CommandData applyCollectionChangeCommandData;
+    @Getter
+    private CommandData applyFullCollectionCommandData;
+    @Getter
+    private CommandData setAccountCommandData;
 
-    public CommandData getApplyCollectionChangeCommandData() {
-        return this.getCommandsData().get("apply_collection_change");
-    }
-
-    public CommandData getApplyFullCollectionCommandData() {
-        return this.getCommandsData().get("apply_full_collection");
-    }
-
-    public CommandData getSetAccountCommandData() {
-        return this.getCommandsData().get("set_account");
+    @Override
+    public void addCommand(Command command) {
+        CommandData data = command.getData();
+        if (command instanceof Disconnect) disconnectCommandData = data;
+        else if (command instanceof ApplyCollectionChange) applyCollectionChangeCommandData = data;
+        else if (command instanceof ApplyFullCollection) applyFullCollectionCommandData = data;
+        else if (command instanceof SetAccount) setAccountCommandData = data;
+        super.addCommand(command);
     }
 }

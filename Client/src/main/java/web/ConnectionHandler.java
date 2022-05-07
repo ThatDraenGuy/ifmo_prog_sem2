@@ -41,8 +41,7 @@ public class ConnectionHandler {
             } finally {
                 try {
                     Thread.sleep(5000);
-                } catch (InterruptedException ex) {
-                    ex.printStackTrace();
+                } catch (InterruptedException ignored) {
                 }
             }
         }

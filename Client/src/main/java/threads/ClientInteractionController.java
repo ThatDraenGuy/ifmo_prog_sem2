@@ -127,7 +127,6 @@ public class ClientInteractionController extends Thread {
         Map<String, InputtedValue> map = promptComplexArgsMap(collectibleScheme);
         try {
             return new CollectibleModel(collectibleScheme, map);
-//            return commandsExecutor.getTargetClassHandler().getCurrentCollectionBuilder().rawBuild(map);
         } catch (ValueNotValidException e) {
             consoleHandler.errorMessage(e);
             return promptComplexArgs(collectibleScheme);

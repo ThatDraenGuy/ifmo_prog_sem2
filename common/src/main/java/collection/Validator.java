@@ -13,12 +13,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 public class Validator {
-    /**
-     * @param field a field that inputted value will go in
-     * @param value a value to be validated
-     * @return validated and converted value
-     * @throws ValueNotValidException if validation was failed
-     */
+
     public static <T> T convertAndValidate(FieldData fieldData, Class<T> fieldType, String value) throws ValueNotValidException {
         T convertedValue = convert(fieldData.getSimpleName(), fieldType, value);
         return validate(fieldData, convertedValue);
@@ -37,18 +32,6 @@ public class Validator {
         return value;
     }
 
-    public static Map<Field, Object> convertAndValidate(Map<Field, Object> map) throws ValueNotValidException {
-//        Map<Field, Object> newMap = new HashMap<>();
-//        for (Field field : map.keySet()) {
-//            if (!field.isAnnotationPresent(CollectibleField.class))
-//                newMap.put(field, convertAndValidate(field, field.getType(), map.get(field).toString()));
-//            else newMap.put(field, map.get(field));
-//
-//        }
-//        return newMap;
-        return null;
-    }
-
     /**
      * Converts a value from String to the needed type
      *
@@ -58,7 +41,6 @@ public class Validator {
      */
     public static <T> T convert(String fieldName, Class<T> fieldType, String value) throws ValueNotValidException {
         if (value.equals("")) return null;
-
         HashMap<Class<?>, Function<String, ?>> variants = new HashMap<>();
         variants.put(Long.class, Long::parseLong);
         variants.put(long.class, Long::parseLong);

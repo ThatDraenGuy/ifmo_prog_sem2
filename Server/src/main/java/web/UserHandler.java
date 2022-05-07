@@ -23,7 +23,6 @@ import java.util.concurrent.Future;
 public class UserHandler extends Thread {
     private final ServerHandler myServerHandler;
     private final ObjectInputStream in;
-    private final ObjectOutputStream out;
     private final MessageSender messageSender;
     @Getter
     private final Logger logger;
@@ -42,7 +41,7 @@ public class UserHandler extends Thread {
         this.logger = LoggerFactory.getLogger("server." + userChannel.getRemoteAddress());
         this.myServerHandler = serverHandler;
         in = new ObjectInputStream(userChannel.socket().getInputStream());
-        out = new ObjectOutputStream(userChannel.socket().getOutputStream());
+        ObjectOutputStream out = new ObjectOutputStream(userChannel.socket().getOutputStream());
         out.flush();
         messageSender = new MessageSender(out);
         start();
@@ -90,10 +89,6 @@ public class UserHandler extends Thread {
         logger.info("Successfully disconnected user");
     }
 
-    public void forceDisconnect() {
-        sendRequest(commandsHandler.formulateDisconnectRequest(userData, userAccount));
-        closeSocket();
-    }
 
     public Message<Request> readMessage() throws IOException, ClassNotFoundException {
         @SuppressWarnings({"unchecked"}) Message<Request> requestMessage = (Message<Request>) in.readObject();

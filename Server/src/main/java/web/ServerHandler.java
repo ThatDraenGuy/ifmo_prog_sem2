@@ -26,18 +26,16 @@ public class ServerHandler implements Runnable {
     @Getter
     private final ExecutorService requestHandlerService;
     private final Logger logger;
-    final private int port = 2525;
-    //
     private final ServerSocketChannel serverSocketChannel;
 
-    public ServerHandler(ServerCommandsHandler commandsHandler) throws IOException {
+    public ServerHandler(ServerCommandsHandler commandsHandler, String port) throws IOException, NumberFormatException {
         this.commandsHandler = commandsHandler;
         this.users = new ArrayList<>();
         this.requestHandlerService = Executors.newFixedThreadPool(10);
         logger = LoggerFactory.getLogger("server");
         serverSocketChannel = ServerSocketChannel.open();
         serverSocketChannel.configureBlocking(true);
-        serverSocketChannel.socket().bind(new InetSocketAddress(port));
+        serverSocketChannel.socket().bind(new InetSocketAddress(Integer.parseInt(port)));
     }
 
     public void run() {

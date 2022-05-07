@@ -2,7 +2,6 @@ package console;
 
 import exceptions.ValueNotValidException;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class AgreementHandler {

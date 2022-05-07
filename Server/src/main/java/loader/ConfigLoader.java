@@ -21,6 +21,7 @@ public class ConfigLoader {
         defaultProperties.put("db_password", "aboba");
         defaultProperties.put("username", "server");
         defaultProperties.put("password", "temp");
+        defaultProperties.put("port", "2525");
     }
 
     public Properties load() {
@@ -43,6 +44,6 @@ public class ConfigLoader {
 
     public boolean checkProperties(Properties properties) {
         return properties.containsKey("db_link") && properties.containsKey("db_user") && properties.containsKey("db_password") &&
-                properties.containsKey("username") && properties.containsKey("password");
+                properties.containsKey("username") && properties.containsKey("password") && properties.containsKey("port");
     }
 }

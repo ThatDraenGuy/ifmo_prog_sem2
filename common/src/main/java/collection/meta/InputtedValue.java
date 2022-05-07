@@ -28,9 +28,9 @@ public class InputtedValue {
         complex = input instanceof Map<?, ?>;
         if (complex) {
             inputtedValues = new HashMap<>();
-            Map<String, ?> mappedInput = (Map<String, ?>) input;
-            for (String key : mappedInput.keySet()) {
-                inputtedValues.put(key, new InputtedValue(mappedInput.get(key)));
+            Map<?, ?> mappedInput = (Map<?, ?>) input;
+            for (Object key : mappedInput.keySet()) {
+                inputtedValues.put(key.toString(), new InputtedValue(mappedInput.get(key)));
             }
         } else {
             string = input.toString();
