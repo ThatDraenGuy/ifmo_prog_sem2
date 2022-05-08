@@ -17,13 +17,15 @@ import java.util.Optional;
  */
 public class TableChecker {
     private final DatabaseMetaData metaData;
+    private final String schema;
 
-    public TableChecker(DatabaseMetaData metaData) {
+    public TableChecker(DatabaseMetaData metaData, String schema) {
         this.metaData = metaData;
+        this.schema = schema;
     }
 
     public void checkMetaData(CollectibleScheme collectibleScheme) throws SQLException, StorageException {
-        ResultSet tables = metaData.getTables(null, "s336765", null, null);
+        ResultSet tables = metaData.getTables(null, schema, null, null);
         List<String> tablesNames = new ArrayList<>();
         while (tables.next()) {
             String tableName = tables.getString("TABLE_NAME");
@@ -34,7 +36,7 @@ public class TableChecker {
 
     private void checkTable(CollectibleScheme collectibleScheme, List<String> tablesNames) throws StorageException, SQLException {
         String name = collectibleScheme.getSimpleName().toLowerCase();
-        if (!tablesNames.contains(name)) throw new StorageException("Sufficient table not located");
+        if (!tablesNames.contains(name)) throw new StorageException("Sufficient table not located: " + name);
         ResultSet columns = metaData.getColumns(null, "s336765", name, null);
         List<ColumnInfo> columnsInfo = new ArrayList<>();
         while (columns.next()) {

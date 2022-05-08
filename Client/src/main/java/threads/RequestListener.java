@@ -25,14 +25,20 @@ public class RequestListener implements Runnable {
         };
         while (true) {
             consoleHandler.debugMessage("requestListener started");
+            threadHandler.getLock().lock();
             try {
-                synchronized (threadHandler.getRequestListenerLock()) {
-                    threadHandler.getRequestListenerLock().wait();
-                    Thread executionThread = new Thread(commandsExecutor, "executionThread");
-                    executionThread.start();
-                }
+                threadHandler.getRequestSent().await();
+                Thread executionThread = new Thread(commandsExecutor, "executionThread");
+                executionThread.start();
+//                synchronized (threadHandler.getRequestSent()) {
+//                    threadHandler.getRequestSent().wait();
+//                    Thread executionThread = new Thread(commandsExecutor, "executionThread");
+//                    executionThread.start();
+//                }
             } catch (InterruptedException e) {
                 return;
+            } finally {
+                threadHandler.getLock().unlock();
             }
         }
     }

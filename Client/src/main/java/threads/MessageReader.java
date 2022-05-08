@@ -10,6 +10,9 @@ import web.ConnectionHandler;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.SocketException;
+import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 public class MessageReader implements Runnable {
     private final ConnectionHandler connectionHandler;
@@ -39,17 +42,23 @@ public class MessageReader implements Runnable {
                     @SuppressWarnings({"unchecked"})
                     Message<Request> requestMessage = (Message<Request>) message;
                     freshRequestMessage = requestMessage;
-                    synchronized (threadHandler.getRequestListenerLock()) {
-                        threadHandler.getRequestListenerLock().notify();
-                    }
+                    threadHandler.getLock().lock();
+                    threadHandler.getRequestSent().signal();
+                    threadHandler.getLock().unlock();
+//                    synchronized (threadHandler.getRequestSent()) {
+//                        threadHandler.getRequestSent().notify();
+//                    }
                 } else {
                     @SuppressWarnings({"unchecked"})
 
                     Message<Response> responseMessage = (Message<Response>) message;
                     freshResponseMessage = responseMessage;
-                    synchronized (threadHandler.getResponseListenerLock()) {
-                        threadHandler.getResponseListenerLock().notify();
-                    }
+                    threadHandler.getLock().lock();
+                    threadHandler.getResponseSent().signal();
+                    threadHandler.getLock().unlock();
+//                    synchronized (threadHandler.getResponseSent()) {
+//                        threadHandler.getResponseSent().notify();
+//                    }
                 }
             } catch (EOFException e) {
                 if (!connectionHandler.isConnectionClosed()) connectionHandler.handleLostConnection();

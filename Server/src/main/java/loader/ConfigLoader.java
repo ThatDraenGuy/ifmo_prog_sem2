@@ -17,6 +17,7 @@ public class ConfigLoader {
         this.logger = LoggerFactory.getLogger("loader.configLoader");
         this.defaultProperties = new Properties();
         defaultProperties.put("db_link", "localhost:5432/progdb");
+        defaultProperties.put("db_schema", "public");
         defaultProperties.put("db_user", "server");
         defaultProperties.put("db_password", "aboba");
         defaultProperties.put("username", "server");
@@ -44,6 +45,7 @@ public class ConfigLoader {
 
     public boolean checkProperties(Properties properties) {
         return properties.containsKey("db_link") && properties.containsKey("db_user") && properties.containsKey("db_password") &&
-                properties.containsKey("username") && properties.containsKey("password") && properties.containsKey("port");
+                properties.containsKey("username") && properties.containsKey("password") && properties.containsKey("port") &&
+                properties.containsKey("db_schema");
     }
 }

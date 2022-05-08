@@ -32,10 +32,11 @@ public class DatabaseHandler implements StorageHandler {
         String user = properties.getProperty("db_user");
         String password = properties.getProperty("db_password");
         logger.info("Attempting to establish connection with database...");
+        //ssh -L <порт>:pg:5432 s<ISU>@se.ifmo.ru -p 2222
         connection = DriverManager.getConnection("jdbc:postgresql://" + link, user, password);
         connection.setAutoCommit(false);
         logger.info("Successfully established connection: " + link);
-        tableChecker = new TableChecker(connection.getMetaData());
+        tableChecker = new TableChecker(connection.getMetaData(), properties.getProperty("db_schema"));
     }
 
     private void handleSQLException(SQLException e) throws StorageException {

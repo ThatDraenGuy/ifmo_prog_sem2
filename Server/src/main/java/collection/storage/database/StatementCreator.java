@@ -121,11 +121,11 @@ public class StatementCreator {
     private void generateInit() throws SQLException {
         StringBuilder builder = new StringBuilder();
         builder.append("""
-                DROP SEQUENCE if exists collection_id;
+                DROP SEQUENCE if exists collection_id CASCADE;
                 CREATE SEQUENCE collection_id;
-                DROP TYPE if exists accessLevel;
+                DROP TYPE if exists accessLevel CASCADE;
                 CREATE TYPE accessLevel AS ENUM ('DISCONNECTED', 'GUEST', 'USER', 'INTERNAL', 'DEV');
-                DROP TABLE if exists accounts;
+                DROP TABLE if exists accounts CASCADE;
                 CREATE TABLE accounts (
                     username VARCHAR(99) PRIMARY KEY,
                     passwordHash CHAR(128) NOT NULL,
@@ -143,7 +143,7 @@ public class StatementCreator {
     }
 
     private void genInit(CollectibleScheme collectibleScheme, StringBuilder builder) {
-        builder.append("DROP TABLE if exists ").append(collectibleScheme.getSimpleName()).append(";\n");
+        builder.append("DROP TABLE if exists ").append(collectibleScheme.getSimpleName()).append(" CASCADE;\n");
         for (FieldData fieldData : collectibleScheme.getFieldsData().values()) {
             if (fieldData.isCollectible()) genInit(fieldData.getCollectibleScheme(), builder);
             else if (fieldData.getType().isEnum()) genEnumInit(fieldData.getType(), builder);
@@ -168,7 +168,7 @@ public class StatementCreator {
     }
 
     private <T> void genEnumInit(Class<T> target, StringBuilder builder) {
-        builder.append("DROP TYPE if exists ").append(target.getSimpleName()).append(";\n");
+        builder.append("DROP TYPE if exists CASCADE,").append(target.getSimpleName()).append(" CASCADE;\n");
         builder.append("CREATE TYPE ").append(target.getSimpleName()).append(" AS ENUM (");
         for (T value : target.getEnumConstants()) {
             builder.append("'").append(value).append("',");
