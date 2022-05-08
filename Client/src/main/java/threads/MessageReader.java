@@ -1,7 +1,8 @@
 package threads;
 
+import commands.ExecutionController;
 import console.ConsoleHandler;
-import lombok.Getter;
+import exceptions.CommandArgsAmountException;
 import message.Message;
 import message.Request;
 import message.Response;
@@ -10,25 +11,21 @@ import web.ConnectionHandler;
 import java.io.EOFException;
 import java.io.IOException;
 import java.net.SocketException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
+import java.util.concurrent.*;
 
 public class MessageReader implements Runnable {
     private final ConnectionHandler connectionHandler;
     private final ConsoleHandler consoleHandler;
-    @Getter
-    private Message<Request> freshRequestMessage;
-    @Getter
-    private Message<Response> freshResponseMessage;
-    private final ThreadHandler threadHandler;
+    private final ExecutionController executionController;
+    private final ExecutorService executor;
+    private final Exchanger<Response> responseExchanger;
 
-    public MessageReader(ThreadHandler threadHandler, ConnectionHandler connectionHandler, ConsoleHandler consoleHandler) {
-        this.threadHandler = threadHandler;
+    public MessageReader(Exchanger<Response> exchanger, ConnectionHandler connectionHandler, ExecutionController executionController, ConsoleHandler consoleHandler) {
         this.connectionHandler = connectionHandler;
         this.consoleHandler = consoleHandler;
-        freshRequestMessage = null;
-        freshResponseMessage = null;
+        this.executionController = executionController;
+        this.responseExchanger = exchanger;
+        executor = Executors.newSingleThreadExecutor();
     }
 
     @Override
@@ -38,32 +35,26 @@ public class MessageReader implements Runnable {
             try {
                 Message<?> message = connectionHandler.readMessage();
                 consoleHandler.debugMessage("I got a message!");
-                if (message.getData() instanceof Request) {
-                    @SuppressWarnings({"unchecked"})
-                    Message<Request> requestMessage = (Message<Request>) message;
-                    freshRequestMessage = requestMessage;
-                    threadHandler.getLock().lock();
-                    threadHandler.getRequestSent().signal();
-                    threadHandler.getLock().unlock();
-//                    synchronized (threadHandler.getRequestSent()) {
-//                        threadHandler.getRequestSent().notify();
-//                    }
-                } else {
-                    @SuppressWarnings({"unchecked"})
-
-                    Message<Response> responseMessage = (Message<Response>) message;
-                    freshResponseMessage = responseMessage;
-                    threadHandler.getLock().lock();
-                    threadHandler.getResponseSent().signal();
-                    threadHandler.getLock().unlock();
-//                    synchronized (threadHandler.getResponseSent()) {
-//                        threadHandler.getResponseSent().notify();
-//                    }
+                if (message.getData() instanceof Request request) {
+                    final Runnable commandsExecutor = () -> {
+                        try {
+                            executionController.executeCommand(request);
+                        } catch (CommandArgsAmountException ignored) {
+                        }
+                    };
+                    executor.execute(commandsExecutor);
+                }
+                if (message.getData() instanceof Response response) {
+                    try {
+                        responseExchanger.exchange(response, 50, TimeUnit.MILLISECONDS);
+                    } catch (TimeoutException | InterruptedException ignored) {
+                    }
                 }
             } catch (EOFException e) {
                 if (!connectionHandler.isConnectionClosed()) connectionHandler.handleLostConnection();
-            } catch (SocketException ignored) {
+            } catch (SocketException e) {
                 consoleHandler.message("(connection terminated)");
+                executor.shutdown();
             } catch (IOException | ClassNotFoundException e) {
                 consoleHandler.errorMessage(e);
             }

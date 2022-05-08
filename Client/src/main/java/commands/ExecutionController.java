@@ -3,6 +3,7 @@ package commands;
 
 import collection.CollectionClassesHandler;
 import security.CurrentAccount;
+import threads.MessageSender;
 import threads.ThreadHandler;
 import console.ConsoleHandler;
 import exceptions.CommandArgsAmountException;
@@ -16,8 +17,7 @@ import java.util.HashMap;
 public class ExecutionController {
     @Getter
     private CommandAccessLevel userAccessLevel;
-    @Setter
-    private ThreadHandler threadHandler;
+    private final MessageSender messageSender;
     final private ClientCommandsHandler clientCommandsHandler;
     final private ConsoleHandler consoleHandler;
     @Getter
@@ -32,8 +32,9 @@ public class ExecutionController {
     private final LimitedCollection<CommandData> history;
     private UserData userData;
 
-    public ExecutionController(ClientCommandsHandler clientCommandsHandler, ConsoleHandler consoleHandler, CollectionClassesHandler targetClassHandler) {
+    public ExecutionController(ClientCommandsHandler clientCommandsHandler, ConsoleHandler consoleHandler, CollectionClassesHandler targetClassHandler, MessageSender messageSender) {
         this.clientCommandsHandler = clientCommandsHandler;
+        this.messageSender = messageSender;
         this.consoleHandler = consoleHandler;
         this.accessibleClientCommands = new HashMap<>();
         this.accessibleServerCommands = new HashMap<>();
@@ -85,7 +86,7 @@ public class ExecutionController {
         Response response;
         consoleHandler.debugMessage("executing command: " + request.getCommandData().getName() + " " + request.getExecutionPayload().getAccount() + " " + CurrentAccount.getAccount());
         if (isClientCommand(request)) response = clientCommandsHandler.executeCommand(request);
-        else response = threadHandler.sendRequest(request);
+        else response = messageSender.sendRequest(request);
         return handleResponse(response);
     }
 
