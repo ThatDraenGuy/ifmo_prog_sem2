@@ -27,7 +27,7 @@ public class CollectionHistoryHandler<T extends MainCollectible<T>> {
     public void saveChange(ListAndId<T> newCollection) {
         Collection<T> addedElements = newCollection.getList().stream().filter(x -> !currentCollection.getList().contains(x)).collect(Collectors.toCollection(ArrayList::new));
         Collection<T> removedElements = currentCollection.getList().stream().filter(x -> !newCollection.getList().contains(x)).collect(Collectors.toCollection(ArrayList::new));
-        CollectionChange<T> change = new CollectionChange<>(addedElements, removedElements, newCollection.getId(), targetClass);
+        CollectionChange<T> change = new CollectionChange<>(addedElements, removedElements, newCollection.getId().get(), targetClass);
         changeHistory.add(change);
         currentCollection.getList().clear();
         currentCollection.getList().addAll(newCollection.getList());
@@ -42,11 +42,11 @@ public class CollectionHistoryHandler<T extends MainCollectible<T>> {
             userHandler.sendFullCollectionChangeRequest(currentCollection);
             return;
         }
-        long lastSupportedId = currentCollection.getId() - changeHistory.size();
+        long lastSupportedId = currentCollection.getId().get() - changeHistory.size();
         if (userCollectionId < lastSupportedId) {
             userHandler.sendFullCollectionChangeRequest(currentCollection);
         } else {
-            long changesNeeded = currentCollection.getId() - userCollectionId;
+            long changesNeeded = currentCollection.getId().get() - userCollectionId;
             long changesSkipped = changeHistory.size() - changesNeeded;
             Queue<CollectionChange<? extends MainCollectible<?>>> changes = changeHistory.stream().skip(changesSkipped).collect(Collectors.toCollection(PriorityQueue::new));
             userHandler.sendCollectionChangeRequest(changes);

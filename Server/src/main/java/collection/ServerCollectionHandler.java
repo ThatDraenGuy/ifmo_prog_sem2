@@ -112,13 +112,13 @@ public class ServerCollectionHandler<T extends MainCollectible<T>> extends Colle
     }
 
     protected void handleCollectionChange() {
-        collection.setId(storageHandler.getCollectionId());
+        collection.getId().incrementAndGet();
         historyHandler.saveChange(collection);
         logger.info("Collection was changed");
     }
 
 
     public synchronized boolean isIdBehind(long id) {
-        return collection.getId() - id > 0;
+        return collection.getId().get() - id > 0;
     }
 }

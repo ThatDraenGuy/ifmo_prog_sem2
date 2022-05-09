@@ -60,6 +60,6 @@ public class CollectionHandler<T extends MainCollectible<?>> {
     }
 
     public long getId() {
-        return collection.getId();
+        return collection.getId().get();
     }
 }

@@ -6,6 +6,7 @@ import lombok.Setter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Just an object to store list & id. Name is self-explanatory
@@ -13,7 +14,7 @@ import java.util.List;
 public class ListAndId<E> implements Serializable {
     @Getter
     @Setter
-    private volatile long id;
+    private AtomicLong id;
 
     private final List<E> list;
     @Getter
@@ -25,7 +26,7 @@ public class ListAndId<E> implements Serializable {
     }
 
     public ListAndId(long id, List<E> list, Class<E> targetClass) {
-        this.id = id;
+        this.id = new AtomicLong(id);
         this.list = list;
         this.targetClass = targetClass;
     }

@@ -18,8 +18,8 @@ public class ClientCollectionHandler<T extends MainCollectible<?>> extends Colle
 
     public void applyChange(CollectionChange<? extends MainCollectible<?>> collectionChange) throws CollectionVersionIsBehindException, IncorrectCollectibleTypeException {
         final long newCollectionId = collectionChange.getNewCollectionId();
-        if (!(newCollectionId - collection.getId() == 1)) {
-            if (newCollectionId != collection.getId())
+        if (!(newCollectionId - collection.getId().get() == 1)) {
+            if (newCollectionId != collection.getId().get())
                 throw new CollectionVersionIsBehindException("Local collection is behind");
             return;
         }

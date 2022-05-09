@@ -25,7 +25,7 @@ public class CollectionChange<T extends MainCollectible<?>> implements Serializa
     public void apply(ListAndId<T> collection) {
         collection.getList().addAll(addedElements);
         collection.getList().removeAll(removedElements);
-        collection.setId(newCollectionId);
+        collection.getId().set(newCollectionId);
     }
 
     @Override
