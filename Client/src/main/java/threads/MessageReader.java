@@ -3,6 +3,7 @@ package threads;
 import commands.ExecutionController;
 import console.ConsoleHandler;
 import exceptions.CommandArgsAmountException;
+import exceptions.ConnectionException;
 import message.Message;
 import message.Request;
 import message.Response;
@@ -39,7 +40,7 @@ public class MessageReader implements Runnable {
                     final Runnable commandsExecutor = () -> {
                         try {
                             executionController.executeCommand(request);
-                        } catch (CommandArgsAmountException ignored) {
+                        } catch (CommandArgsAmountException | ConnectionException ignored) {
                         }
                     };
                     executor.execute(commandsExecutor);

@@ -29,7 +29,6 @@ public class UserHandler extends Thread {
     private final ServerCommandsHandler commandsHandler;
     private UserData userData;
     private Account userAccount;
-    //
     private final SocketChannel userChannel;
     private boolean disconnected;
 

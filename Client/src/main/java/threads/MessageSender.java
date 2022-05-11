@@ -2,6 +2,7 @@ package threads;
 
 import commands.ActionResult;
 import console.ConsoleHandler;
+import exceptions.ConnectionException;
 import message.CommandResponse;
 import message.Request;
 import message.Response;
@@ -20,7 +21,7 @@ public class MessageSender {
         this.responseExchanger = responseExchanger;
     }
 
-    public synchronized Response sendRequest(Request request) {
+    public synchronized Response sendRequest(Request request) throws ConnectionException {
         consoleHandler.debugMessage("sending request...");
         connectionHandler.send(request);
         try {

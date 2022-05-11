@@ -2,6 +2,7 @@ package commands;
 
 
 import collection.CollectionClassesHandler;
+import exceptions.ConnectionException;
 import security.CurrentAccount;
 import threads.MessageSender;
 import threads.ThreadHandler;
@@ -79,7 +80,7 @@ public class ExecutionController {
         return isClientCommand(request.getCommandData().getName());
     }
 
-    public Response executeCommand(Request request) throws CommandArgsAmountException {
+    public Response executeCommand(Request request) throws CommandArgsAmountException, ConnectionException {
         handleRequest(request);
         if (!request.getCommandData().getAccessLevel().equals(CommandAccessLevel.INTERNAL))
             history.add(request.getCommandData());

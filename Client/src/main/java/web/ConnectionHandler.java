@@ -63,7 +63,9 @@ public class ConnectionHandler {
         }
     }
 
-    public void send(Request data) {
+    public void send(Request data) throws ConnectionException {
+        if (isConnectionClosed())
+            throw new ConnectionException("Sever forcefully ended connection. Reconnection needed");
         try {
             Message<Request> message = new Message<>(data);
             consoleHandler.debugMessage("I'm gonna send it");

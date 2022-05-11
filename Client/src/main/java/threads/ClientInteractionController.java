@@ -7,10 +7,7 @@ import collection.meta.FieldData;
 import collection.meta.InputtedValue;
 import commands.*;
 import console.ConsoleHandler;
-import exceptions.CommandArgsAmountException;
-import exceptions.CommandExecutionException;
-import exceptions.CommandNonExistentException;
-import exceptions.ValueNotValidException;
+import exceptions.*;
 import lombok.Setter;
 import message.Request;
 import message.Response;
@@ -47,7 +44,7 @@ public class ClientInteractionController extends Thread {
                 Request cmdRequest = parseInput(input);
                 Response response = commandsExecutor.executeCommand(cmdRequest);
                 handleResponse(response);
-            } catch (CommandNonExistentException | CommandArgsAmountException | CommandExecutionException e) {
+            } catch (CommandNonExistentException | CommandArgsAmountException | CommandExecutionException | ConnectionException e) {
                 consoleHandler.errorMessage(e);
             } catch (NoSuchElementException e) {
                 consoleHandler.errorMessage(new NoSuchElementException("InputStream ran out of lines while the program was working"));
