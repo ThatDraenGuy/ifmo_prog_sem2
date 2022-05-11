@@ -48,7 +48,7 @@ public class UserHandler extends Thread {
     }
 
     @Override
-    public synchronized void run() {
+    public void run() {
         sendRequest(commandsHandler.formulateFetchServerDataRequest(userAccount));
         while (userChannel.isOpen()) {
             try {
@@ -59,7 +59,6 @@ public class UserHandler extends Thread {
             } catch (EOFException e) {
                 if (!disconnected) logger.warn("Lost connection with user");
                 silentDisconnect();
-//                return;
             } catch (IOException | ClassNotFoundException e) {
                 if (userChannel.isOpen()) {
                     logger.error(e.toString());
@@ -68,6 +67,7 @@ public class UserHandler extends Thread {
             }
         }
         messageSender.setStopped(true);
+        messageSender.interrupt();
         logger.info("This thread ended its duty");
     }
 

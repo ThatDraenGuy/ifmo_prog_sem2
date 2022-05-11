@@ -39,6 +39,7 @@ public class ThreadHandler {
 
     public void stop() {
         connectionHandler.disconnect();
+        messageReader.shutdown();
         clientInteractionController.setExitQueried(true);
     }
 }

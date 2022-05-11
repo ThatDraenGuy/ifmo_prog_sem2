@@ -54,10 +54,14 @@ public class MessageReader implements Runnable {
                 if (!connectionHandler.isConnectionClosed()) connectionHandler.handleLostConnection();
             } catch (SocketException e) {
                 consoleHandler.message("(connection terminated)");
-                executor.shutdown();
+//                executor.shutdown();
             } catch (IOException | ClassNotFoundException e) {
                 consoleHandler.errorMessage(e);
             }
         }
+    }
+
+    public void shutdown() {
+        executor.shutdown();
     }
 }

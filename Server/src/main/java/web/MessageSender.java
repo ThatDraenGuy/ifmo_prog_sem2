@@ -11,11 +11,13 @@ import java.io.ObjectOutputStream;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import java.util.Queue;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 
 public class MessageSender extends Thread {
     private final ObjectOutputStream out;
     private final Logger logger;
-    private final Queue<Message<?>> messages;
+    private final BlockingQueue<Message<?>> messages;
     @Getter
     @Setter
     private boolean stopped;
@@ -23,7 +25,7 @@ public class MessageSender extends Thread {
 
     public MessageSender(ObjectOutputStream out) {
         this.out = out;
-        this.messages = new LinkedList<>();
+        this.messages = new ArrayBlockingQueue<>(5);
         this.stopped = false;
         this.logger = LoggerFactory.getLogger("server.messageSender");
         start();
@@ -31,7 +33,7 @@ public class MessageSender extends Thread {
 
 
     public void sendMessage(Message<?> message) {
-        messages.add(message);
+        messages.offer(message);
         logger.debug("added new message to queue");
     }
 
@@ -40,10 +42,10 @@ public class MessageSender extends Thread {
     public void run() {
         while (!stopped) {
             try {
-                Message<?> message = messages.remove();
+                Message<?> message = messages.take();
                 out.writeObject(message);
                 logger.debug("Successfully sent message to user");
-            } catch (NoSuchElementException ignored) {
+            } catch (InterruptedException ignored) {
             } catch (IOException e) {
                 logger.error(e.getMessage());
             }
