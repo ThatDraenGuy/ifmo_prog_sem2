@@ -56,4 +56,9 @@ public class DragonFactory implements MainCollectibleFactory<Dragon> {
         String owner = getValue("owner", collectibleModel, String.class);
         return new DragonCave(depth, creationDate, owner);
     }
+
+    public CollectibleModel getModel(Dragon dragon) {
+        return null;
+        //TODO
+    }
 }

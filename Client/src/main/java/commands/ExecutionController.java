@@ -2,6 +2,7 @@ package commands;
 
 
 import collection.CollectionClassesHandler;
+import exceptions.CommandNonExistentException;
 import exceptions.ConnectionException;
 import security.CurrentAccount;
 import threads.MessageSender;
@@ -67,6 +68,17 @@ public class ExecutionController {
         }
     }
 
+    public CommandData getCommandData(String name) throws CommandNonExistentException {
+        if (isAccessibleCommand(name)) {
+            if (isClientCommand(name)) {
+                return accessibleClientCommands.get(name);
+            } else {
+                return accessibleServerCommands.get(name);
+            }
+        } else {
+            throw new CommandNonExistentException(name);
+        }
+    }
 
     public boolean isAccessibleCommand(String name) {
         return (accessibleServerCommands.containsKey(name) || accessibleClientCommands.containsKey(name));

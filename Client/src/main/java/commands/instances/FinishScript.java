@@ -1,14 +1,14 @@
 package commands.instances;
 
 import commands.*;
-import threads.ClientInteractionController;
+import threads.ConsoleInteractionController;
 
 public class FinishScript extends AbstractCommand {
-    private final ClientInteractionController clientInteractionController;
+    private final ConsoleInteractionController clientInteractionController;
 
-    public FinishScript(ClientInteractionController clientInteractionController) {
+    public FinishScript(ConsoleInteractionController consoleInteractionController) {
         super("finish_script", "command needed for scripts", new CommandArgsInfo(CommandArgsType.NO_ARGS), CommandAccessLevel.INTERNAL);
-        this.clientInteractionController = clientInteractionController;
+        this.clientInteractionController = consoleInteractionController;
     }
 
     public ActionResult action(ExecutionPayload executionPayload) {

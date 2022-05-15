@@ -31,7 +31,7 @@ public class Login extends AbstractCommand {
                 return new ActionResult(true, "Successfully logged into account");
             } else return new ActionResult(false, "An exception occurred");
         } catch (Exception e) {
-            return new ActionResult(false, e.toString());
+            return new ActionResult(false, e.getMessage());
         }
     }
 }

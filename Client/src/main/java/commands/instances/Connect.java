@@ -26,7 +26,7 @@ public class Connect extends AbstractCommand {
             String address = args.getArgs();
             String[] splitStr = address.split(":");
             if (splitStr.length != 2)
-                return new ActionResult(false, "Please input address in the form of host:port (e.g. 127.0.0.1:25565)");
+                return new ActionResult(false, "Invalid input");
             String host = splitStr[0];
             int port = Integer.parseInt(splitStr[1]);
             connectionHandler.connect(host, port);

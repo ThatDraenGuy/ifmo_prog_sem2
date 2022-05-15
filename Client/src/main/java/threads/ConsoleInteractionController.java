@@ -16,13 +16,13 @@ import message.Response;
 import java.lang.reflect.Field;
 import java.util.*;
 
-public class ClientInteractionController extends Thread {
+public class ConsoleInteractionController extends Thread {
     private final ExecutionController commandsExecutor;
     private ConsoleHandler consoleHandler;
     @Setter
     private boolean exitQueried;
 
-    public ClientInteractionController(ExecutionController commandsExecutor, ConsoleHandler consoleHandler) {
+    public ConsoleInteractionController(ExecutionController commandsExecutor, ConsoleHandler consoleHandler) {
         this.commandsExecutor = commandsExecutor;
         this.consoleHandler = consoleHandler;
     }
@@ -131,7 +131,6 @@ public class ClientInteractionController extends Thread {
     }
 
     private Map<String, InputtedValue> promptComplexArgsMap(CollectibleScheme collectibleScheme) {
-//        List<Field> fields = commandsExecutor.getTargetClassHandler().getCurrentCollectionBuilder().getClassFields(targetClass);
         Map<String, InputtedValue> map = new HashMap<>();
         for (String key : collectibleScheme.getFieldsData().keySet()) {
             FieldData fieldData = collectibleScheme.getFieldsData().get(key);

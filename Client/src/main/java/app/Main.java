@@ -1,10 +1,13 @@
+package app;
+
 import collection.CollectionClassesHandler;
 import commands.ClientCommandsHandler;
 import commands.CommandAccessLevel;
+import commands.Requester;
 import message.Response;
 import security.Account;
 import security.CurrentAccount;
-import threads.ClientInteractionController;
+import threads.ConsoleInteractionController;
 import threads.MessageReader;
 import threads.MessageSender;
 import web.ConnectionHandler;
@@ -13,20 +16,20 @@ import commands.ExecutionController;
 import commands.instances.*;
 import console.ConsoleHandler;
 
-import java.io.IOException;
+import java.io.*;
 import java.util.concurrent.Exchanger;
 
 /**
- * A Main class, only consists of main() method.
+ * An app.Main class, only consists of main() method.
  */
 public class Main {
     /**
      *
      */
     public static void main(String... args) {
-        ConsoleHandler consoleHandler = new ConsoleHandler(System.in, System.out, System.err);
-        CurrentAccount.setAccount(new Account("guest", "guest", CommandAccessLevel.GUEST));
         try {
+            ConsoleHandler consoleHandler = new ConsoleHandler(System.in, System.out, System.err);
+            CurrentAccount.setAccount(new Account("guest", "guest", CommandAccessLevel.GUEST));
             ConnectionHandler connectionHandler = new ConnectionHandler(consoleHandler);
             ClientCommandsHandler clientCommandsHandler = new ClientCommandsHandler();
             CollectionClassesHandler collectionClassesHandler = new CollectionClassesHandler(consoleHandler);
@@ -34,7 +37,7 @@ public class Main {
             MessageSender messageSender = new MessageSender(connectionHandler, responseExchanger, consoleHandler);
             ExecutionController executionController = new ExecutionController(clientCommandsHandler, consoleHandler, collectionClassesHandler, messageSender);
             MessageReader messageReader = new MessageReader(responseExchanger, connectionHandler, executionController, consoleHandler);
-            ClientInteractionController app = new ClientInteractionController(executionController, consoleHandler);
+            ConsoleInteractionController app = new ConsoleInteractionController(executionController, consoleHandler);
             ThreadHandler threadHandler = new ThreadHandler(connectionHandler, messageReader, app, consoleHandler);
             clientCommandsHandler.addCommands(
                     new Exit(consoleHandler, threadHandler),
@@ -54,8 +57,13 @@ public class Main {
                     new FilterByType(collectionClassesHandler),
                     new FilterGreaterThanAge(collectionClassesHandler));
             threadHandler.start();
+            Controllers.setExecutionController(executionController);
+            Controllers.setInteractionController(app);
+            Controllers.setRequester(new Requester(executionController));
         } catch (IOException | ClassNotFoundException e) {
-            consoleHandler.errorMessage(e);
+            e.printStackTrace();
         }
+        App app = new App();
+        app.main();
     }
 }

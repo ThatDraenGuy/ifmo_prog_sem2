@@ -6,4 +6,5 @@ import exceptions.IncorrectCollectibleTypeException;
 public interface CollectibleFactory<T extends Collectible> {
     T getObject(CollectibleModel collectibleModel) throws IncorrectCollectibleTypeException;
 
+    CollectibleModel getModel(T object);
 }
