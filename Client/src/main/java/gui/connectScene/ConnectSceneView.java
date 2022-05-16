@@ -1,11 +1,12 @@
 package gui.connectScene;
 
+import gui.AbstractView;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
 
-public class ConnectSceneView {
+public class ConnectSceneView extends AbstractView {
     @FXML
     private TextField address;
     @FXML
@@ -19,20 +20,8 @@ public class ConnectSceneView {
 
 
     public void initialize() {
+        defaultInitialize(progress.visibleProperty(), message.textProperty(), viewModel);
         viewModel.getAddress().bind(address.textProperty());
-        message.textProperty().bind(viewModel.getMessage());
-//        progress.progressProperty().bind(viewModel.getConnectTaskProgressProperty());
-        progress.visibleProperty().bind(viewModel.isConnectTaskRunning());
-        viewModel.getErrorMessage().addListener(
-                (observableValue, oldValue, newValue) -> {
-                    if (newValue != null && !newValue.isEmpty()) {
-                        Alert alert = new Alert(
-                                Alert.AlertType.ERROR, newValue
-                        );
-                        alert.showAndWait();
-                    }
-                }
-        );
     }
 
     @FXML

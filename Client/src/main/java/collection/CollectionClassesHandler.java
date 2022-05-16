@@ -5,12 +5,14 @@ import collection.history.CollectionChange;
 import console.ConsoleHandler;
 import exceptions.CollectionVersionIsBehindException;
 import exceptions.IncorrectCollectibleTypeException;
+import gui.Notifications;
 import lombok.Getter;
 import utility.ListAndId;
 
 import java.util.Queue;
 
 public class CollectionClassesHandler {
+    public final static String COLLECTIBLE_SCHEME_CHANGE_EVENT = "COLLECTIBLE_SCHEME_CHANGE_EVENT";
     @Getter
     volatile private ClientCollectionHandler<?> currentCollectionHandler;
     @Getter
@@ -26,6 +28,7 @@ public class CollectionClassesHandler {
     private <T extends MainCollectible<?>> void createCollection(Class<T> targetClass) {
         currentCollectionHandler = new ClientCollectionHandler<>(targetClass);
         currentClass = targetClass;
+        Notifications.publish(COLLECTIBLE_SCHEME_CHANGE_EVENT);
         consoleHandler.debugMessage("created empty collection: " + currentCollectionHandler);
     }
 
@@ -37,6 +40,7 @@ public class CollectionClassesHandler {
     private <T extends MainCollectible<?>> void createCollection(Class<T> targetClass, ListAndId<T> listAndId) {
         currentCollectionHandler = new ClientCollectionHandler<>(targetClass, listAndId);
         currentClass = targetClass;
+        Notifications.publish(COLLECTIBLE_SCHEME_CHANGE_EVENT);
         consoleHandler.debugMessage("created collection from server collection: " + currentCollectionHandler);
     }
 

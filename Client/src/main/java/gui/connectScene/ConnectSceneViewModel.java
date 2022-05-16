@@ -1,30 +1,22 @@
 package gui.connectScene;
 
 import app.Controllers;
+import gui.AbstractViewModel;
 import gui.Notifications;
 import javafx.beans.property.*;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import lombok.Getter;
 
-public class ConnectSceneViewModel {
+public class ConnectSceneViewModel extends AbstractViewModel {
     private final ConnectSceneModel model = new ConnectSceneModel();
     @Getter
-    private final StringProperty address;
-    @Getter
-    private final BooleanProperty success;
-    @Getter
-    private final StringProperty message;
-    @Getter
-    private final StringProperty errorMessage;
+    private final StringProperty address = new SimpleStringProperty("");
 
 
     public ConnectSceneViewModel() {
-        address = new SimpleStringProperty("");
-        success = new SimpleBooleanProperty();
-        message = new SimpleStringProperty("");
-        errorMessage = new SimpleStringProperty("");
-        Notifications.subscribe(Notifications.EVENT_MODEL_UPDATE, this, this::update);
+        Notifications.subscribe(Notifications.EVENT_MODEL_UPDATE, this, this::connectEvent);
+        Notifications.subscribe("connect", this, this::connectEvent);
     }
 
 
@@ -52,17 +44,10 @@ public class ConnectSceneViewModel {
     };
 
 
-    private void update(String event) {
+    private void connectEvent(String event) {
         model.getConnectResult().ifPresent((actionResult -> {
-            success.setValue(actionResult.isSuccess());
-            if (!success.get()) {
-                errorMessage.setValue(actionResult.getMessage());
-                message.setValue("");
-                errorMessage.setValue("");
-            } else {
-                message.setValue(actionResult.getMessage());
-                Controllers.getSceneController().switchToLoginScene();
-            }
+            handleActionResult(actionResult);
+            if (success.get()) Controllers.getSceneController().switchToLoginScene();
         }));
     }
 
@@ -70,7 +55,7 @@ public class ConnectSceneViewModel {
         return connectTask.progressProperty();
     }
 
-    public ReadOnlyBooleanProperty isConnectTaskRunning() {
+    public ReadOnlyBooleanProperty isTaskRunning() {
         return connectTask.runningProperty();
     }
 }

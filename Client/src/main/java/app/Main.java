@@ -56,14 +56,12 @@ public class Main {
                     new CountByColor(collectionClassesHandler),
                     new FilterByType(collectionClassesHandler),
                     new FilterGreaterThanAge(collectionClassesHandler));
-            threadHandler.start();
-            Controllers.setExecutionController(executionController);
-            Controllers.setInteractionController(app);
+            executionController.initialize();
+            Controllers.setThreadHandler(threadHandler);
             Controllers.setRequester(new Requester(executionController));
+            threadHandler.start();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
         }
-        App app = new App();
-        app.main();
     }
 }

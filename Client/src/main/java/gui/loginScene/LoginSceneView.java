@@ -1,10 +1,12 @@
 package gui.loginScene;
 
+import commands.AbstractCommand;
+import gui.AbstractView;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
-public class LoginSceneView {
+public class LoginSceneView extends AbstractView {
     @FXML
     private TextField loginField;
     @FXML
@@ -14,28 +16,17 @@ public class LoginSceneView {
     @FXML
     private Hyperlink register;
     @FXML
-    private ProgressIndicator progress;
+    protected ProgressIndicator progress;
     @FXML
-    private Label message;
+    protected Label message;
 
     private final LoginSceneViewModel viewModel = new LoginSceneViewModel();
 
 
     public void initialize() {
+        defaultInitialize(progress.visibleProperty(), message.textProperty(), viewModel);
         viewModel.getUsername().bind(loginField.textProperty());
         viewModel.getPassword().bind(passwordField.textProperty());
-        progress.visibleProperty().bind(viewModel.isTaskRunning());
-        message.textProperty().bind(viewModel.getMessage());
-        viewModel.getErrorMessage().addListener(
-                (observableValue, oldValue, newValue) -> {
-                    if (newValue != null && !newValue.isEmpty()) {
-                        Alert alert = new Alert(
-                                Alert.AlertType.ERROR, newValue
-                        );
-                        alert.showAndWait();
-                    }
-                }
-        );
     }
 
 

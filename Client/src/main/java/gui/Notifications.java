@@ -8,9 +8,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Consumer;
-
+/**
+ * A Notifications class - mediator for observer pattern. Subscribers use a String as an event identifier they want to subscribe to.
+ * Publisher publishes event by specifying the event identifier.
+ * That way subscribers and publishers don't need to store each other's references and directly contact each other
+ */
 public class Notifications {
     public final static String EVENT_MODEL_UPDATE = "modelUpdate";
+    public final static String ACCOUNT_CHANGE_EVENT = "ACCOUNT_CHANGE_EVENT";
 
     private static final Map<String, List<SubscriberObject>> subscribers = new LinkedHashMap<>();
 
@@ -69,8 +74,11 @@ public class Notifications {
         }
 
         @Override
-        public boolean equals(Object obj) {
-            return subscriber.equals(obj);
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+            SubscriberObject that = (SubscriberObject) o;
+            return subscriber.equals(that.subscriber) && action.equals(that.action);
         }
     }
 }

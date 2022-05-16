@@ -33,7 +33,6 @@ public class ConsoleInteractionController extends Thread {
      */
     public void run() {
         consoleHandler.debugMessage("interactionController started");
-        commandsExecutor.initialize();
         while (!exitQueried) {
             try {
                 Thread.sleep(200);

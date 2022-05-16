@@ -1,5 +1,7 @@
 package threads;
 
+import app.App;
+import javafx.application.Platform;
 import web.ConnectionHandler;
 import console.ConsoleHandler;
 
@@ -19,7 +21,9 @@ public class ThreadHandler {
     }
 
     public void start() {
-        clientInteractionController.start();
+        App app = new App();
+        app.main();
+//        clientInteractionController.start();
     }
 
 
@@ -29,8 +33,10 @@ public class ThreadHandler {
     }
 
     public void stop() {
+        consoleHandler.message("stopping...");
         connectionHandler.disconnect();
         messageReader.shutdown();
         clientInteractionController.setExitQueried(true);
+        Platform.exit();
     }
 }

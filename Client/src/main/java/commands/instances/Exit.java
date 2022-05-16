@@ -18,9 +18,7 @@ public class Exit extends AbstractCommand {
     }
 
     public ActionResult action(ExecutionPayload executionPayload) {
-        if (consoleHandler.promptAgreement("Are you sure you want to exit?")) {
-            threadHandler.stop();
-            return new ActionResult(true, "exiting...");
-        } else return new ActionResult(false, "Exit cancelled");
+        threadHandler.stop();
+        return new ActionResult(true, "exiting...");
     }
 }

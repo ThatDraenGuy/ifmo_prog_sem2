@@ -1,24 +1,19 @@
 package gui.loginScene;
 
 import app.Controllers;
+import gui.AbstractViewModel;
 import gui.Notifications;
 import javafx.beans.property.*;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import lombok.Getter;
 
-public class LoginSceneViewModel {
+public class LoginSceneViewModel extends AbstractViewModel {
     private final LoginSceneModel model = new LoginSceneModel();
     @Getter
     private final StringProperty username = new SimpleStringProperty("");
     @Getter
     private final StringProperty password = new SimpleStringProperty("");
-    @Getter
-    private final BooleanProperty success = new SimpleBooleanProperty();
-    @Getter
-    private final StringProperty message = new SimpleStringProperty("");
-    @Getter
-    private final StringProperty errorMessage = new SimpleStringProperty("");
 
 
     public LoginSceneViewModel() {
@@ -64,29 +59,13 @@ public class LoginSceneViewModel {
 
     private void loginEvent(String event) {
         model.getLoginResult().ifPresent((actionResult -> {
-            success.setValue(actionResult.isSuccess());
-            if (!success.get()) {
-                errorMessage.setValue(actionResult.getMessage());
-                message.setValue("");
-                errorMessage.setValue("");
-            } else {
-                message.setValue(actionResult.getMessage());
-                Controllers.getSceneController().switchToMainScene();
-            }
+            handleActionResult(actionResult);
+            if (success.get()) Controllers.getSceneController().switchToMainScene();
         }));
     }
 
     private void registerEvent(String event) {
-        model.getRegisterResult().ifPresent((actionResult -> {
-            success.setValue(actionResult.isSuccess());
-            if (!success.get()) {
-                errorMessage.setValue(actionResult.getMessage());
-                message.setValue("");
-                errorMessage.setValue("");
-            } else {
-                message.setValue(actionResult.getMessage());
-            }
-        }));
+        model.getRegisterResult().ifPresent((this::handleActionResult));
     }
 
     public ReadOnlyBooleanProperty isTaskRunning() {

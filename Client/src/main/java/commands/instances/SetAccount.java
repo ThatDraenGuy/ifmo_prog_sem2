@@ -1,6 +1,7 @@
 package commands.instances;
 
 import commands.*;
+import gui.Notifications;
 import security.Account;
 import security.CurrentAccount;
 
@@ -16,6 +17,7 @@ public class SetAccount extends AbstractCommand {
     protected ActionResult action(ExecutionPayload executionPayload) {
         Account newAccount = executionPayload.getAccount();
         CurrentAccount.setAccount(newAccount);
+        Notifications.publish(Notifications.ACCOUNT_CHANGE_EVENT);
         executionController.setUserAccessLevel(newAccount.getAccessLevel());
         return new ActionResult(true, "changed account");
     }
