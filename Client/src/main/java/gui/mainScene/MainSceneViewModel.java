@@ -3,10 +3,13 @@ package gui.mainScene;
 import app.Controllers;
 import collection.CollectionClassesHandler;
 import collection.classes.MainCollectible;
+import commands.ActionResult;
 import gui.AbstractViewModel;
+import gui.CommandService;
 import gui.Notifications;
 import gui.Utilities;
 import gui.editorDialog.EditorDialog;
+import javafx.application.Platform;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -36,15 +39,12 @@ public class MainSceneViewModel extends AbstractViewModel {
     private EditorDialog addDialog;
     @Getter
     private EditorDialog editDialog;
+    @Getter
     private Map<String, String> editorDialogAnswer;
 
     public MainSceneViewModel() {
         tableView = new TableView<>();
         Notifications.subscribe(MainSceneModel.LOGOUT_TASK_EVENT, this, this::logOutEvent);
-        Notifications.subscribe(MainSceneModel.DISCONNECT_TASK_EVENT, this, this::disconnectEvent);
-        Notifications.subscribe(MainSceneModel.DELETE_TASK_EVENT, this, this::deleteEvent);
-        Notifications.subscribe(MainSceneModel.ADD_TASK_EVENT, this, this::addEvent);
-        Notifications.subscribe(MainSceneModel.EDIT_TASK_EVENT, this, this::editEvent);
         Notifications.subscribe(Notifications.ACCOUNT_CHANGE_EVENT, this, this::accountChangeEvent);
         Notifications.subscribe(CollectionClassesHandler.COLLECTIBLE_SCHEME_CHANGE_EVENT, this, this::collectibleSchemeChangeEvent);
     }
@@ -66,42 +66,29 @@ public class MainSceneViewModel extends AbstractViewModel {
         disconnectTask.restart();
     }
 
-    private final Service<Void> disconnectTask = Utilities.getDefaultService(model::disconnect);
+    private final Service<Void> disconnectTask = CommandService.getNoArgs("disconnect", this::disconnectEvent);
 
-    private void disconnectEvent(String event) {
-        model.getDisconnectResult().ifPresent(actionResult -> {
-            handleActionResult(actionResult);
-            if (success.get()) Controllers.getSceneController().switchToConnectScene();
-        });
+    private void disconnectEvent(ActionResult actionResult) {
+        handleActionResult(actionResult);
+        if (success.get()) Controllers.getSceneController().switchToConnectScene();
     }
 
     public void exit() {
         exitTask.restart();
     }
 
-    private final Service<Void> exitTask = Utilities.getDefaultService(model::exit);
+    private final Service<Void> exitTask = CommandService.getNoArgs("exit", this::handleActionResult);
 
     public void delete() {
         deleteTask.restart();
     }
 
-    private final Service<Void> deleteTask = new Service<>() {
-        @Override
-        protected Task<Void> createTask() {
-            return new Task<>() {
-                @Override
-                protected Void call() {
-                    updateProgress(0.1, 1.0);
-                    updateMessage("deleting...");
-                    model.delete(tableView.getSelectionModel().getSelectedItem().getId());
-                    return null;
-                }
-            };
-        }
-    };
+    private final Service<Void> deleteTask = CommandService.getSimpleArgs("remove_by_id", this::deleteEvent, () ->
+            tableView.getSelectionModel().getSelectedItem().getId().toString());
 
-    private void deleteEvent(String event) {
-        model.getDeleteResult().ifPresent(this::handleActionResult);
+
+    private void deleteEvent(ActionResult actionResult) {
+        handleActionResult(actionResult);
     }
 
     public void add() {
@@ -111,24 +98,23 @@ public class MainSceneViewModel extends AbstractViewModel {
         addTask.restart();
     }
 
-    private final Service<Void> addTask = new Service<>() {
-        @Override
-        protected Task<Void> createTask() {
-            return new Task<>() {
-                @Override
-                protected Void call() {
-                    updateProgress(0.1, 1.0);
-                    updateMessage("adding...");
-                    model.add(editorDialogAnswer);
-                    return null;
-                }
-            };
-        }
-    };
+    private final Service<Void> addTask = CommandService.getComplexArgs("add", this::addEvent, this::getEditorDialogAnswer);
 
-    private void addEvent(String event) {
-        model.getAddResult().ifPresent(this::handleActionResult);
+    private void addEvent(ActionResult actionResult) {
+        handleActionResult(actionResult);
     }
+
+//    private Map<String,String> promptEditorDialog() {
+//        var ref = new Object() {
+//            Map<String, String> res;
+//        };
+//        Platform.runLater(() -> {
+//            Optional<Map<String, String>> mapOptional = addDialog.getDialog().showAndWait();
+//            if (mapOptional.isEmpty()) return;
+//            ref.res = mapOptional.get();
+//        });
+//        return ref.res;
+//    }
 
     public void edit() {
         editDialog.setValues(tableView.getSelectionModel().getSelectedItem().toModel());
@@ -138,23 +124,11 @@ public class MainSceneViewModel extends AbstractViewModel {
         editTask.restart();
     }
 
-    private final Service<Void> editTask = new Service<>() {
-        @Override
-        protected Task<Void> createTask() {
-            return new Task<>() {
-                @Override
-                protected Void call() {
-                    updateProgress(0.1, 1.0);
-                    updateMessage("editing...");
-                    model.edit(tableView.getSelectionModel().getSelectedItem().getId(), editorDialogAnswer);
-                    return null;
-                }
-            };
-        }
-    };
+    private final Service<Void> editTask = CommandService.getBothArgs("update", this::editEvent, () ->
+            tableView.getSelectionModel().getSelectedItem().getId().toString(), this::getEditorDialogAnswer);
 
-    private void editEvent(String event) {
-        model.getAddResult().ifPresent(this::handleActionResult);
+    private void editEvent(ActionResult actionResult) {
+        handleActionResult(actionResult);
     }
 
     private void accountChangeEvent(String event) {
