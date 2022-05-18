@@ -1,6 +1,6 @@
 package security;
 
-import annotations.UserAccessible;
+import annotations.UserWritable;
 import collection.classes.Collectible;
 import commands.CommandAccessLevel;
 import lombok.Getter;
@@ -8,10 +8,10 @@ import lombok.Getter;
 
 public class Account implements Collectible {
     @Getter
-    @UserAccessible
+    @UserWritable
     private final String password;
     @Getter
-    @UserAccessible
+    @UserWritable
     private final String name;
     @Getter
     private final CommandAccessLevel accessLevel;

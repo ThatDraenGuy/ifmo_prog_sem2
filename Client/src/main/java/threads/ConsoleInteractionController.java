@@ -133,7 +133,7 @@ public class ConsoleInteractionController extends Thread {
         Map<String, InputtedValue> map = new HashMap<>();
         for (String key : collectibleScheme.getFieldsData().keySet()) {
             FieldData fieldData = collectibleScheme.getFieldsData().get(key);
-            if (fieldData.isUserAccessible()) {
+            if (fieldData.isUserWritable()) {
                 if (!fieldData.isCollectible()) map.put(key, new InputtedValue(promptField(key, fieldData)));
                 else map.put(key, new InputtedValue(promptComplexArgsMap(fieldData.getCollectibleScheme())));
             }

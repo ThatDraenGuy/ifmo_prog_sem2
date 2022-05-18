@@ -1,12 +1,9 @@
 package gui;
 
 import app.Controllers;
-import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
-import javafx.stage.WindowEvent;
 
 import java.io.IOException;
 
@@ -22,12 +19,10 @@ public class SceneController {
         connectScene = new Scene(FXMLLoader.load(getClass().getClassLoader().getResource("gui/connectScene.fxml")));
         loginScene = new Scene(FXMLLoader.load(getClass().getClassLoader().getResource("gui/loginScene.fxml")));
         mainScene = new Scene(FXMLLoader.load(getClass().getClassLoader().getResource("gui/mainScene.fxml")));
-        primaryStage.setOnCloseRequest(new EventHandler<WindowEvent>() {
-            @Override
-            public void handle(WindowEvent event) {
-                Controllers.getThreadHandler().stop();
-            }
-        });
+        primaryStage.setMinHeight(200);
+        primaryStage.setMinWidth(200);
+        primaryStage.setTitle("Dracoll");
+        primaryStage.setOnCloseRequest(event -> Controllers.getThreadHandler().stop());
     }
 
     public void switchToLoginScene() {

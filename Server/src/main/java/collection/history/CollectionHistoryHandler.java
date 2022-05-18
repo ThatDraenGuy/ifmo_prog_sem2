@@ -48,7 +48,7 @@ public class CollectionHistoryHandler<T extends MainCollectible<T>> {
         } else {
             long changesNeeded = currentCollection.getId().get() - userCollectionId;
             long changesSkipped = changeHistory.size() - changesNeeded;
-            Queue<CollectionChange<? extends MainCollectible<?>>> changes = changeHistory.stream().skip(changesSkipped).collect(Collectors.toCollection(PriorityQueue::new));
+            Queue<CollectionChange<? extends MainCollectible<?>>> changes = changeHistory.stream().skip(changesSkipped).collect(Collectors.toCollection(ArrayDeque::new));
             userHandler.sendCollectionChangeRequest(changes);
         }
     }

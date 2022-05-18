@@ -2,19 +2,17 @@ package collection.classes;
 
 import annotations.LowerBounded;
 import annotations.NotNull;
-import annotations.UserAccessible;
-import lombok.Builder;
+import annotations.UserWritable;
 import lombok.Getter;
-import lombok.NonNull;
 
 import java.time.ZonedDateTime;
 
 public class Coordinates implements Collectible {
-    @UserAccessible
+    @UserWritable
     @NotNull
     @Getter
     private final int x;
-    @UserAccessible
+    @UserWritable
     @NotNull
     @LowerBounded(value = -255)
     @Getter

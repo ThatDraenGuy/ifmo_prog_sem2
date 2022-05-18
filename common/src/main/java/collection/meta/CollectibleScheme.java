@@ -13,8 +13,11 @@ public class CollectibleScheme implements Serializable {
     private final String simpleName;
     @Getter
     private final HashMap<String, FieldData> fieldsData;
+    @Getter
+    private final Class<?> targetClass;
 
     public CollectibleScheme(Class<? extends Collectible> targetClass) {
+        this.targetClass = targetClass;
         fieldsData = new HashMap<>();
         simpleName = targetClass.getSimpleName();
         Field[] fields = targetClass.getDeclaredFields();

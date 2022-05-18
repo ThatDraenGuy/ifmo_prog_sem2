@@ -1,12 +1,19 @@
 package gui.mainScene;
 
+import collection.classes.MainCollectible;
 import collection.meta.CollectibleModel;
 import gui.AbstractView;
+import gui.editorDialog.EditorDialog;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.event.ActionEvent;
+import javafx.event.EventType;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.ProgressIndicator;
-import javafx.scene.control.TableView;
+import javafx.scene.control.*;
+import javafx.scene.layout.AnchorPane;
+
+import java.util.Map;
+
 
 public class MainSceneView extends AbstractView {
     @FXML
@@ -17,8 +24,15 @@ public class MainSceneView extends AbstractView {
     private Label message;
     @FXML
     private ProgressIndicator progress;
+    private TableView<? extends MainCollectible<?>> tableView;
     @FXML
-    private TableView<CollectibleModel> table;
+    private AnchorPane tablePlace;
+    @FXML
+    private Button add;
+    @FXML
+    private Button edit;
+    @FXML
+    private Button delete;
 
     private final MainSceneViewModel viewModel = new MainSceneViewModel();
 
@@ -26,7 +40,21 @@ public class MainSceneView extends AbstractView {
         defaultInitialize(progress.visibleProperty(), message.textProperty(), viewModel);
         account.textProperty().bind(viewModel.getAccount());
         server.textProperty().bind(viewModel.getServer());
-
+        viewModel.getTableView().addEventHandler(EventType.ROOT, event -> {
+            System.out.println("fired & copied");
+            tableView = viewModel.getTableView();
+            tablePlace.getChildren().add(tableView);
+            tablePlace.prefWidthProperty().bind(tableView.prefWidthProperty());
+            AnchorPane.setTopAnchor(tableView, 0.0);
+            AnchorPane.setBottomAnchor(tableView, 0.0);
+            AnchorPane.setLeftAnchor(tableView, 0.0);
+            AnchorPane.setRightAnchor(tableView, 0.0);
+            BooleanBinding binding = tableView.getSelectionModel().selectedItemProperty().isNull().or(
+                    Bindings.select(tableView.getSelectionModel().selectedItemProperty(), "owner").isNotEqualTo(account.textProperty())
+            );
+            delete.disableProperty().bind(binding);
+            edit.disableProperty().bind(binding);
+        });
     }
 
     @FXML
@@ -42,5 +70,20 @@ public class MainSceneView extends AbstractView {
     @FXML
     private void exit(ActionEvent event) {
         viewModel.exit();
+    }
+
+    @FXML
+    private void delete(ActionEvent event) {
+        viewModel.delete();
+    }
+
+    @FXML
+    private void add(ActionEvent event) {
+        viewModel.add();
+    }
+
+    @FXML
+    private void edit(ActionEvent event) {
+        viewModel.edit();
     }
 }

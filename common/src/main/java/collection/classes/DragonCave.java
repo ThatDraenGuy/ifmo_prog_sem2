@@ -1,14 +1,13 @@
 package collection.classes;
 
 import annotations.NotNull;
-import annotations.UserAccessible;
-import lombok.Builder;
+import annotations.UserWritable;
 import lombok.Getter;
 
 import java.time.ZonedDateTime;
 
 public class DragonCave implements Collectible {
-    @UserAccessible
+    @UserWritable
     @NotNull
     @Getter
     private final int depth;

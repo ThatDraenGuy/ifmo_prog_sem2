@@ -16,4 +16,6 @@ public interface MainCollectible<T> extends Collectible, Comparable<T> {
 
 
     int compareTo(CollectibleModel collectibleModel);
+
+    CollectibleModel toModel();
 }

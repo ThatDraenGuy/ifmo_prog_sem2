@@ -5,7 +5,6 @@ import annotations.CollectibleField;
 import collection.meta.CollectibleModel;
 import collection.meta.FieldModel;
 import lombok.Getter;
-import lombok.NonNull;
 
 
 import java.time.ZonedDateTime;
@@ -14,31 +13,34 @@ import java.time.ZonedDateTime;
 public class Dragon implements MainCollectible<Dragon> {
     @NotNull
     @LowerBounded
+    @UserReadable
     private final Long id; //Поле не может быть null, Значение поля должно быть больше 0, Значение этого поля должно быть уникальным, Значение этого поля должно генерироваться автоматически
     @NotNull
-    @UserAccessible
+    @UserWritable
     private final String name; //Поле не может быть null, Строка не может быть пустой
     @NotNull
-    @UserAccessible
+    @UserWritable
     @CollectibleField
     private final Coordinates coordinates; //Поле не может быть null
-    @UserAccessible
+    @UserWritable
     @LowerBounded
     private final Long age; //Значение поля должно быть больше 0, Поле может быть null
     @NotNull
-    @UserAccessible
+    @UserWritable
     private final Color color; //Поле не может быть null
-    @UserAccessible
+    @UserWritable
     private final DragonType type; //Поле может быть null
     @NotNull
-    @UserAccessible
+    @UserWritable
     private final DragonCharacter character; //Поле не может быть null
     @CollectibleField
-    @UserAccessible
+    @UserWritable
     private final DragonCave cave; //Поле может быть null
     @NotNull
+    @UserReadable
     private final ZonedDateTime creationDate; //Поле не может быть null, Значение этого поля должно генерироваться автоматически
     @NotNull
+    @UserReadable
     private final String owner;
 
 
@@ -82,4 +84,9 @@ public class Dragon implements MainCollectible<Dragon> {
         return str.toString();
     }
 
+    @Override
+    public CollectibleModel toModel() {
+        DragonFactory factory = new DragonFactory();
+        return factory.getModel(this);
+    }
 }

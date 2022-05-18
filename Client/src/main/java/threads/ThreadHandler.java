@@ -21,9 +21,9 @@ public class ThreadHandler {
     }
 
     public void start() {
+        clientInteractionController.start();
         App app = new App();
         app.main();
-//        clientInteractionController.start();
     }
 
 

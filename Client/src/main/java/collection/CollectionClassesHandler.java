@@ -6,6 +6,7 @@ import console.ConsoleHandler;
 import exceptions.CollectionVersionIsBehindException;
 import exceptions.IncorrectCollectibleTypeException;
 import gui.Notifications;
+import javafx.scene.control.TableView;
 import lombok.Getter;
 import utility.ListAndId;
 
@@ -15,6 +16,10 @@ public class CollectionClassesHandler {
     public final static String COLLECTIBLE_SCHEME_CHANGE_EVENT = "COLLECTIBLE_SCHEME_CHANGE_EVENT";
     @Getter
     volatile private ClientCollectionHandler<?> currentCollectionHandler;
+    @Getter
+    volatile private TableViewHandler<?> currentTableViewHandler;
+    //    @Getter
+//    private TableView<? extends MainCollectible<?>> currentTableView;
     @Getter
     private Class<? extends MainCollectible<?>> currentClass;
     @Getter
@@ -27,9 +32,14 @@ public class CollectionClassesHandler {
 
     private <T extends MainCollectible<?>> void createCollection(Class<T> targetClass) {
         currentCollectionHandler = new ClientCollectionHandler<>(targetClass);
+        currentTableViewHandler = new TableViewHandler<>(targetClass);
+        handleCollectionCreation(targetClass);
+        consoleHandler.debugMessage("created empty collection: " + currentCollectionHandler);
+    }
+
+    private <T extends MainCollectible<?>> void handleCollectionCreation(Class<T> targetClass) {
         currentClass = targetClass;
         Notifications.publish(COLLECTIBLE_SCHEME_CHANGE_EVENT);
-        consoleHandler.debugMessage("created empty collection: " + currentCollectionHandler);
     }
 
     public void handleTargetClass(Class<? extends MainCollectible<?>> targetClass) {
@@ -39,8 +49,8 @@ public class CollectionClassesHandler {
 
     private <T extends MainCollectible<?>> void createCollection(Class<T> targetClass, ListAndId<T> listAndId) {
         currentCollectionHandler = new ClientCollectionHandler<>(targetClass, listAndId);
-        currentClass = targetClass;
-        Notifications.publish(COLLECTIBLE_SCHEME_CHANGE_EVENT);
+        currentTableViewHandler = new TableViewHandler<>(targetClass, listAndId);
+        handleCollectionCreation(targetClass);
         consoleHandler.debugMessage("created collection from server collection: " + currentCollectionHandler);
     }
 
@@ -48,6 +58,7 @@ public class CollectionClassesHandler {
         try {
             for (CollectionChange<? extends MainCollectible<?>> collectionChange : collectionChanges) {
                 currentCollectionHandler.applyChange(collectionChange);
+                currentTableViewHandler.applyChange(collectionChange);
                 consoleHandler.debugMessage("applied collectionChange: " + collectionChange);
             }
         } catch (CollectionVersionIsBehindException e) {
@@ -57,8 +68,10 @@ public class CollectionClassesHandler {
 
     public <T extends MainCollectible<?>> void applyFullCollection(ListAndId<T> listAndId) throws IncorrectCollectibleTypeException {
         Class<T> targetClass = listAndId.getTargetClass();
-        if (isCurrentClass(targetClass)) currentCollectionHandler.setCollection(listAndId);
-        else createCollection(targetClass, listAndId);
+        if (isCurrentClass(targetClass)) {
+            currentCollectionHandler.setCollection(listAndId);
+            currentTableViewHandler.set(listAndId);
+        } else createCollection(targetClass, listAndId);
     }
 
 

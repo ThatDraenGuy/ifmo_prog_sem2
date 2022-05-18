@@ -10,7 +10,9 @@ import java.util.Collection;
 public class CollectionChange<T extends MainCollectible<?>> implements Serializable {
     @Getter
     private final long newCollectionId;
+    @Getter
     private final Collection<T> addedElements;
+    @Getter
     private final Collection<T> removedElements;
     @Getter
     private final Class<T> elementClass;
