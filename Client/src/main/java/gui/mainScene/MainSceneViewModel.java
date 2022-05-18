@@ -10,6 +10,8 @@ import gui.Notifications;
 import gui.Utilities;
 import gui.editorDialog.EditorDialog;
 import javafx.application.Platform;
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -26,6 +28,7 @@ import security.CurrentAccount;
 
 import java.util.Map;
 import java.util.Optional;
+import java.util.stream.Stream;
 
 public class MainSceneViewModel extends AbstractViewModel {
     private final MainSceneModel model = new MainSceneModel();
@@ -144,9 +147,8 @@ public class MainSceneViewModel extends AbstractViewModel {
     }
 
     @Override
-    public ReadOnlyBooleanProperty isTaskRunning() {
-        SimpleBooleanProperty property = new SimpleBooleanProperty();
-        property.set(deleteTask.isRunning() || exitTask.isRunning() || disconnectTask.isRunning() || logOutTask.isRunning());
-        return property;
+    public BooleanBinding taskRunningProperty() {
+        return Stream.of(deleteTask.runningProperty(), exitTask.runningProperty(), disconnectTask.runningProperty(), logOutTask.runningProperty()).
+                map(property -> property.isEqualTo(new SimpleBooleanProperty(true))).reduce(Bindings::or).get();
     }
 }

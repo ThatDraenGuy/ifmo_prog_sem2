@@ -17,10 +17,6 @@ public class CollectionClassesHandler {
     @Getter
     volatile private ClientCollectionHandler<?> currentCollectionHandler;
     @Getter
-    volatile private TableViewHandler<?> currentTableViewHandler;
-    //    @Getter
-//    private TableView<? extends MainCollectible<?>> currentTableView;
-    @Getter
     private Class<? extends MainCollectible<?>> currentClass;
     @Getter
     private final ConsoleHandler consoleHandler;
@@ -32,7 +28,6 @@ public class CollectionClassesHandler {
 
     private <T extends MainCollectible<?>> void createCollection(Class<T> targetClass) {
         currentCollectionHandler = new ClientCollectionHandler<>(targetClass);
-        currentTableViewHandler = new TableViewHandler<>(targetClass);
         handleCollectionCreation(targetClass);
         consoleHandler.debugMessage("created empty collection: " + currentCollectionHandler);
     }
@@ -49,7 +44,6 @@ public class CollectionClassesHandler {
 
     private <T extends MainCollectible<?>> void createCollection(Class<T> targetClass, ListAndId<T> listAndId) {
         currentCollectionHandler = new ClientCollectionHandler<>(targetClass, listAndId);
-        currentTableViewHandler = new TableViewHandler<>(targetClass, listAndId);
         handleCollectionCreation(targetClass);
         consoleHandler.debugMessage("created collection from server collection: " + currentCollectionHandler);
     }
@@ -58,7 +52,6 @@ public class CollectionClassesHandler {
         try {
             for (CollectionChange<? extends MainCollectible<?>> collectionChange : collectionChanges) {
                 currentCollectionHandler.applyChange(collectionChange);
-                currentTableViewHandler.applyChange(collectionChange);
                 consoleHandler.debugMessage("applied collectionChange: " + collectionChange);
             }
         } catch (CollectionVersionIsBehindException e) {
@@ -70,7 +63,6 @@ public class CollectionClassesHandler {
         Class<T> targetClass = listAndId.getTargetClass();
         if (isCurrentClass(targetClass)) {
             currentCollectionHandler.setCollection(listAndId);
-            currentTableViewHandler.set(listAndId);
         } else createCollection(targetClass, listAndId);
     }
 

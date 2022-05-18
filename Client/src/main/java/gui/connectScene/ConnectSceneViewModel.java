@@ -5,6 +5,7 @@ import commands.ActionResult;
 import gui.AbstractViewModel;
 import gui.CommandService;
 import gui.Notifications;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
@@ -30,7 +31,7 @@ public class ConnectSceneViewModel extends AbstractViewModel {
         return connectTask.progressProperty();
     }
 
-    public ReadOnlyBooleanProperty isTaskRunning() {
-        return connectTask.runningProperty();
+    public BooleanBinding taskRunningProperty() {
+        return connectTask.runningProperty().isEqualTo(new SimpleBooleanProperty(true));
     }
 }

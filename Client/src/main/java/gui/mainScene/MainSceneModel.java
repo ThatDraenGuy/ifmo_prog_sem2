@@ -53,66 +53,12 @@ public class MainSceneModel {
         Notifications.publish(LOGOUT_TASK_EVENT);
     }
 
-    public void disconnect(Void unused) {
-        ActionResult result = requester.request("disconnect", new CommandArgs());
-        disconnectResult = Optional.ofNullable(result);
-        Notifications.publish(DISCONNECT_TASK_EVENT);
-    }
-
-    public void exit(Void unused) {
-        requester.request("exit", new CommandArgs());
-    }
-
-    public void delete(long id) {
-        ActionResult result = requester.request("remove_by_id", new CommandArgs(String.valueOf(id)));
-        deleteResult = Optional.ofNullable(result);
-        Notifications.publish(DELETE_TASK_EVENT);
-    }
-
-    public void add(Map<String, String> map) {
-        try {
-            ActionResult result = requester.request("add", new CommandArgs(build(map)));
-            addResult = Optional.ofNullable(result);
-        } catch (ValueNotValidException e) {
-            addResult = Optional.of(new ActionResult(false, "invalid data"));
-        } finally {
-            Notifications.publish(ADD_TASK_EVENT);
-        }
-    }
-
-    public void edit(long id, Map<String, String> map) {
-        try {
-            ActionResult result = requester.request("update", new CommandArgs(String.valueOf(id), build(map)));
-            editResult = Optional.ofNullable(result);
-        } catch (ValueNotValidException e) {
-            editResult = Optional.of(new ActionResult(false, "invalid data"));
-        } finally {
-            Notifications.publish(EDIT_TASK_EVENT);
-        }
-    }
 
     public TableView<? extends MainCollectible<?>> getTableView() {
-        return collectionClassesHandler.getCurrentTableViewHandler().getTableView();
+        return collectionClassesHandler.getCurrentCollectionHandler().getTableViewHandler().getTableView();
     }
 
     public CollectibleScheme getScheme() {
         return collectionClassesHandler.getCurrentCollectionHandler().getCollectibleScheme();
-    }
-
-    private CollectibleModel build(Map<String, String> map) throws ValueNotValidException {
-        CollectibleScheme scheme = getScheme();
-        return new CollectibleModel(scheme, getMap(scheme, map));
-    }
-
-    private Map<String, InputtedValue> getMap(CollectibleScheme collectibleScheme, Map<String, String> stringMap) {
-        Map<String, InputtedValue> map = new HashMap<>();
-        for (String key : collectibleScheme.getFieldsData().keySet()) {
-            FieldData fieldData = collectibleScheme.getFieldsData().get(key);
-            if (fieldData.isUserWritable()) {
-                if (!fieldData.isCollectible()) map.put(key, new InputtedValue(stringMap.get(key)));
-                else map.put(key, new InputtedValue(getMap(fieldData.getCollectibleScheme(), stringMap)));
-            }
-        }
-        return map;
     }
 }

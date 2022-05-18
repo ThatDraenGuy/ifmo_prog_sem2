@@ -1,9 +1,7 @@
 package gui.mainScene;
 
 import collection.classes.MainCollectible;
-import collection.meta.CollectibleModel;
 import gui.AbstractView;
-import gui.editorDialog.EditorDialog;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.event.ActionEvent;
@@ -11,8 +9,8 @@ import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.FlowPane;
 
-import java.util.Map;
 
 
 public class MainSceneView extends AbstractView {
@@ -28,6 +26,8 @@ public class MainSceneView extends AbstractView {
     @FXML
     private AnchorPane tablePlace;
     @FXML
+    private FlowPane visual;
+    @FXML
     private Button add;
     @FXML
     private Button edit;
@@ -41,7 +41,6 @@ public class MainSceneView extends AbstractView {
         account.textProperty().bind(viewModel.getAccount());
         server.textProperty().bind(viewModel.getServer());
         viewModel.getTableView().addEventHandler(EventType.ROOT, event -> {
-            System.out.println("fired & copied");
             tableView = viewModel.getTableView();
             tablePlace.getChildren().add(tableView);
             tablePlace.prefWidthProperty().bind(tableView.prefWidthProperty());

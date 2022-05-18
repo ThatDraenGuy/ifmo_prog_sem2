@@ -1,6 +1,6 @@
 package gui;
 
-import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.StringProperty;
 
 public interface ViewModel {
@@ -8,5 +8,5 @@ public interface ViewModel {
 
     StringProperty getErrorMessage();
 
-    ReadOnlyBooleanProperty isTaskRunning();
+    BooleanBinding taskRunningProperty();
 }

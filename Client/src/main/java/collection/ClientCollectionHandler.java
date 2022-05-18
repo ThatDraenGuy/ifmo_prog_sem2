@@ -4,16 +4,22 @@ import collection.classes.MainCollectible;
 import collection.history.CollectionChange;
 import exceptions.CollectionVersionIsBehindException;
 import exceptions.IncorrectCollectibleTypeException;
+import lombok.Getter;
 import utility.ListAndId;
 
 public class ClientCollectionHandler<T extends MainCollectible<?>> extends CollectionHandler<T> {
+    @Getter
+    private final TableViewHandler<T> tableViewHandler;
+
     public ClientCollectionHandler(Class<T> targetClass) {
         super(targetClass);
+        tableViewHandler = new TableViewHandler<>(targetClass);
     }
 
     public ClientCollectionHandler(Class<T> targetClass, ListAndId<T> collection) {
-        this(targetClass);
+        super(targetClass);
         this.collection = collection;
+        tableViewHandler = new TableViewHandler<>(targetClass, collection);
     }
 
     public void applyChange(CollectionChange<? extends MainCollectible<?>> collectionChange) throws CollectionVersionIsBehindException, IncorrectCollectibleTypeException {
@@ -24,11 +30,13 @@ public class ClientCollectionHandler<T extends MainCollectible<?>> extends Colle
             return;
         }
         CollectionChange<T> castedCollectionChange = castCollectionChange(collectionChange);
+        tableViewHandler.applyChange(castedCollectionChange);
         castedCollectionChange.apply(collection);
     }
 
     public void setCollection(ListAndId<? extends MainCollectible<?>> collection) throws IncorrectCollectibleTypeException {
         this.collection = castCollection(collection);
+        tableViewHandler.set(this.collection);
     }
 
     private ListAndId<T> castCollection(ListAndId<? extends MainCollectible<?>> collection) throws IncorrectCollectibleTypeException {

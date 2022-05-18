@@ -16,7 +16,6 @@ import utility.ListAndId;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.function.Function;
 
 public class TableViewHandler<T extends MainCollectible<?>> {
     @Getter
@@ -34,14 +33,11 @@ public class TableViewHandler<T extends MainCollectible<?>> {
         put(listAndId);
     }
 
-    public void applyChange(CollectionChange<? extends MainCollectible<?>> collectionChange) {
-        if (collectionChange.getElementClass().equals(Dragon.class)) {
-            CollectionChange<T> change = (CollectionChange<T>) collectionChange;
-            Collection<T> added = change.getAddedElements();
-            Collection<T> removed = change.getRemovedElements();
-            tableView.getItems().addAll(added);
-            tableView.getItems().removeAll(removed);
-        }
+    public void applyChange(CollectionChange<T> change) {
+        Collection<T> added = change.getAddedElements();
+        Collection<T> removed = change.getRemovedElements();
+        tableView.getItems().addAll(added);
+        tableView.getItems().removeAll(removed);
     }
 
     public void put(ListAndId<T> listAndId) {
@@ -51,9 +47,9 @@ public class TableViewHandler<T extends MainCollectible<?>> {
         autoResizeColumns(tableView);
     }
 
-    public void set(ListAndId<? extends MainCollectible<?>> listAndId) {
+    public void set(ListAndId<T> listAndId) {
         tableView.getItems().clear();
-        put((ListAndId<T>) listAndId);
+        put(listAndId);
     }
 
 

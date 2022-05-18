@@ -56,7 +56,7 @@ public class CommandService {
     }
 
     private static Service<Void> getService(String command, Consumer<ActionResult> handler, Supplier<CommandArgs> argsSupplier) {
-        return new Service<Void>() {
+        return new Service<>() {
             @Override
             protected Task<Void> createTask() {
                 return new Task<>() {
