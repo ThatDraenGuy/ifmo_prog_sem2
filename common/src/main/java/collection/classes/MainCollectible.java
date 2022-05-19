@@ -6,6 +6,8 @@ public interface MainCollectible<T> extends Collectible, Comparable<T> {
 
     Long getId();
 
+    String getName();
+
     Color getColor();
 
     DragonType getType();

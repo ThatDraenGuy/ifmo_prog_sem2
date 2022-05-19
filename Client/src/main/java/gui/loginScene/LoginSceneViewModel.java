@@ -37,7 +37,7 @@ public class LoginSceneViewModel extends AbstractViewModel {
         handleActionResult(actionResult);
     }
 
-    public BooleanBinding taskRunningProperty() {
+    public BooleanBinding isTaskRunning() {
         return loginTask.runningProperty().or(registerTask.runningProperty());
     }
 }

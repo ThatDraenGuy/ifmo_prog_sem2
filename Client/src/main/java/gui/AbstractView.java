@@ -6,7 +6,7 @@ import javafx.scene.control.Alert;
 
 public abstract class AbstractView {
     protected void defaultInitialize(BooleanProperty progressVisibility, StringProperty message, ViewModel viewModel) {
-        progressVisibility.bind(viewModel.taskRunningProperty());
+        progressVisibility.bind(viewModel.isTaskRunning());
         message.bind(viewModel.getMessage());
         viewModel.getErrorMessage().addListener(
                 (observableValue, oldValue, newValue) -> {

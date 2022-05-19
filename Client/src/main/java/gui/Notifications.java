@@ -14,7 +14,7 @@ import java.util.function.Consumer;
  * That way subscribers and publishers don't need to store each other's references and directly contact each other
  */
 public class Notifications {
-    public final static String EVENT_MODEL_UPDATE = "modelUpdate";
+    public final static String SCENE_CHANGE_EVENT = "SCENE_CHANGE_EVENT";
     public final static String ACCOUNT_CHANGE_EVENT = "ACCOUNT_CHANGE_EVENT";
 
     private static final Map<String, List<SubscriberObject>> subscribers = new LinkedHashMap<>();

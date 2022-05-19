@@ -2,24 +2,31 @@ package collection;
 
 import collection.classes.MainCollectible;
 import collection.history.CollectionChange;
+import com.sun.javafx.collections.ObservableListWrapper;
 import exceptions.CollectionVersionIsBehindException;
 import exceptions.IncorrectCollectibleTypeException;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import lombok.Getter;
 import utility.ListAndId;
 
 public class ClientCollectionHandler<T extends MainCollectible<?>> extends CollectionHandler<T> {
     @Getter
     private final TableViewHandler<T> tableViewHandler;
+    @Getter
+    private final VisualViewHandler<T> visualViewHandler;
 
     public ClientCollectionHandler(Class<T> targetClass) {
         super(targetClass);
         tableViewHandler = new TableViewHandler<>(targetClass);
+        visualViewHandler = new VisualViewHandler<>(targetClass, collectibleScheme);
     }
 
     public ClientCollectionHandler(Class<T> targetClass, ListAndId<T> collection) {
         super(targetClass);
         this.collection = collection;
         tableViewHandler = new TableViewHandler<>(targetClass, collection);
+        visualViewHandler = new VisualViewHandler<>(targetClass, collectibleScheme, collection);
     }
 
     public void applyChange(CollectionChange<? extends MainCollectible<?>> collectionChange) throws CollectionVersionIsBehindException, IncorrectCollectibleTypeException {
@@ -31,12 +38,14 @@ public class ClientCollectionHandler<T extends MainCollectible<?>> extends Colle
         }
         CollectionChange<T> castedCollectionChange = castCollectionChange(collectionChange);
         tableViewHandler.applyChange(castedCollectionChange);
+        visualViewHandler.applyChange(castedCollectionChange);
         castedCollectionChange.apply(collection);
     }
 
     public void setCollection(ListAndId<? extends MainCollectible<?>> collection) throws IncorrectCollectibleTypeException {
         this.collection = castCollection(collection);
         tableViewHandler.set(this.collection);
+        visualViewHandler.set(this.collection);
     }
 
     private ListAndId<T> castCollection(ListAndId<? extends MainCollectible<?>> collection) throws IncorrectCollectibleTypeException {

@@ -8,5 +8,5 @@ public interface ViewModel {
 
     StringProperty getErrorMessage();
 
-    BooleanBinding taskRunningProperty();
+    BooleanBinding isTaskRunning();
 }

@@ -135,7 +135,8 @@ public class EditorDialog {
             if (model.getFieldData().isCollectible()) setValues(model.getCollectibleModel());
             else {
                 TextField textField = textFields.get(field);
-                if (textField != null) textField.setText(model.getValue().toString());
+                String value = model.getValue() == null ? "" : model.getValue().toString();
+                if (textField != null) textField.setText(value);
                 ChoiceBox<?> choiceBox = choiceBoxes.get(field);
                 if (choiceBox != null) {
                     setChoiceBox(choiceBox, model);

@@ -19,24 +19,27 @@ public class SceneController {
         connectScene = new Scene(FXMLLoader.load(getClass().getClassLoader().getResource("gui/connectScene.fxml")));
         loginScene = new Scene(FXMLLoader.load(getClass().getClassLoader().getResource("gui/loginScene.fxml")));
         mainScene = new Scene(FXMLLoader.load(getClass().getClassLoader().getResource("gui/mainScene.fxml")));
-        primaryStage.setMinHeight(200);
-        primaryStage.setMinWidth(200);
         primaryStage.setTitle("Dracoll");
         primaryStage.setOnCloseRequest(event -> Controllers.getThreadHandler().stop());
     }
 
     public void switchToLoginScene() {
-        primaryStage.setScene(loginScene);
-        primaryStage.show();
+        switchTo(loginScene);
     }
 
     public void switchToMainScene() {
-        primaryStage.setScene(mainScene);
-        primaryStage.show();
+        switchTo(mainScene);
     }
 
     public void switchToConnectScene() {
-        primaryStage.setScene(connectScene);
+        switchTo(connectScene);
+    }
+
+    private void switchTo(Scene scene) {
+        primaryStage.setScene(scene);
+        Notifications.publish(Notifications.SCENE_CHANGE_EVENT);
         primaryStage.show();
+        primaryStage.setMinHeight(scene.getHeight());
+        primaryStage.setMinWidth(scene.getWidth());
     }
 }

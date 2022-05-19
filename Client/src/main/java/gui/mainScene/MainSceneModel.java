@@ -12,12 +12,15 @@ import commands.CommandArgs;
 import commands.Requester;
 import exceptions.ValueNotValidException;
 import gui.Notifications;
+import javafx.beans.property.ObjectProperty;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
+import javafx.scene.Node;
 import javafx.scene.control.TableView;
+import javafx.scene.image.ImageView;
 import lombok.Getter;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 public class MainSceneModel {
     public static final String LOGOUT_TASK_EVENT = "LOGOUT_TASK_EVENT";
@@ -56,6 +59,14 @@ public class MainSceneModel {
 
     public TableView<? extends MainCollectible<?>> getTableView() {
         return collectionClassesHandler.getCurrentCollectionHandler().getTableViewHandler().getTableView();
+    }
+
+    public ObservableList<Node> getVisuals() {
+        return collectionClassesHandler.getCurrentCollectionHandler().getVisualViewHandler().getImages();
+    }
+
+    public ObjectProperty<? extends MainCollectible<?>> getSelectedVisual() {
+        return collectionClassesHandler.getCurrentCollectionHandler().getVisualViewHandler().getSelected();
     }
 
     public CollectibleScheme getScheme() {

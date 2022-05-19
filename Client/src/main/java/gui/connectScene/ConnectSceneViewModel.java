@@ -31,7 +31,7 @@ public class ConnectSceneViewModel extends AbstractViewModel {
         return connectTask.progressProperty();
     }
 
-    public BooleanBinding taskRunningProperty() {
+    public BooleanBinding isTaskRunning() {
         return connectTask.runningProperty().isEqualTo(new SimpleBooleanProperty(true));
     }
 }

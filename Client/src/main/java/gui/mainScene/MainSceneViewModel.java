@@ -12,22 +12,25 @@ import gui.editorDialog.EditorDialog;
 import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
-import javafx.beans.property.ReadOnlyBooleanProperty;
-import javafx.beans.property.SimpleBooleanProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
+import javafx.beans.property.*;
+import javafx.collections.ObservableList;
+import javafx.collections.ObservableMap;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.event.EventType;
+import javafx.scene.Node;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableView;
+import javafx.scene.image.ImageView;
 import lombok.Getter;
 import security.CurrentAccount;
 
+import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
+import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
 public class MainSceneViewModel extends AbstractViewModel {
@@ -39,11 +42,37 @@ public class MainSceneViewModel extends AbstractViewModel {
     @Getter
     private TableView<? extends MainCollectible<?>> tableView;
     @Getter
+    private ObservableList<Node> visuals;
+    @Getter
     private EditorDialog addDialog;
     @Getter
     private EditorDialog editDialog;
     @Getter
     private Map<String, String> editorDialogAnswer;
+    @Getter
+    private final BooleanProperty tableTabOpened = new SimpleBooleanProperty();
+    @Getter
+    private final BooleanProperty visualTabOpened = new SimpleBooleanProperty();
+    private final ObjectProperty<? extends MainCollectible<?>> selectedItemProperty = new ObjectPropertyBase<MainCollectible<?>>() {
+        @Override
+        public Object getBean() {
+            if (tableTabOpened.get()) return tableView.getSelectionModel().getSelectedItem();
+            if (visualTabOpened.get()) return model.getSelectedVisual().get();
+            return null;
+        }
+
+        @Override
+        public MainCollectible<?> get() {
+            if (tableTabOpened.get()) return tableView.getSelectionModel().getSelectedItem();
+            if (visualTabOpened.get()) return model.getSelectedVisual().get();
+            return null;
+        }
+
+        @Override
+        public String getName() {
+            return "selectedItemProperty";
+        }
+    };
 
     public MainSceneViewModel() {
         tableView = new TableView<>();
@@ -120,7 +149,7 @@ public class MainSceneViewModel extends AbstractViewModel {
 //    }
 
     public void edit() {
-        editDialog.setValues(tableView.getSelectionModel().getSelectedItem().toModel());
+        editDialog.setValues(selectedItemProperty.getValue().toModel());
         Optional<Map<String, String>> mapOptional = editDialog.getDialog().showAndWait();
         if (mapOptional.isEmpty()) return;
         editorDialogAnswer = mapOptional.get();
@@ -128,7 +157,7 @@ public class MainSceneViewModel extends AbstractViewModel {
     }
 
     private final Service<Void> editTask = CommandService.getBothArgs("update", this::editEvent, () ->
-            tableView.getSelectionModel().getSelectedItem().getId().toString(), this::getEditorDialogAnswer);
+            selectedItemProperty.getValue().getId().toString(), this::getEditorDialogAnswer);
 
     private void editEvent(ActionResult actionResult) {
         handleActionResult(actionResult);
@@ -141,14 +170,39 @@ public class MainSceneViewModel extends AbstractViewModel {
     private void collectibleSchemeChangeEvent(String event) {
         TableView<?> oldTableView = tableView;
         tableView = model.getTableView();
+        visuals = model.getVisuals();
         addDialog = new EditorDialog(model.getScheme(), new ButtonType("Add", ButtonBar.ButtonData.APPLY));
         editDialog = new EditorDialog(model.getScheme(), new ButtonType("Edit", ButtonBar.ButtonData.APPLY));
         oldTableView.fireEvent(new Event(EventType.ROOT));
     }
 
     @Override
-    public BooleanBinding taskRunningProperty() {
+    public BooleanBinding isTaskRunning() {
         return Stream.of(deleteTask.runningProperty(), exitTask.runningProperty(), disconnectTask.runningProperty(), logOutTask.runningProperty()).
-                map(property -> property.isEqualTo(new SimpleBooleanProperty(true))).reduce(Bindings::or).get();
+                map(property -> property.isEqualTo(TRUE)).reduce(Bindings::or).get();
     }
+
+    public BooleanBinding isItemSelected() {
+        BooleanBinding tableBind = tableTabOpened.isEqualTo(TRUE).and(tableView.getSelectionModel().selectedItemProperty().isNotNull()).and(
+                Bindings.select(tableView.getSelectionModel().selectedItemProperty(), "owner").isEqualTo(account));
+        BooleanBinding visualBind = visualTabOpened.isEqualTo(TRUE).and(model.getSelectedVisual().isNotNull()).and(
+                Bindings.select(model.getSelectedVisual(), "owner").isEqualTo(account));
+        return Bindings.or(tableBind, visualBind);
+    }
+
+//    public ObjectProperty<? extends MainCollectible<?>> selectedItemProperty() {
+//        return new ObjectPropertyBase<MainCollectible<?>>() {
+//            @Override
+//            public Object getBean() {
+//                if (tableTabOpened.get()) return tableView.getSelectionModel().getSelectedItem();
+//                if (visualTabOpened.get()) return model.getSelectedVisual();
+//                return null;
+//            }
+//
+//            @Override
+//            public String getName() {
+//                return "selectedItemProperty";
+//            }
+//        };
+//    }
 }
