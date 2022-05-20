@@ -6,24 +6,44 @@
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
 <AnchorPane minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="300.0"
             xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="gui.connectScene.ConnectSceneView">
     <children>
-        <Label fx:id="infoLabel" alignment="CENTER" layoutX="88.0" layoutY="10.0" prefHeight="40.0" prefWidth="124.0"
-               text="ConnectScene" AnchorPane.leftAnchor="88.0" AnchorPane.rightAnchor="88.0"
-               AnchorPane.topAnchor="10.0"/>
+        <HBox layoutX="88.0" layoutY="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+              AnchorPane.topAnchor="10.0">
+            <children>
+                <AnchorPane fx:id="localeBoxPlace"/>
+                <Label fx:id="infoLabel" alignment="CENTER" prefHeight="40.0" prefWidth="124.0" text="ConnectScene"/>
+            </children>
+        </HBox>
         <VBox alignment="BOTTOM_CENTER" layoutX="10.0" layoutY="216.0" AnchorPane.bottomAnchor="10.0"
               AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
             <children>
-                <TextField fx:id="address" onAction="#connect" prefHeight="24.0" prefWidth="208.0"
-                           promptText="Enter server address:">
-                    <opaqueInsets>
-                        <Insets/>
-                    </opaqueInsets>
-                </TextField>
+                <GridPane>
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0"/>
+                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                    </rowConstraints>
+                    <children>
+                        <TextField fx:id="address" onAction="#connect" prefHeight="24.0" prefWidth="208.0"
+                                   promptText="Enter server address:" GridPane.columnIndex="1">
+                            <opaqueInsets>
+                                <Insets/>
+                            </opaqueInsets>
+                        </TextField>
+                        <Label fx:id="connectLabel" text="Address:"/>
+                    </children>
+                </GridPane>
                 <Label fx:id="message" prefHeight="16.0" prefWidth="300.0" text="Message">
                     <VBox.margin>
                         <Insets top="20.0"/>
@@ -34,8 +54,8 @@
                         <Insets top="20.0"/>
                     </VBox.margin>
                     <children>
-                        <Button layoutX="190.0" layoutY="16.0" mnemonicParsing="false" onAction="#connect"
-                                prefHeight="30.0" prefWidth="100.0" text="Connect" AnchorPane.rightAnchor="0.0"/>
+                        <Button fx:id="connectButton" layoutX="190.0" layoutY="16.0" mnemonicParsing="false"
+                                onAction="#connect" text="Connect" AnchorPane.rightAnchor="0.0"/>
                         <ProgressIndicator fx:id="progress" layoutX="59.0" layoutY="3.0" AnchorPane.leftAnchor="0.0"/>
                     </children>
                 </AnchorPane>

@@ -11,6 +11,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
+import locales.I18N;
 import lombok.Getter;
 import utility.ListAndId;
 
@@ -71,6 +72,8 @@ public class TableViewHandler<T extends MainCollectible<?>> {
 
     private <S> TableColumn<T, S> genColumn(FieldData data, Class<S> dataClass, String schemeName, String fieldName) {
         TableColumn<T, S> column = new TableColumn<>(fieldName);
+        column.textProperty().bind(I18N.getCollectibleBinding(fieldName));
+        column.textProperty().addListener(((observable, oldValue, newValue) -> autoResizeColumns(tableView)));
         if (data.isCollectible()) {
             column.getColumns().addAll(create(data.getCollectibleScheme(), fieldName));
             return column;
@@ -103,25 +106,19 @@ public class TableViewHandler<T extends MainCollectible<?>> {
     }
 
     public static void autoResizeColumns(TableView<?> table) {
-        //Set the right policy
         table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
-        table.getColumns().forEach((column) ->
-        {
-            //Minimal width = columnHeader
-            Text t = new Text(column.getText());
-            double max = t.getLayoutBounds().getWidth();
+        table.getColumns().forEach((column) -> {
+            Text header = new Text(column.getText());
+            double max = header.getLayoutBounds().getWidth();
             for (int i = 0; i < table.getItems().size(); i++) {
-                //cell must not be empty
                 if (column.getCellData(i) != null) {
-                    t = new Text(column.getCellData(i).toString());
-                    double calcwidth = t.getLayoutBounds().getWidth();
-                    //remember new max-width
-                    if (calcwidth > max) {
-                        max = calcwidth;
+                    Text word = new Text(column.getCellData(i).toString());
+                    double newWidth = word.getLayoutBounds().getWidth();
+                    if (newWidth > max) {
+                        max = newWidth;
                     }
                 }
             }
-            //set the new max-width with some extra space
             column.setPrefWidth(max + 10.0d);
         });
     }

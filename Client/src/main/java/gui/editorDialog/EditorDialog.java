@@ -15,6 +15,7 @@ import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.GridPane;
+import locales.I18N;
 import lombok.Getter;
 
 import java.util.*;
@@ -28,7 +29,7 @@ public class EditorDialog {
     private final Map<String, TextField> textFields = new HashMap<>();
     private final Map<String, ChoiceBox<?>> choiceBoxes = new HashMap<>();
     private final Map<String, ObservableValue<?>> input = new HashMap<>();
-    private final ButtonType cancelButton = ButtonType.CANCEL;
+    private final ButtonType cancelButton = new ButtonType("cancelButton", ButtonBar.ButtonData.CANCEL_CLOSE);
 
     public EditorDialog(CollectibleScheme scheme, ButtonType buttonType) {
         this.dialog = create(scheme, buttonType);
@@ -65,6 +66,10 @@ public class EditorDialog {
             }
             return null;
         });
+        for (ButtonType type : dialog.getDialogPane().getButtonTypes()) {
+            Button button = (Button) dialog.getDialogPane().lookupButton(type);
+            button.textProperty().bind(I18N.getGuiLabelBinding(button.getText()));
+        }
         return dialog;
     }
 

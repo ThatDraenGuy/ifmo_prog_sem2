@@ -24,6 +24,7 @@ import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableView;
 import javafx.scene.image.ImageView;
+import locales.I18N;
 import lombok.Getter;
 import security.CurrentAccount;
 
@@ -171,8 +172,8 @@ public class MainSceneViewModel extends AbstractViewModel {
         TableView<?> oldTableView = tableView;
         tableView = model.getTableView();
         visuals = model.getVisuals();
-        addDialog = new EditorDialog(model.getScheme(), new ButtonType("Add", ButtonBar.ButtonData.APPLY));
-        editDialog = new EditorDialog(model.getScheme(), new ButtonType("Edit", ButtonBar.ButtonData.APPLY));
+        addDialog = new EditorDialog(model.getScheme(), new ButtonType("addButton", ButtonBar.ButtonData.APPLY));
+        editDialog = new EditorDialog(model.getScheme(), new ButtonType("editButton", ButtonBar.ButtonData.APPLY));
         oldTableView.fireEvent(new Event(EventType.ROOT));
     }
 

@@ -14,55 +14,61 @@
 <?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
 
-
 <AnchorPane prefHeight="400.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="gui.loginScene.LoginSceneView">
-   <children>
-      <Label fx:id="infoLabel" layoutX="110.0" layoutY="10.0" prefHeight="40.0" prefWidth="81.0" text="LoginScene"
-             AnchorPane.leftAnchor="110.0" AnchorPane.rightAnchor="110.0" AnchorPane.topAnchor="10.0"/>
-      <VBox alignment="BOTTOM_CENTER" layoutX="10.0" layoutY="236.0" AnchorPane.bottomAnchor="10.0"
-            AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
-         <children>
-            <GridPane alignment="CENTER" vgap="10.0">
-               <columnConstraints>
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="99.0" minWidth="10.0" prefWidth="86.0"/>
-                  <ColumnConstraints hgrow="SOMETIMES" maxWidth="220.0" minWidth="10.0" prefWidth="194.0"/>
-               </columnConstraints>
-               <rowConstraints>
-                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
-                  <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
-               </rowConstraints>
-               <children>
-                  <TextField fx:id="loginField" onAction="#login" promptText="Input login:" GridPane.columnIndex="1"/>
-                  <PasswordField fx:id="passwordField" onAction="#login" promptText="Input password:"
-                                 GridPane.columnIndex="1" GridPane.rowIndex="1"/>
-                  <Label alignment="CENTER" prefHeight="16.0" prefWidth="101.0" text="Login:"/>
-                  <Label alignment="CENTER" prefHeight="16.0" prefWidth="87.0" text="Password:" GridPane.rowIndex="1"/>
-               </children>
+    <children>
+        <HBox layoutX="110.0" layoutY="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+              AnchorPane.topAnchor="10.0">
+            <children>
+                <AnchorPane fx:id="localeBoxPlace"/>
+                <Label fx:id="infoLabel" prefHeight="40.0" prefWidth="81.0" text="LoginScene"/>
+            </children>
+        </HBox>
+        <VBox alignment="BOTTOM_CENTER" layoutX="10.0" layoutY="236.0" AnchorPane.bottomAnchor="10.0"
+              AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+            <children>
+                <GridPane alignment="CENTER" vgap="10.0">
+                    <columnConstraints>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="99.0" minWidth="10.0" prefWidth="86.0"/>
+                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="220.0" minWidth="10.0" prefWidth="194.0"/>
+                    </columnConstraints>
+                    <rowConstraints>
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                        <RowConstraints minHeight="10.0" vgrow="SOMETIMES"/>
+                    </rowConstraints>
+                    <children>
+                        <TextField fx:id="loginField" onAction="#login" promptText="Input login:"
+                                   GridPane.columnIndex="1"/>
+                        <PasswordField fx:id="passwordField" onAction="#login" promptText="Input password:"
+                                       GridPane.columnIndex="1" GridPane.rowIndex="1"/>
+                        <Label fx:id="loginLabel" alignment="CENTER" prefHeight="16.0" prefWidth="101.0" text="Login:"/>
+                        <Label fx:id="passwordLabel" alignment="CENTER" prefHeight="16.0" prefWidth="87.0"
+                               text="Password:" GridPane.rowIndex="1"/>
+                    </children>
             </GridPane>
             <Label fx:id="message" prefHeight="30.0" prefWidth="300.0" text="Label">
                <VBox.margin>
-                  <Insets top="10.0"/>
+                   <Insets top="10.0"/>
                </VBox.margin>
             </Label>
             <AnchorPane>
                <VBox.margin>
-                  <Insets/>
+                   <Insets/>
                </VBox.margin>
                <children>
-                  <HBox alignment="BOTTOM_RIGHT" layoutX="222.0" layoutY="34.0" prefHeight="24.0" prefWidth="135.0"
-                        spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
-                     <children>
-                        <Hyperlink fx:id="register" onAction="#register" text="register"/>
-                        <Button fx:id="loginButton" mnemonicParsing="false" onAction="#login" text="Log in"/>
-                     </children>
-                  </HBox>
-                  <ProgressIndicator fx:id="progress" layoutX="14.0" layoutY="5.0" AnchorPane.leftAnchor="0.0"/>
+                   <HBox alignment="BOTTOM_RIGHT" layoutX="222.0" layoutY="34.0" spacing="10.0"
+                         AnchorPane.bottomAnchor="0.0" AnchorPane.rightAnchor="0.0">
+                       <children>
+                           <Hyperlink fx:id="register" onAction="#register" text="register"/>
+                           <Button fx:id="loginButton" mnemonicParsing="false" onAction="#login" text="Log in"/>
+                       </children>
+                   </HBox>
+                   <ProgressIndicator fx:id="progress" layoutX="14.0" layoutY="5.0" AnchorPane.leftAnchor="0.0"/>
                </children>
             </AnchorPane>
          </children>
          <padding>
-            <Insets top="10.0"/>
+             <Insets top="10.0"/>
          </padding>
       </VBox>
    </children>
