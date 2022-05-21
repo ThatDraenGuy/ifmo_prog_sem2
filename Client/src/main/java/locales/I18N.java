@@ -53,6 +53,10 @@ public class I18N {
         return Bindings.createStringBinding(() -> getCollectible(key), locale);
     }
 
+    public static StringBinding getCollectibleBinding(String key, String appendix) {
+        return Bindings.createStringBinding(() -> getCollectible(key) + appendix, locale);
+    }
+
     public static void setLocale(Locale locale) {
         if (locale != null) {
             guiLabels = ResourceBundle.getBundle("locales.GuiLabels", locale);

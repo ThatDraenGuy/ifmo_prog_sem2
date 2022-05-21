@@ -4,8 +4,11 @@ import collection.classes.*;
 import collection.history.CollectionChange;
 import collection.meta.CollectibleScheme;
 import collection.meta.FieldData;
+import javafx.beans.binding.*;
+import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
 import javafx.beans.value.ObservableValueBase;
+import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
@@ -16,7 +19,12 @@ import lombok.Getter;
 import utility.ListAndId;
 
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
+import java.time.format.DateTimeFormatter;
+import java.time.temporal.Temporal;
+import java.time.temporal.TemporalAccessor;
 import java.util.*;
+import java.util.concurrent.Callable;
 
 public class TableViewHandler<T extends MainCollectible<?>> {
     @Getter
@@ -65,7 +73,7 @@ public class TableViewHandler<T extends MainCollectible<?>> {
         List<TableColumn<T, ?>> list = new ArrayList<>();
         for (String fieldName : scheme.getFieldsData().keySet()) {
             FieldData data = scheme.getFieldsData().get(fieldName);
-            if (data.isUserReadable()) list.add(genColumn(data, data.getClass(), schemeName, fieldName));
+            if (data.isUserReadable()) list.add(genColumn(data, data.getType(), schemeName, fieldName));
         }
         return list;
     }
@@ -102,6 +110,26 @@ public class TableViewHandler<T extends MainCollectible<?>> {
                 }
             });
         } else column.setCellValueFactory(new PropertyValueFactory<>(fieldName));
+        if (Temporal.class.isAssignableFrom(dataClass)) {
+            column.cellFactoryProperty().bind(Bindings.createObjectBinding(() -> new Callback<>() {
+                @Override
+                public TableCell<T, S> call(TableColumn<T, S> param) {
+                    return new TableCell<>() {
+                        private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy - hh:mm (zzzz)", I18N.getLocale().get());
+
+                        @Override
+                        protected void updateItem(S item, boolean empty) {
+                            super.updateItem(item, empty);
+                            if (empty) {
+                                setText(null);
+                            } else {
+                                this.setText(formatter.format((TemporalAccessor) item));
+                            }
+                        }
+                    };
+                }
+            }, I18N.getLocale()));
+        }
         return column;
     }
 
@@ -121,5 +149,23 @@ public class TableViewHandler<T extends MainCollectible<?>> {
             }
             column.setPrefWidth(max + 10.0d);
         });
+//        table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+//        table.getColumns().forEach((column) -> {
+//            StringProperty stringProperty = column.textProperty();
+//            IntegerBinding lengthBind = stringProperty.length();
+//            NumberBinding finalBinding = lengthBind;
+//            for (int i = 0; i < table.getItems().size(); i++) {
+//                if (column.getCellData(i) != null) {
+//                    int finalI = i;
+//                    DoubleBinding binding = Bindings.createDoubleBinding(() -> {
+//                        Text word = new Text(column.getCellData(finalI).toString());
+//                        double width = word.getLayoutBounds().getWidth();
+//                        return width;
+//                    }, I18N.getLocale());
+//                    finalBinding = Bindings.max(finalBinding,binding);
+//                }
+//            }
+//            column.prefWidthProperty().bind(finalBinding.add(10.0d));
+//        });
     }
 }

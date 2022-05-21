@@ -83,7 +83,8 @@ public class EditorDialog {
     }
 
     private void handleData(GridPane grid, String fieldName, FieldData data) {
-        Label label = new Label(fieldName + ": ");
+        Label label = new Label();
+        label.textProperty().bind(I18N.getCollectibleBinding(fieldName, ":"));
         if (data.isCollectible()) {
             addRow(grid, label);
             handleCollectible(grid, data.getCollectibleScheme());
@@ -104,7 +105,7 @@ public class EditorDialog {
         if (!fieldType.isEnum()) {
             TextField textField = new TextField();
             textFields.put(fieldName, textField);
-            textField.setPromptText(fieldName);
+            textField.promptTextProperty().bind(I18N.getCollectibleBinding(fieldName));
             input.put(fieldName, textField.textProperty());
             textField.textProperty().addListener((observable, oldValue, newValue) -> {
                 try {
