@@ -12,9 +12,12 @@ public class ActionResult implements Serializable {
     private final boolean success;
     @Getter
     private final String message;
+    @Getter
+    private final Object[] args;
 
-    public ActionResult(boolean result, String message) {
+    public ActionResult(boolean result, String message, Object... args) {
         this.success = result;
         this.message = message;
+        this.args = args;
     }
 }

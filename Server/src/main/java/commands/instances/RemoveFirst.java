@@ -21,11 +21,11 @@ public class RemoveFirst extends AbstractCommand {
     public ActionResult action(ExecutionPayload executionPayload) {
         try {
             collectionHandler.removeFirst(executionPayload.getAccount().getName());
-            return new ActionResult(true, "Successfully deleted first element");
+            return new ActionResult(true, "removeSuccess");
         } catch (NoSuchElementException e) {
-            return new ActionResult(false, "There are no elements in the collection!");
+            return new ActionResult(false, "emptyCollectionException");
         } catch (StorageException e) {
-            return new ActionResult(false, "A storage exception has occured: " + e.getMessage());
+            return new ActionResult(false, "storageException");
         }
     }
 }

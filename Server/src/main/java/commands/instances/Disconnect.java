@@ -12,7 +12,7 @@ public class Disconnect extends AbstractCommand {
     protected ActionResult action(ExecutionPayload executionPayload) {
         if (executionPayload instanceof ServerExecutionPayload serverExecutionPayload) {
             serverExecutionPayload.getUserHandler().sendDisconnectRequest();
-            return new ActionResult(true, "Successfully disconnected user");
-        } else return new ActionResult(false, "Couldn't disconnect user");
+            return new ActionResult(true, "disconnectSuccess");
+        } else return new ActionResult(false, "disconnectFailure");
     }
 }

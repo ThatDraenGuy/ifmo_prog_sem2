@@ -19,9 +19,9 @@ public class Clear extends AbstractCommand {
     public ActionResult action(ExecutionPayload executionPayload) {
         try {
             collectionHandler.clear(executionPayload.getAccount().getName());
-            return new ActionResult(true, "Successfully cleared your collectibles");
+            return new ActionResult(true, "clearSuccess");
         } catch (StorageException e) {
-            return new ActionResult(false, "A storage exception has occurred: " + e.getMessage());
+            return new ActionResult(false, "storageException");
         }
     }
 }

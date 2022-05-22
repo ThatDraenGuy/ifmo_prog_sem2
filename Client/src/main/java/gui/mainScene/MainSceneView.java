@@ -8,6 +8,7 @@ import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
+import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.GridPane;
 import locales.I18N;
@@ -17,7 +18,7 @@ public class MainSceneView extends AbstractView {
     @FXML
     private Label account, accountLabel, server, serverLabel, localeLabel;
     @FXML
-    private Label message;
+    private TextArea message;
     @FXML
     private ProgressIndicator progress;
     private TableView<? extends MainCollectible<?>> tableView;
@@ -33,6 +34,8 @@ public class MainSceneView extends AbstractView {
     private Tab tableTab, visualTab;
     @FXML
     private GridPane infoGrid;
+    @FXML
+    private BorderPane mainArea;
 
     private final MainSceneViewModel viewModel = new MainSceneViewModel();
 
@@ -50,7 +53,6 @@ public class MainSceneView extends AbstractView {
         viewModel.getTableView().addEventHandler(EventType.ROOT, event -> {
             tableView = viewModel.getTableView();
             tablePlace.getChildren().add(tableView);
-//            tablePlace.prefWidthProperty().bind(tableView.prefWidthProperty());
             AnchorPane.setTopAnchor(tableView, 0.0);
             AnchorPane.setBottomAnchor(tableView, 0.0);
             AnchorPane.setLeftAnchor(tableView, 0.0);

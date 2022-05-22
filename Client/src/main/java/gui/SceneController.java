@@ -38,8 +38,8 @@ public class SceneController {
     private void switchTo(Scene scene) {
         primaryStage.setScene(scene);
         Notifications.publish(Notifications.SCENE_CHANGE_EVENT);
-        primaryStage.show();
         primaryStage.setMinHeight(scene.getHeight());
         primaryStage.setMinWidth(scene.getWidth());
+        primaryStage.show();
     }
 }

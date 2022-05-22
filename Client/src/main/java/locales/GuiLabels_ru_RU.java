@@ -27,6 +27,7 @@ public class GuiLabels_ru_RU extends ListResourceBundle {
             {"serverLabel", "Текущий сервер:"},
             {"localeLabel", "Текущий язык:"},
             {"tableTab", "Таблица"},
-            {"visualTab", "Визуал"}
+            {"visualTab", "Визуал"},
+            {"info", "информация"}
     };
 }

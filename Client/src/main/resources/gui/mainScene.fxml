@@ -7,6 +7,7 @@
 <?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.ToolBar?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
@@ -15,7 +16,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<BorderPane xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane maxHeight="700.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="gui.mainScene.MainSceneView">
     <center>
         <AnchorPane BorderPane.alignment="CENTER">
@@ -34,8 +35,9 @@
                                 <AnchorPane minHeight="-Infinity" minWidth="-Infinity">
                                     <children>
                                         <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="166.0" layoutY="168.0"
-                                                    AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0"
-                                                    AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                                    pannable="true" vbarPolicy="ALWAYS" AnchorPane.bottomAnchor="0.0"
+                                                    AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
+                                                    AnchorPane.topAnchor="0.0">
                                             <content>
                                                 <AnchorPane minHeight="-Infinity" minWidth="-Infinity">
                                                     <children>
@@ -63,8 +65,6 @@
             <children>
                 <ProgressIndicator fx:id="progress" disable="true" layoutX="-1.0" AnchorPane.bottomAnchor="7.5"
                                    AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="7.5"/>
-                <Label fx:id="message" layoutX="-1.0" prefHeight="45.0" prefWidth="117.0" text="Label"
-                       AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="0.0"/>
                 <GridPane fx:id="infoGrid" hgap="10.0" layoutX="54.0" layoutY="-3.0" vgap="10.0"
                           AnchorPane.leftAnchor="270.0" AnchorPane.topAnchor="0.0">
                     <columnConstraints>
@@ -94,6 +94,8 @@
                                 textAlignment="CENTER"/>
                     </items>
                 </ToolBar>
+                <TextArea fx:id="message" editable="false" layoutX="26.0" layoutY="-44.0" prefHeight="100.0"
+                          prefWidth="150.0" wrapText="true" AnchorPane.leftAnchor="60.0" AnchorPane.topAnchor="0.0"/>
             </children>
         </AnchorPane>
     </top>

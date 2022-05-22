@@ -19,6 +19,8 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import locales.CollectibleFormatter;
+import locales.I18N;
 import lombok.Getter;
 import utility.ListAndId;
 
@@ -105,9 +107,9 @@ public class VisualViewHandler<T extends MainCollectible<?>> {
                 if (selectedButton != null) selectedButton.setBorder(defaultBorder);
                 selectedButton = button;
                 button.setBorder(selectedBorder);
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, element.toString());
+                Alert alert = new Alert(Alert.AlertType.INFORMATION, CollectibleFormatter.getDescription(element.toModel()));
                 alert.setHeaderText(element.getName());
-                alert.setTitle("info");
+                alert.setTitle(I18N.getGuiLabel("info"));
                 alert.setGraphic(new ImageView(image));
                 alert.show();
             }));

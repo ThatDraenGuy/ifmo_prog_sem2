@@ -73,7 +73,7 @@ public class DatabaseHandler implements StorageHandler {
                 CommandAccessLevel accessLevel = CommandAccessLevel.valueOf(resultSet.getString("accessLevel"));
                 return new AccountData(passHash, salt, accessLevel);
             } else {
-                throw new UnknownAccountException("Account with username " + username + " doesn't exist");
+                throw new UnknownAccountException("unknownAccountException");
             }
         } catch (SQLException e) {
             throw new StorageException(e);

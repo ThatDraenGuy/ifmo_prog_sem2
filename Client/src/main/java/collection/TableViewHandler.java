@@ -14,6 +14,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.text.Text;
 import javafx.util.Callback;
+import locales.CollectibleFormatter;
 import locales.I18N;
 import lombok.Getter;
 import utility.ListAndId;
@@ -110,45 +111,43 @@ public class TableViewHandler<T extends MainCollectible<?>> {
                 }
             });
         } else column.setCellValueFactory(new PropertyValueFactory<>(fieldName));
-        if (Temporal.class.isAssignableFrom(dataClass)) {
-            column.cellFactoryProperty().bind(Bindings.createObjectBinding(() -> new Callback<>() {
-                @Override
-                public TableCell<T, S> call(TableColumn<T, S> param) {
-                    return new TableCell<>() {
-                        private final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy - hh:mm (zzzz)", I18N.getLocale().get());
-
-                        @Override
-                        protected void updateItem(S item, boolean empty) {
-                            super.updateItem(item, empty);
-                            if (empty) {
-                                setText(null);
-                            } else {
-                                this.setText(formatter.format((TemporalAccessor) item));
-                            }
+        column.cellFactoryProperty().bind(Bindings.createObjectBinding(() -> new Callback<>() {
+            @Override
+            public TableCell<T, S> call(TableColumn<T, S> param) {
+                return new TableCell<>() {
+                    @Override
+                    protected void updateItem(S item, boolean empty) {
+                        super.updateItem(item, empty);
+                        if (empty) {
+                            setText(null);
+                        } else {
+                            this.setText(CollectibleFormatter.formatData(data, dataClass, item));
                         }
-                    };
+                    }
+                };
                 }
             }, I18N.getLocale()));
-        }
         return column;
     }
 
     public static void autoResizeColumns(TableView<?> table) {
         table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
-        table.getColumns().forEach((column) -> {
-            Text header = new Text(column.getText());
-            double max = header.getLayoutBounds().getWidth();
-            for (int i = 0; i < table.getItems().size(); i++) {
-                if (column.getCellData(i) != null) {
-                    Text word = new Text(column.getCellData(i).toString());
-                    double newWidth = word.getLayoutBounds().getWidth();
-                    if (newWidth > max) {
-                        max = newWidth;
-                    }
-                }
-            }
-            column.setPrefWidth(max + 10.0d);
-        });
+//        table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
+//        table.getColumns().forEach((column) -> {
+//            Text header = new Text(column.getText());
+//            double max = header.getLayoutBounds().getWidth();
+//            for (int i = 0; i < table.getItems().size(); i++) {
+//                if (column.getCellData(i) != null) {
+//                    Text word = new Text(column.getCellData(i).toString());
+//                    double newWidth = word.getLayoutBounds().getWidth();
+//                    if (newWidth > max) {
+//                        max = newWidth;
+//                    }
+//                }
+//            }
+//            column.setPrefWidth(max + 10.0d);
+//        });
+
 //        table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 //        table.getColumns().forEach((column) -> {
 //            StringProperty stringProperty = column.textProperty();

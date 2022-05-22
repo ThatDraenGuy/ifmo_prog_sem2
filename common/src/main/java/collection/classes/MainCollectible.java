@@ -16,6 +16,7 @@ public interface MainCollectible<T> extends Collectible, Comparable<T> {
 
     String getOwner();
 
+    Object[] getDescriptionArgs();
 
     int compareTo(CollectibleModel collectibleModel);
 

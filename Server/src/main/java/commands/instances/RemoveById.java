@@ -21,11 +21,11 @@ public class RemoveById extends AbstractCommand {
         CommandArgs args = executionPayload.getCommandArgs();
         try {
             collectionHandler.removeById(args.getArgs(), executionPayload.getAccount().getName());
-            return new ActionResult(true, "Successfully deleted element with id " + args.getArgs());
+            return new ActionResult(true, "removeSuccess");
         } catch (ElementIdException e) {
-            return new ActionResult(false, e.getMessage());
+            return new ActionResult(false, "elementIdException", e.getMessage());
         } catch (StorageException e) {
-            return new ActionResult(false, "A storage exception has occurred: " + e.getMessage());
+            return new ActionResult(false, "storageException");
         }
     }
 }

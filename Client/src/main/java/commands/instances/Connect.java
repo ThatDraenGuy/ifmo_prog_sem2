@@ -26,19 +26,19 @@ public class Connect extends AbstractCommand {
             String address = args.getArgs();
             String[] splitStr = address.split(":");
             if (splitStr.length != 2)
-                return new ActionResult(false, "Invalid input");
+                return new ActionResult(false, "invalidAddressException");
             String host = splitStr[0];
             int port = Integer.parseInt(splitStr[1]);
             connectionHandler.connect(host, port);
             threadHandler.reloadMessageReader();
             executionController.setUserAccessLevel(CommandAccessLevel.GUEST);
-            return new ActionResult(true, "You have been successfully connected");
+            return new ActionResult(true, "connectSuccess");
         } catch (NumberFormatException e) {
-            return new ActionResult(false, "Couldn't parse port");
+            return new ActionResult(false, "invalidPortException");
         } catch (UnknownHostException e) {
-            return new ActionResult(false, "Couldn't find host \"" + args.getArgs() + "\"");
+            return new ActionResult(false, "unknownHostException", args.getArgs());
         } catch (IOException e) {
-            return new ActionResult(false, e.getMessage());
+            return new ActionResult(false, "connectFailure");
         }
     }
 }

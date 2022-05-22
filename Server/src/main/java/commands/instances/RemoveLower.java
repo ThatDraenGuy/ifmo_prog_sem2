@@ -21,9 +21,9 @@ public class RemoveLower extends AbstractCommand {
         CommandArgs args = executionPayload.getCommandArgs();
         try {
             serverCollectionHandler.removeLower(args.getCollectibleModel(), executionPayload.getAccount().getName());
-            return new ActionResult(true, "Successfully removed all lower objects");
+            return new ActionResult(true, "removeSuccess");
         } catch (StorageException e) {
-            return new ActionResult(false, "A storage exception has occurred: " + e.getMessage());
+            return new ActionResult(false, "storageException");
         }
     }
 }

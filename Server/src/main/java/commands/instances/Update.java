@@ -23,11 +23,13 @@ public class Update extends AbstractCommand {
         CommandArgs args = executionPayload.getCommandArgs();
         try {
             serverCollectionHandler.update(args.getArgs(), executionPayload.getAccount().getName(), args.getCollectibleModel());
-            return new ActionResult(true, "Successfully updated element with id " + args.getArgs());
-        } catch (ElementIdException | IncorrectCollectibleTypeException e) {
-            return new ActionResult(false, e.getMessage());
+            return new ActionResult(true, "updateSuccess");
+        } catch (ElementIdException e) {
+            return new ActionResult(false, "elementIdException", e.getMessage());
         } catch (StorageException e) {
-            return new ActionResult(false, "A storage exception has occurred: " + e.getMessage());
+            return new ActionResult(false, "storageException");
+        } catch (IncorrectCollectibleTypeException e) {
+            return new ActionResult(false, "incorrectCollectibleException");
         }
     }
 }

@@ -5,6 +5,7 @@ import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import locales.I18N;
 import lombok.Getter;
 
 public abstract class AbstractViewModel implements ViewModel {
@@ -28,11 +29,11 @@ public abstract class AbstractViewModel implements ViewModel {
     protected void handleActionResult(ActionResult actionResult) {
         success.setValue(actionResult.isSuccess());
         if (!success.get()) {
-            errorMessage.setValue(actionResult.getMessage());
+            errorMessage.setValue(I18N.getInteraction(actionResult.getMessage(), actionResult.getArgs()));
             message.setValue("");
             errorMessage.setValue("");
         } else {
-            message.setValue(actionResult.getMessage());
+            message.setValue(I18N.getInteraction(actionResult.getMessage(), actionResult.getArgs()));
         }
     }
 }

@@ -7,6 +7,7 @@ import collection.meta.FieldModel;
 import lombok.Getter;
 
 
+import java.text.ChoiceFormat;
 import java.time.ZonedDateTime;
 
 @Getter
@@ -82,6 +83,10 @@ public class Dragon implements MainCollectible<Dragon> {
         if (cave != null) str.append(". His cave ").append(cave);
         str.append("; Owner - ").append(owner);
         return str.toString();
+    }
+
+    public Object[] getDescriptionArgs() {
+        return new Object[]{id, name, age, color, type, character, creationDate, coordinates.getX(), coordinates.getY(), cave.getDepth(), owner};
     }
 
     @Override

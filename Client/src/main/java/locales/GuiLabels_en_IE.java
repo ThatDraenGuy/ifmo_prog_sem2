@@ -27,6 +27,7 @@ public class GuiLabels_en_IE extends ListResourceBundle {
             {"serverLabel", "Current server:"},
             {"localeLabel", "Current language:"},
             {"tableTab", "Table"},
-            {"visualTab", "Visuals"}
+            {"visualTab", "Visuals"},
+            {"info", "info"}
     };
 }

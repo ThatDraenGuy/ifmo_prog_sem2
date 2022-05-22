@@ -8,11 +8,13 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import lombok.Getter;
 
+import java.text.MessageFormat;
 import java.util.*;
 
 public class I18N {
     private static ResourceBundle guiLabels;
     private static ResourceBundle collectibles;
+    private static ResourceBundle interactions;
     @Getter
     private static final ObjectProperty<Locale> locale;
     @Getter
@@ -40,17 +42,27 @@ public class I18N {
         return key;
     }
 
-    public static String getCollectible(String key) {
-        if (collectibles.containsKey(key)) return collectibles.getString(key);
-        return key;
+    public static String getCollectible(String key, Object... args) {
+        if (!collectibles.containsKey(key)) return key;
+        MessageFormat format = new MessageFormat(collectibles.getString(key));
+        for (int i = 0; i < args.length; i++) {
+            if (args[i] == null) args[i] = "";
+        }
+        return format.format(args);
+    }
+
+    public static String getInteraction(String key, Object... args) {
+        if (!interactions.containsKey(key)) return key;
+        MessageFormat format = new MessageFormat(interactions.getString(key));
+        return format.format(args);
     }
 
     public static StringBinding getGuiLabelBinding(String key) {
         return Bindings.createStringBinding(() -> getGuiLabel(key), locale);
     }
 
-    public static StringBinding getCollectibleBinding(String key) {
-        return Bindings.createStringBinding(() -> getCollectible(key), locale);
+    public static StringBinding getCollectibleBinding(String key, Object... args) {
+        return Bindings.createStringBinding(() -> getCollectible(key, args), locale);
     }
 
     public static StringBinding getCollectibleBinding(String key, String appendix) {
@@ -61,6 +73,7 @@ public class I18N {
         if (locale != null) {
             guiLabels = ResourceBundle.getBundle("locales.GuiLabels", locale);
             collectibles = ResourceBundle.getBundle("locales.Collectibles", locale);
+            interactions = ResourceBundle.getBundle("locales.Interactions", locale);
             I18N.locale.setValue(locale);
         }
     }

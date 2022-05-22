@@ -1,5 +1,6 @@
 package gui;
 
+import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Alert;
@@ -8,12 +9,21 @@ import javafx.util.StringConverter;
 import locales.I18N;
 
 import java.util.Locale;
+import java.util.Timer;
+import java.util.TimerTask;
 
 public abstract class AbstractView {
     protected ChoiceBox<Locale> localeChoiceBox;
+    protected final Timer timer = new Timer();
     protected void defaultInitialize(BooleanProperty progressVisibility, StringProperty message, ViewModel viewModel) {
         progressVisibility.bind(viewModel.isTaskRunning());
-        message.bind(viewModel.getMessage());
+        message.bindBidirectional(viewModel.getMessage());
+        message.addListener((observable -> timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                message.setValue("");
+            }
+        }, 5000)));
         viewModel.getErrorMessage().addListener(
                 (observableValue, oldValue, newValue) -> {
                     if (newValue != null && !newValue.isEmpty()) {

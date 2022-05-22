@@ -20,9 +20,11 @@ public class Add extends AbstractCommand {
     public ActionResult action(ExecutionPayload executionPayload) {
         try {
             serverCollectionHandler.add(executionPayload.getCommandArgs().getCollectibleModel());
-            return new ActionResult(true, "Successfully added new dragon to collection");
-        } catch (IncorrectCollectibleTypeException | StorageException e) {
-            return new ActionResult(false, e.getMessage());
+            return new ActionResult(true, "addSuccess");
+        } catch (StorageException e) {
+            return new ActionResult(false, "storageException");
+        } catch (IncorrectCollectibleTypeException e) {
+            return new ActionResult(false, "incorrectCollectibleException");
         }
     }
 }

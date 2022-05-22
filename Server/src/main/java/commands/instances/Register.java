@@ -25,9 +25,9 @@ public class Register extends AbstractCommand {
             CollectibleModel model = executionPayload.getCommandArgs().getCollectibleModel();
             Account account = accountFactory.getObject(model);
             accountsHandler.register(account.getName(), account.getPassword());
-            return new ActionResult(true, "Successfully registered account");
+            return new ActionResult(true, "registerSuccess");
         } catch (StorageException e) {
-            return new ActionResult(false, "A storage exception has occurred");
+            return new ActionResult(false, "storageException");
         } catch (IncorrectAccountDataException | IncorrectCollectibleTypeException e) {
             return new ActionResult(false, e.getMessage());
         }
