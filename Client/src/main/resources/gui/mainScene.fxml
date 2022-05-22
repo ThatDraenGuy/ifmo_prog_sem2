@@ -32,23 +32,14 @@
                         </Tab>
                         <Tab fx:id="visualTab" text="Visual">
                             <content>
-                                <AnchorPane minHeight="-Infinity" minWidth="-Infinity">
+                                <AnchorPane>
                                     <children>
                                         <ScrollPane fitToHeight="true" fitToWidth="true" layoutX="166.0" layoutY="168.0"
-                                                    pannable="true" vbarPolicy="ALWAYS" AnchorPane.bottomAnchor="0.0"
+                                                    pannable="true" AnchorPane.bottomAnchor="0.0"
                                                     AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                                                     AnchorPane.topAnchor="0.0">
                                             <content>
-                                                <AnchorPane minHeight="-Infinity" minWidth="-Infinity">
-                                                    <children>
-                                                        <FlowPane fx:id="visual" hgap="10.0" layoutX="111.0"
-                                                                  layoutY="100.0" vgap="10.0"
-                                                                  AnchorPane.bottomAnchor="0.0"
-                                                                  AnchorPane.leftAnchor="0.0"
-                                                                  AnchorPane.rightAnchor="0.0"
-                                                                  AnchorPane.topAnchor="0.0"/>
-                                                    </children>
-                                                </AnchorPane>
+                                                <FlowPane fx:id="visual" hgap="10.0" vgap="10.0"/>
                                             </content>
                                         </ScrollPane>
                                     </children>
