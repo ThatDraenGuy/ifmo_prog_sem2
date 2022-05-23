@@ -7,6 +7,7 @@ import java.util.ListResourceBundle;
 public class Collectibles_en_IE extends ListResourceBundle {
     @Getter
     private final Object[][] contents = new Object[][]{
+            {"empty", "-"},
             {"id", "id"},
             {"name", "name"},
             {"coordinates", "coordinates"},
@@ -19,6 +20,16 @@ public class Collectibles_en_IE extends ListResourceBundle {
             {"owner", "owner"},
             {"x", "x"},
             {"y", "y"},
-            {"depth", "depth"}
+            {"depth", "depth"},
+            {"Color.YELLOW", "YELLOW"},
+            {"Color.BROWN", "BROWN"},
+            {"Color.GREEN", "GREEN"},
+            {"DragonCharacter.CUNNING", "CUNNING"},
+            {"DragonCharacter.WISE", "WISE"},
+            {"DragonCharacter.GOOD", "GOOD"},
+            {"DragonType.WATER", "WATER"},
+            {"DragonType.UNDERGROUND", "UNDERGROUND"},
+            {"DragonType.AIR", "AIR"},
+            {"DragonType.FIRE", "FIRE"}
     };
 }

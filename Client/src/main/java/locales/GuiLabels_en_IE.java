@@ -7,6 +7,7 @@ import java.util.ListResourceBundle;
 public class GuiLabels_en_IE extends ListResourceBundle {
     @Getter
     private final Object[][] contents = new Object[][]{
+            {"appName", "Dracoll"},
             {"connectButton", "Connect"},
             {"connectPrompt", "Enter address:"},
             {"connectLabel", "Address:"},
@@ -29,6 +30,7 @@ public class GuiLabels_en_IE extends ListResourceBundle {
             {"tableTab", "Table"},
             {"visualTab", "Visuals"},
             {"info", "info"},
-            {"error", "error"}
+            {"error", "error"},
+            {"ownedBy", "owned by: {0}"}
     };
 }

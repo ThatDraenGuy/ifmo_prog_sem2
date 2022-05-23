@@ -7,6 +7,7 @@ import java.util.ListResourceBundle;
 public class GuiLabels_ru_RU extends ListResourceBundle {
     @Getter
     private final Object[][] contents = new Object[][]{
+            {"appName", "Драколл"},
             {"connectButton", "Подключиться"},
             {"connectPrompt", "Введите адрес:"},
             {"connectLabel", "Адрес:"},
@@ -29,6 +30,7 @@ public class GuiLabels_ru_RU extends ListResourceBundle {
             {"tableTab", "Таблица"},
             {"visualTab", "Визуал"},
             {"info", "информация"},
-            {"error", "ошибка"}
+            {"error", "ошибка"},
+            {"ownedBy", "Владелец: {0}"}
     };
 }

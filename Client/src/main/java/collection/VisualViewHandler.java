@@ -1,10 +1,8 @@
 package collection;
 
-import app.Controllers;
 import collection.classes.MainCollectible;
 import collection.history.CollectionChange;
 import collection.meta.CollectibleScheme;
-import commands.Requester;
 import gui.Notifications;
 import javafx.animation.FadeTransition;
 import javafx.animation.Transition;
@@ -53,6 +51,7 @@ public class VisualViewHandler<T extends MainCollectible<?>> {
     private final ObservableMap<T, Node> visuals = FXCollections.observableHashMap();
     private final ObservableMap<T, Transition> animations = FXCollections.observableHashMap();
     private final CollectibleScheme scheme;
+    private final Map<collection.classes.Color, Image> variants = new HashMap<>();
     private final Map<String, Color> coloredOwners = new HashMap<>();
 
     private final Border defaultBorder = new Border(new BorderStroke(Color.WHITE, null, null, BorderWidths.EMPTY));
@@ -108,8 +107,12 @@ public class VisualViewHandler<T extends MainCollectible<?>> {
         return transition;
     }
 
+    private void sampleScheme(CollectibleScheme scheme) {
+
+    }
+
     private Node sample(CollectibleScheme scheme, T element) {
-        InputStream imageInput = getClass().getClassLoader().getResourceAsStream("images/" + scheme.getSimpleName() + ".png");
+        InputStream imageInput = getClass().getClassLoader().getResourceAsStream("images/" + scheme.getSimpleName() + "/" + element.getColor() + ".png");
         System.out.println("yes image");
         if (imageInput != null) {
             Button button = new Button();
@@ -118,7 +121,9 @@ public class VisualViewHandler<T extends MainCollectible<?>> {
             button.setGraphic(imageView);
             button.setText(element.getName());
             button.setBackground(new Background(new BackgroundFill(getColoredOwner(element.getOwner()), CornerRadii.EMPTY, new Insets(1, 1, 1, 1))));
-            button.setTooltip(new Tooltip("owned by: " + element.getOwner()));
+            Tooltip tooltip = new Tooltip();
+            tooltip.textProperty().bind(I18N.getGuiLabelBinding("ownedBy", element.getOwner()));
+            button.setTooltip(tooltip);
             button.setOnAction((event -> {
                 selected.setValue(element);
                 if (selectedButton != null) selectedButton.setBorder(defaultBorder);

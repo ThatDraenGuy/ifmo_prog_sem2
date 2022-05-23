@@ -25,6 +25,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableView;
 import lombok.Getter;
 import security.CurrentAccount;
+import web.ConnectionHandler;
 
 import java.util.Map;
 import java.util.Optional;
@@ -78,6 +79,7 @@ public class MainSceneViewModel extends AbstractViewModel {
         tableView = new TableView<>();
         Notifications.subscribe(Notifications.ACCOUNT_CHANGE_EVENT, this, this::accountChangeEvent);
         Notifications.subscribe(CollectionClassesHandler.COLLECTIBLE_SCHEME_CHANGE_EVENT, this, this::collectibleSchemeChangeEvent);
+        Notifications.subscribe(ConnectionHandler.DISCONNECT_EVENT, this, this::handleDisconnection);
         visualTabOpened.addListener(((observable, oldValue, newValue) -> {
             if (!newValue.equals(oldValue) && newValue.equals(true)) {
                 visualViewHandler.playAnimation();
@@ -97,7 +99,11 @@ public class MainSceneViewModel extends AbstractViewModel {
 
     private void disconnectEvent(ActionResult actionResult) {
         handleActionResult(actionResult);
-        if (success.get()) Controllers.getSceneController().switchToConnectScene();
+        if (success.getValue()) Controllers.getSceneController().switchToConnectScene();
+    }
+
+    private void handleDisconnection(String event) {
+        Controllers.getSceneController().switchToConnectScene();
     }
 
     public void exit() {

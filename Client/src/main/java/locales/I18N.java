@@ -37,9 +37,10 @@ public class I18N {
         setLocale(locale.getValue());
     }
 
-    public static String getGuiLabel(String key) {
-        if (guiLabels.containsKey(key)) return guiLabels.getString(key);
-        return key;
+    public static String getGuiLabel(String key, Object... args) {
+        if (!guiLabels.containsKey(key)) return key;
+        MessageFormat format = new MessageFormat(guiLabels.getString(key));
+        return format.format(args);
     }
 
     public static String getCollectible(String key, Object... args) {
@@ -57,8 +58,8 @@ public class I18N {
         return format.format(args);
     }
 
-    public static StringBinding getGuiLabelBinding(String key) {
-        return Bindings.createStringBinding(() -> getGuiLabel(key), locale);
+    public static StringBinding getGuiLabelBinding(String key, Object... args) {
+        return Bindings.createStringBinding(() -> getGuiLabel(key, args), locale);
     }
 
     public static StringBinding getCollectibleBinding(String key, Object... args) {

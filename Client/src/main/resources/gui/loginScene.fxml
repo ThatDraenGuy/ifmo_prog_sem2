@@ -7,6 +7,8 @@
 <?import javafx.scene.control.PasswordField?>
 <?import javafx.scene.control.ProgressIndicator?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
 <?import javafx.scene.layout.GridPane?>
@@ -17,13 +19,17 @@
 <AnchorPane prefHeight="400.0" prefWidth="300.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="gui.loginScene.LoginSceneView">
     <children>
-        <HBox layoutX="110.0" layoutY="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
-              AnchorPane.topAnchor="10.0">
+        <AnchorPane layoutY="10.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="10.0">
             <children>
-                <AnchorPane fx:id="localeBoxPlace"/>
-                <Label fx:id="infoLabel" prefHeight="40.0" prefWidth="81.0" text="LoginScene"/>
+                <AnchorPane fx:id="localeBoxPlace" AnchorPane.leftAnchor="0.0" AnchorPane.topAnchor="0.0"/>
+                <ImageView fitHeight="80.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true"
+                           AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                    <image>
+                        <Image url="@../images/icon.png"/>
+                    </image>
+                </ImageView>
             </children>
-        </HBox>
+        </AnchorPane>
         <VBox alignment="BOTTOM_CENTER" layoutX="10.0" layoutY="236.0" AnchorPane.bottomAnchor="10.0"
               AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
             <children>

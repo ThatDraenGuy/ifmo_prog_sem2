@@ -14,8 +14,6 @@ public class ConnectSceneView extends AbstractView {
     @FXML
     private TextField address;
     @FXML
-    private Label infoLabel;
-    @FXML
     private Button connectButton;
     @FXML
     private Label message;

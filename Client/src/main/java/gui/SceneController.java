@@ -4,6 +4,7 @@ import app.Controllers;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.stage.Stage;
+import locales.I18N;
 
 import java.io.IOException;
 
@@ -19,7 +20,7 @@ public class SceneController {
         connectScene = new Scene(FXMLLoader.load(getClass().getClassLoader().getResource("gui/connectScene.fxml")));
         loginScene = new Scene(FXMLLoader.load(getClass().getClassLoader().getResource("gui/loginScene.fxml")));
         mainScene = new Scene(FXMLLoader.load(getClass().getClassLoader().getResource("gui/mainScene.fxml")));
-        primaryStage.setTitle("Dracoll");
+        primaryStage.titleProperty().bind(I18N.getGuiLabelBinding("appName"));
         primaryStage.setOnCloseRequest(event -> Controllers.getThreadHandler().stop());
     }
 
@@ -38,8 +39,8 @@ public class SceneController {
     private void switchTo(Scene scene) {
         primaryStage.setScene(scene);
         Notifications.publish(Notifications.SCENE_CHANGE_EVENT);
+        primaryStage.show();
         primaryStage.setMinHeight(scene.getHeight());
         primaryStage.setMinWidth(scene.getWidth());
-        primaryStage.show();
     }
 }

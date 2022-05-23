@@ -62,7 +62,7 @@ public class ConsoleHandler {
     }
 
     public void debugMessage(String str) {
-//        message(str);
+        message(str);
     }
 
     /**

@@ -3,12 +3,14 @@ package web;
 
 import console.ConsoleHandler;
 import exceptions.ConnectionException;
+import gui.Notifications;
 import message.*;
 
 import java.io.*;
 import java.net.Socket;
 
 public class ConnectionHandler {
+    public static final String DISCONNECT_EVENT = "DISCONNECT_EVENT";
     private String host;
     private int port;
     private final ConsoleHandler consoleHandler;
@@ -50,7 +52,7 @@ public class ConnectionHandler {
     public void disconnect() {
         try {
             if (socket != null) socket.close();
-
+            Notifications.publish(DISCONNECT_EVENT);
         } catch (IOException e) {
             consoleHandler.errorMessage(e);
         }

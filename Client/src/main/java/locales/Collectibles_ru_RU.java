@@ -31,17 +31,6 @@ public class Collectibles_ru_RU extends ListResourceBundle {
             {"DragonType.WATER", "ВОДЯНОЙ"},
             {"DragonType.UNDERGROUND", "ПОДЗЕМНЫЙ"},
             {"DragonType.AIR", "ВОЗДУШНЫЙ"},
-            {"DragonType.FIRE", "ОГНЕННЫЙ"},
-            {"DragonDescription", """
-id: {0}
-name: {1}
-age: {2}
-color: {3}
-type: {4}
-character: {5}
-creationDate: {6}
-coordinates: '{'{7},{8}'}'
-cave: depth: {9}
-owner: {10}"""}
+            {"DragonType.FIRE", "ОГНЕННЫЙ"}
     };
 }
