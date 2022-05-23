@@ -1,5 +1,7 @@
 package gui.mainScene;
 
+import app.Controllers;
+import collection.VisualViewHandler;
 import collection.classes.MainCollectible;
 import gui.AbstractView;
 import javafx.beans.binding.Bindings;

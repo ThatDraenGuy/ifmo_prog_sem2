@@ -12,21 +12,15 @@ import utility.ListAndId;
 
 public class ClientCollectionHandler<T extends MainCollectible<?>> extends CollectionHandler<T> {
     @Getter
-    private final TableViewHandler<T> tableViewHandler;
-    @Getter
-    private final VisualViewHandler<T> visualViewHandler;
+    private CollectionChange<T> lastChange;
 
     public ClientCollectionHandler(Class<T> targetClass) {
         super(targetClass);
-        tableViewHandler = new TableViewHandler<>(targetClass);
-        visualViewHandler = new VisualViewHandler<>(targetClass, collectibleScheme);
     }
 
     public ClientCollectionHandler(Class<T> targetClass, ListAndId<T> collection) {
         super(targetClass);
         this.collection = collection;
-        tableViewHandler = new TableViewHandler<>(targetClass, collection);
-        visualViewHandler = new VisualViewHandler<>(targetClass, collectibleScheme, collection);
     }
 
     public void applyChange(CollectionChange<? extends MainCollectible<?>> collectionChange) throws CollectionVersionIsBehindException, IncorrectCollectibleTypeException {
@@ -37,15 +31,12 @@ public class ClientCollectionHandler<T extends MainCollectible<?>> extends Colle
             return;
         }
         CollectionChange<T> castedCollectionChange = castCollectionChange(collectionChange);
-        tableViewHandler.applyChange(castedCollectionChange);
-        visualViewHandler.applyChange(castedCollectionChange);
         castedCollectionChange.apply(collection);
+        lastChange = castedCollectionChange;
     }
 
     public void setCollection(ListAndId<? extends MainCollectible<?>> collection) throws IncorrectCollectibleTypeException {
         this.collection = castCollection(collection);
-        tableViewHandler.set(this.collection);
-        visualViewHandler.set(this.collection);
     }
 
     private ListAndId<T> castCollection(ListAndId<? extends MainCollectible<?>> collection) throws IncorrectCollectibleTypeException {
@@ -66,5 +57,9 @@ public class ClientCollectionHandler<T extends MainCollectible<?>> extends Colle
             return castedCollectionChange;
         }
         throw new IncorrectCollectibleTypeException();
+    }
+
+    public ListAndId<T> getCollection() {
+        return collection;
     }
 }

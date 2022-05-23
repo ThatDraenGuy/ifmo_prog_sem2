@@ -30,6 +30,8 @@ public abstract class AbstractView {
                         Alert alert = new Alert(
                                 Alert.AlertType.ERROR, newValue
                         );
+                        alert.setTitle(I18N.getGuiLabel("error"));
+                        alert.setHeaderText(I18N.getGuiLabel("error"));
                         alert.showAndWait();
                     }
                 }

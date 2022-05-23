@@ -4,6 +4,7 @@ import collection.classes.*;
 import collection.history.CollectionChange;
 import collection.meta.CollectibleScheme;
 import collection.meta.FieldData;
+import gui.Notifications;
 import javafx.beans.binding.*;
 import javafx.beans.property.StringProperty;
 import javafx.beans.value.ObservableValue;
@@ -28,22 +29,22 @@ import java.util.*;
 import java.util.concurrent.Callable;
 
 public class TableViewHandler<T extends MainCollectible<?>> {
+    private final ClientCollectionHandler<T> collectionHandler;
     @Getter
     private final TableView<T> tableView;
     private final Class<T> targetClass;
 
-    public TableViewHandler(Class<T> targetClass) {
-        this.targetClass = targetClass;
+    public TableViewHandler(ClientCollectionHandler<T> collectionHandler) {
+        this.collectionHandler = collectionHandler;
+        this.targetClass = collectionHandler.getTargetClass();
         tableView = generate(targetClass);
+        Notifications.subscribe(CollectionClassesHandler.COLLECTION_SET_EVENT, this, this::set);
+        Notifications.subscribe(CollectionClassesHandler.COLLECTION_CHANGE_EVENT, this, this::applyChange);
+        put(collectionHandler.getCollection());
     }
 
-    public TableViewHandler(Class<T> targetClass, ListAndId<T> listAndId) {
-        this.targetClass = targetClass;
-        tableView = generate(targetClass);
-        put(listAndId);
-    }
-
-    public void applyChange(CollectionChange<T> change) {
+    public void applyChange(String event) {
+        CollectionChange<T> change = collectionHandler.getLastChange();
         Collection<T> added = change.getAddedElements();
         Collection<T> removed = change.getRemovedElements();
         tableView.getItems().addAll(added);
@@ -57,7 +58,8 @@ public class TableViewHandler<T extends MainCollectible<?>> {
         autoResizeColumns(tableView);
     }
 
-    public void set(ListAndId<T> listAndId) {
+    public void set(String event) {
+        ListAndId<T> listAndId = collectionHandler.getCollection();
         tableView.getItems().clear();
         put(listAndId);
     }

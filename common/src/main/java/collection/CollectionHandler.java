@@ -8,6 +8,7 @@ import utility.ListAndId;
 import java.util.*;
 
 public class CollectionHandler<T extends MainCollectible<?>> {
+    @Getter
     protected final Class<T> targetClass;
     @Getter
     protected final CollectibleScheme collectibleScheme;

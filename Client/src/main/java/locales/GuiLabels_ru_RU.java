@@ -28,6 +28,7 @@ public class GuiLabels_ru_RU extends ListResourceBundle {
             {"localeLabel", "Текущий язык:"},
             {"tableTab", "Таблица"},
             {"visualTab", "Визуал"},
-            {"info", "информация"}
+            {"info", "информация"},
+            {"error", "ошибка"}
     };
 }

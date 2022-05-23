@@ -29,8 +29,6 @@ public class Notifications {
                 subscriberList.forEach(
                         subscriberObject -> subscriberObject.getAction().accept(event)
                 );
-
-                // event ends after last subscriber gets callback
             }
         });
     }

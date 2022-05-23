@@ -1,11 +1,10 @@
 package app;
 
-import commands.ExecutionController;
+import collection.CollectionClassesHandler;
 import commands.Requester;
 import gui.SceneController;
 import lombok.Getter;
 import lombok.Setter;
-import threads.ConsoleInteractionController;
 import threads.ThreadHandler;
 
 public class Controllers {
@@ -24,4 +23,7 @@ public class Controllers {
     @Getter
     @Setter
     private static ThreadHandler threadHandler;
+    @Getter
+    @Setter
+    private static CollectionClassesHandler collectionClassesHandler;
 }

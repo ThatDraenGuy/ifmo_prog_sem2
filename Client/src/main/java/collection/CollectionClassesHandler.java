@@ -6,7 +6,6 @@ import console.ConsoleHandler;
 import exceptions.CollectionVersionIsBehindException;
 import exceptions.IncorrectCollectibleTypeException;
 import gui.Notifications;
-import javafx.scene.control.TableView;
 import lombok.Getter;
 import utility.ListAndId;
 
@@ -14,6 +13,8 @@ import java.util.Queue;
 
 public class CollectionClassesHandler {
     public final static String COLLECTIBLE_SCHEME_CHANGE_EVENT = "COLLECTIBLE_SCHEME_CHANGE_EVENT";
+    public final static String COLLECTION_CHANGE_EVENT = "COLLECTION_CHANGE_EVENT";
+    public final static String COLLECTION_SET_EVENT = "COLLECTION_SET_EVENT";
     @Getter
     volatile private ClientCollectionHandler<?> currentCollectionHandler;
     @Getter
@@ -52,6 +53,7 @@ public class CollectionClassesHandler {
         try {
             for (CollectionChange<? extends MainCollectible<?>> collectionChange : collectionChanges) {
                 currentCollectionHandler.applyChange(collectionChange);
+                Notifications.publish(COLLECTION_CHANGE_EVENT);
                 consoleHandler.debugMessage("applied collectionChange: " + collectionChange);
             }
         } catch (CollectionVersionIsBehindException e) {
@@ -63,6 +65,7 @@ public class CollectionClassesHandler {
         Class<T> targetClass = listAndId.getTargetClass();
         if (isCurrentClass(targetClass)) {
             currentCollectionHandler.setCollection(listAndId);
+            Notifications.publish(COLLECTION_SET_EVENT);
         } else createCollection(targetClass, listAndId);
     }
 

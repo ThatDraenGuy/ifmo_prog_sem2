@@ -2,40 +2,39 @@ package gui.mainScene;
 
 import app.Controllers;
 import collection.CollectionClassesHandler;
+import collection.TableViewHandler;
+import collection.VisualViewHandler;
 import collection.classes.MainCollectible;
+import collection.meta.CollectibleScheme;
 import commands.ActionResult;
 import gui.AbstractViewModel;
 import gui.CommandService;
 import gui.Notifications;
 import gui.Utilities;
 import gui.editorDialog.EditorDialog;
-import javafx.application.Platform;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
 import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
 import javafx.concurrent.Service;
-import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.TableView;
-import javafx.scene.image.ImageView;
-import locales.I18N;
 import lombok.Getter;
 import security.CurrentAccount;
 
-import java.util.Collection;
 import java.util.Map;
 import java.util.Optional;
-import java.util.concurrent.Callable;
 import java.util.stream.Stream;
 
 public class MainSceneViewModel extends AbstractViewModel {
-    private final MainSceneModel model = new MainSceneModel();
+    @Getter
+    private VisualViewHandler<?> visualViewHandler;
+    @Getter
+    private TableViewHandler<?> tableViewHandler;
     @Getter
     private final StringProperty account = new SimpleStringProperty("");
     @Getter
@@ -58,14 +57,14 @@ public class MainSceneViewModel extends AbstractViewModel {
         @Override
         public Object getBean() {
             if (tableTabOpened.get()) return tableView.getSelectionModel().getSelectedItem();
-            if (visualTabOpened.get()) return model.getSelectedVisual().get();
+            if (visualTabOpened.get()) return visualViewHandler.getSelected().get();
             return null;
         }
 
         @Override
         public MainCollectible<?> get() {
             if (tableTabOpened.get()) return tableView.getSelectionModel().getSelectedItem();
-            if (visualTabOpened.get()) return model.getSelectedVisual().get();
+            if (visualTabOpened.get()) return visualViewHandler.getSelected().get();
             return null;
         }
 
@@ -77,22 +76,17 @@ public class MainSceneViewModel extends AbstractViewModel {
 
     public MainSceneViewModel() {
         tableView = new TableView<>();
-        Notifications.subscribe(MainSceneModel.LOGOUT_TASK_EVENT, this, this::logOutEvent);
         Notifications.subscribe(Notifications.ACCOUNT_CHANGE_EVENT, this, this::accountChangeEvent);
         Notifications.subscribe(CollectionClassesHandler.COLLECTIBLE_SCHEME_CHANGE_EVENT, this, this::collectibleSchemeChangeEvent);
+        visualTabOpened.addListener(((observable, oldValue, newValue) -> {
+            if (!newValue.equals(oldValue) && newValue.equals(true)) {
+                visualViewHandler.playAnimation();
+            }
+        }));
     }
 
     public void logOut() {
-        logOutTask.restart();
-    }
-
-    private final Service<Void> logOutTask = Utilities.getDefaultService(model::logOut);
-
-    private void logOutEvent(String event) {
-        model.getLogOutResult().ifPresent(actionResult -> {
-            handleActionResult(actionResult);
-            if (success.get()) Controllers.getSceneController().switchToLoginScene();
-        });
+        Controllers.getSceneController().switchToLoginScene();
     }
 
     public void disconnect() {
@@ -117,7 +111,7 @@ public class MainSceneViewModel extends AbstractViewModel {
     }
 
     private final Service<Void> deleteTask = CommandService.getSimpleArgs("remove_by_id", this::deleteEvent, () ->
-            tableView.getSelectionModel().getSelectedItem().getId().toString());
+            selectedItemProperty.getValue().getId().toString());
 
 
     private void deleteEvent(ActionResult actionResult) {
@@ -170,25 +164,31 @@ public class MainSceneViewModel extends AbstractViewModel {
 
     private void collectibleSchemeChangeEvent(String event) {
         TableView<?> oldTableView = tableView;
-        tableView = model.getTableView();
-        visuals = model.getVisuals();
-        addDialog = new EditorDialog(model.getScheme(), new ButtonType("addButton", ButtonBar.ButtonData.APPLY));
-        editDialog = new EditorDialog(model.getScheme(), new ButtonType("editButton", ButtonBar.ButtonData.APPLY));
+        visualViewHandler = new VisualViewHandler<>(Controllers.getCollectionClassesHandler().getCurrentCollectionHandler());
+        tableViewHandler = new TableViewHandler<>(Controllers.getCollectionClassesHandler().getCurrentCollectionHandler());
+        tableView = tableViewHandler.getTableView();
+        visuals = visualViewHandler.getImages();
+        addDialog = new EditorDialog(getScheme(), new ButtonType("addButton", ButtonBar.ButtonData.APPLY));
+        editDialog = new EditorDialog(getScheme(), new ButtonType("editButton", ButtonBar.ButtonData.APPLY));
         oldTableView.fireEvent(new Event(EventType.ROOT));
     }
 
     @Override
     public BooleanBinding isTaskRunning() {
-        return Stream.of(deleteTask.runningProperty(), exitTask.runningProperty(), disconnectTask.runningProperty(), logOutTask.runningProperty()).
+        return Stream.of(deleteTask.runningProperty(), exitTask.runningProperty(), disconnectTask.runningProperty()).
                 map(property -> property.isEqualTo(TRUE)).reduce(Bindings::or).get();
     }
 
     public BooleanBinding isItemSelected() {
         BooleanBinding tableBind = tableTabOpened.isEqualTo(TRUE).and(tableView.getSelectionModel().selectedItemProperty().isNotNull()).and(
                 Bindings.select(tableView.getSelectionModel().selectedItemProperty(), "owner").isEqualTo(account));
-        BooleanBinding visualBind = visualTabOpened.isEqualTo(TRUE).and(model.getSelectedVisual().isNotNull()).and(
-                Bindings.select(model.getSelectedVisual(), "owner").isEqualTo(account));
+        BooleanBinding visualBind = visualTabOpened.isEqualTo(TRUE).and(visualViewHandler.getSelected().isNotNull()).and(
+                Bindings.select(visualViewHandler.getSelected(), "owner").isEqualTo(account));
         return Bindings.or(tableBind, visualBind);
+    }
+
+    public CollectibleScheme getScheme() {
+        return Controllers.getCollectionClassesHandler().getCurrentCollectionHandler().getCollectibleScheme();
     }
 
 //    public ObjectProperty<? extends MainCollectible<?>> selectedItemProperty() {
