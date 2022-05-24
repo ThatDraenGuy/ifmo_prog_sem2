@@ -4,7 +4,7 @@ import lombok.Getter;
 
 import java.util.ListResourceBundle;
 
-public class Interactions_en_IE extends ListResourceBundle {
+public class Interactions_hu_HU extends ListResourceBundle {
     @Getter
     private final Object[][] contents = new Object[][]{
             {"storageException", "A storage exception has occurred"},

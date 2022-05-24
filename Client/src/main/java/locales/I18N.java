@@ -21,19 +21,11 @@ public class I18N {
     private static final ObservableList<Locale> supportedLocales = FXCollections.observableArrayList();
 
     static {
-        locale = new SimpleObjectProperty<>(Locale.forLanguageTag("ru-RU"));
-//        locale.addListener(((observable, oldValue, newValue) -> {
-//            if (newValue==null) locale.setValue(oldValue);
-//            else {
-//                try {
-//                    setLocale(newValue);
-//                } catch (MissingResourceException e) {
-//                    locale.setValue(oldValue);
-//                }
-//            }
-//        }));
+        locale = new SimpleObjectProperty<>(Locale.getDefault());
         supportedLocales.add(Locale.forLanguageTag("ru-RU"));
         supportedLocales.add(Locale.forLanguageTag("en-IE"));
+        supportedLocales.add(Locale.forLanguageTag("hu-HU"));
+        if (!supportedLocales.contains(locale.getValue())) locale.setValue(Locale.forLanguageTag("en-IE"));
         setLocale(locale.getValue());
     }
 
