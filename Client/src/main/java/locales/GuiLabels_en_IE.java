@@ -21,6 +21,7 @@ public class GuiLabels_en_IE extends ListResourceBundle {
             {"editButton", "edit"},
             {"deleteButton", "delete"},
             {"clearButton", "clear"},
+            {"filterButton", "filter"},
             {"cancelButton", "cancel"},
             {"logOutButton", "log out"},
             {"changeServerButton", "change server"},
@@ -32,6 +33,7 @@ public class GuiLabels_en_IE extends ListResourceBundle {
             {"visualTab", "Visuals"},
             {"info", "info"},
             {"error", "error"},
-            {"ownedBy", "owned by: {0}"}
+            {"ownedBy", "owned by: {0}"},
+            {"emptyTable", "No suitable objects found"}
     };
 }

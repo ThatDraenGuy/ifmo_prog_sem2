@@ -1,4 +1,4 @@
-package gui.editorDialog;
+package gui.dialogs;
 
 import collection.Validator;
 import collection.meta.CollectibleModel;
@@ -14,7 +14,8 @@ import javafx.collections.FXCollections;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
-import javafx.scene.layout.GridPane;
+import javafx.scene.layout.*;
+import javafx.scene.paint.Color;
 import locales.I18N;
 import lombok.Getter;
 
@@ -28,32 +29,33 @@ public class EditorDialog {
     private final List<BooleanProperty> validatedProperties = new ArrayList<>();
     private final Map<String, TextField> textFields = new HashMap<>();
     private final Map<String, ChoiceBox<?>> choiceBoxes = new HashMap<>();
-    private final Map<String, ObservableValue<?>> input = new HashMap<>();
+    protected final Map<String, ObservableValue<?>> input = new HashMap<>();
     private final ButtonType cancelButton = new ButtonType("cancelButton", ButtonBar.ButtonData.CANCEL_CLOSE);
+    private final Border invalidBorder = new Border(new BorderStroke(Color.RED, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN));
+    private final Border validBorder = new Border(new BorderStroke(Color.LIME, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.THIN));
+    private final Border defaultBorder = new Border(new BorderStroke(Color.WHITE, BorderStrokeStyle.NONE, CornerRadii.EMPTY, BorderStroke.THIN));
 
     public EditorDialog(CollectibleScheme scheme, ButtonType buttonType) {
         this.dialog = create(scheme, buttonType);
     }
 
-    private Dialog<Map<String, String>> create(CollectibleScheme scheme, ButtonType buttonType) {
+    protected Dialog<Map<String, String>> create(CollectibleScheme scheme, ButtonType buttonType) {
         Dialog<Map<String, String>> dialog = new Dialog<>();
         //Buttons
         dialog.getDialogPane().getButtonTypes().addAll(buttonType, cancelButton);
         //Grid for fields
-        GridPane grid = new GridPane();
-        grid.setHgap(10);
-        grid.setVgap(10);
-        grid.setPadding(new Insets(10, 10, 10, 10));
-        handleCollectible(grid, scheme);
-        Optional<BooleanBinding> bindingOptional = validatedProperties.stream().map(booleanProperty -> booleanProperty.isEqualTo(new SimpleBooleanProperty(true))).reduce(Bindings::and);
-        BooleanBinding validatedBinding = bindingOptional.orElseGet(() -> new BooleanBinding() {
-            @Override
-            protected boolean computeValue() {
-                return true;
-            }
-        });
-        dialog.getDialogPane().lookupButton(buttonType).disableProperty().bind(validatedBinding.not());
-        dialog.getDialogPane().setContent(grid);
+        dialog.getDialogPane().setContent(createGrid(scheme));
+        //ValidatedBinding
+        dialog.getDialogPane().lookupButton(buttonType).disableProperty().bind(createValidatedBinding().not());
+        setResult(dialog, buttonType);
+        for (ButtonType type : dialog.getDialogPane().getButtonTypes()) {
+            Button button = (Button) dialog.getDialogPane().lookupButton(type);
+            button.textProperty().bind(I18N.getGuiLabelBinding(button.getText()));
+        }
+        return dialog;
+    }
+
+    protected void setResult(Dialog<Map<String, String>> dialog, ButtonType buttonType) {
         dialog.setResultConverter(dialogButton -> {
             if (dialogButton.equals(buttonType)) {
                 Map<String, String> map = new HashMap<>();
@@ -66,14 +68,28 @@ public class EditorDialog {
             }
             return null;
         });
-        for (ButtonType type : dialog.getDialogPane().getButtonTypes()) {
-            Button button = (Button) dialog.getDialogPane().lookupButton(type);
-            button.textProperty().bind(I18N.getGuiLabelBinding(button.getText()));
-        }
-        return dialog;
     }
 
-    private void handleCollectible(GridPane grid, CollectibleScheme scheme) {
+    protected BooleanBinding createValidatedBinding() {
+        Optional<BooleanBinding> bindingOptional = validatedProperties.stream().map(booleanProperty -> booleanProperty.isEqualTo(new SimpleBooleanProperty(true))).reduce(Bindings::and);
+        return bindingOptional.orElseGet(() -> new BooleanBinding() {
+            @Override
+            protected boolean computeValue() {
+                return true;
+            }
+        });
+    }
+
+    protected GridPane createGrid(CollectibleScheme scheme) {
+        GridPane grid = new GridPane();
+        grid.setHgap(10);
+        grid.setVgap(10);
+        grid.setPadding(new Insets(10, 10, 10, 10));
+        handleCollectible(grid, scheme);
+        return grid;
+    }
+
+    protected void handleCollectible(GridPane grid, CollectibleScheme scheme) {
         for (String fieldName : scheme.getFieldsData().keySet()) {
             FieldData data = scheme.getFieldsData().get(fieldName);
             if (data.isUserWritable()) {
@@ -82,7 +98,7 @@ public class EditorDialog {
         }
     }
 
-    private void handleData(GridPane grid, String fieldName, FieldData data) {
+    protected void handleData(GridPane grid, String fieldName, FieldData data) {
         Label label = new Label();
         label.textProperty().bind(I18N.getCollectibleBinding(fieldName, ":"));
         if (data.isCollectible()) {
@@ -94,12 +110,12 @@ public class EditorDialog {
         addRow(grid, label, choice);
     }
 
-    private void addRow(GridPane grid, Node... row) {
+    protected void addRow(GridPane grid, Node... row) {
         grid.addRow(counter, row);
         counter++;
     }
 
-    private <T> Control generateChoice(FieldData fieldData, Class<T> fieldType, String fieldName) {
+    protected <T> Control generateChoice(FieldData fieldData, Class<T> fieldType, String fieldName) {
         BooleanProperty booleanProperty = new SimpleBooleanProperty();
         Control control;
         if (!fieldType.isEnum()) {
@@ -111,8 +127,10 @@ public class EditorDialog {
                 try {
                     Validator.convertAndValidate(fieldData, fieldType, newValue);
                     booleanProperty.setValue(true);
+                    textField.setBorder(validBorder);
                 } catch (ValueNotValidException e) {
                     booleanProperty.setValue(false);
+                    textField.setBorder(invalidBorder);
                 }
             });
             control = textField;
@@ -125,13 +143,16 @@ public class EditorDialog {
                 try {
                     Validator.validate(fieldData, newValue);
                     booleanProperty.setValue(true);
+                    box.setBorder(validBorder);
                 } catch (ValueNotValidException e) {
                     booleanProperty.setValue(false);
+                    box.setBorder(invalidBorder);
                 }
             }));
             control = box;
         }
         validatedProperties.add(booleanProperty);
+        control.setBorder(defaultBorder);
         return control;
     }
 
@@ -151,8 +172,9 @@ public class EditorDialog {
         }
     }
 
-    private <T> void setChoiceBox(ChoiceBox<T> box, FieldModel model) {
+    protected <T> void setChoiceBox(ChoiceBox<T> box, FieldModel model) {
         T value = (T) model.getValue();
         box.setValue(value);
     }
+
 }

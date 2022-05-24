@@ -10,12 +10,14 @@ import commands.ActionResult;
 import gui.AbstractViewModel;
 import gui.CommandService;
 import gui.Notifications;
-import gui.editorDialog.EditorDialog;
+import gui.dialogs.EditorDialog;
+import gui.dialogs.FilterDialog;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
+import javafx.concurrent.Task;
 import javafx.event.Event;
 import javafx.event.EventType;
 import javafx.scene.Node;
@@ -48,12 +50,14 @@ public class MainSceneViewModel extends AbstractViewModel {
     @Getter
     private EditorDialog editDialog;
     @Getter
-    private Map<String, String> editorDialogAnswer;
+    private FilterDialog filterDialog;
+    @Getter
+    private Map<String, String> dialogAnswer;
     @Getter
     private final BooleanProperty tableTabOpened = new SimpleBooleanProperty();
     @Getter
     private final BooleanProperty visualTabOpened = new SimpleBooleanProperty();
-    private final ObjectProperty<? extends MainCollectible<?>> selectedItemProperty = new ObjectPropertyBase<MainCollectible<?>>() {
+    private final ObjectProperty<? extends MainCollectible<?>> selectedItemProperty = new ObjectPropertyBase<>() {
         @Override
         public Object getBean() {
             if (tableTabOpened.get()) return tableView.getSelectionModel().getSelectedItem();
@@ -132,42 +136,51 @@ public class MainSceneViewModel extends AbstractViewModel {
     public void add() {
         Optional<Map<String, String>> mapOptional = addDialog.getDialog().showAndWait();
         if (mapOptional.isEmpty()) return;
-        editorDialogAnswer = mapOptional.get();
+        dialogAnswer = mapOptional.get();
         addTask.restart();
     }
 
-    private final Service<Void> addTask = CommandService.getComplexArgs("add", this::addEvent, this::getEditorDialogAnswer);
+    private final Service<Void> addTask = CommandService.getComplexArgs("add", this::addEvent, this::getDialogAnswer);
 
     private void addEvent(ActionResult actionResult) {
         handleActionResult(actionResult);
     }
 
-//    private Map<String,String> promptEditorDialog() {
-//        var ref = new Object() {
-//            Map<String, String> res;
-//        };
-//        Platform.runLater(() -> {
-//            Optional<Map<String, String>> mapOptional = addDialog.getDialog().showAndWait();
-//            if (mapOptional.isEmpty()) return;
-//            ref.res = mapOptional.get();
-//        });
-//        return ref.res;
-//    }
 
     public void edit() {
         editDialog.setValues(selectedItemProperty.getValue().toModel());
         Optional<Map<String, String>> mapOptional = editDialog.getDialog().showAndWait();
         if (mapOptional.isEmpty()) return;
-        editorDialogAnswer = mapOptional.get();
+        dialogAnswer = mapOptional.get();
         editTask.restart();
     }
 
     private final Service<Void> editTask = CommandService.getBothArgs("update", this::editEvent, () ->
-            selectedItemProperty.getValue().getId().toString(), this::getEditorDialogAnswer);
+            selectedItemProperty.getValue().getId().toString(), this::getDialogAnswer);
 
     private void editEvent(ActionResult actionResult) {
         handleActionResult(actionResult);
     }
+
+    public void filter() {
+        Optional<Map<String, String>> mapOptional = filterDialog.getDialog().showAndWait();
+        if (mapOptional.isEmpty()) return;
+        dialogAnswer = mapOptional.get();
+        filterTask.restart();
+    }
+
+    private final Service<Void> filterTask = new Service<>() {
+        @Override
+        protected Task<Void> createTask() {
+            return new Task<>() {
+                @Override
+                protected Void call() throws Exception {
+                    tableViewHandler.setFilter(dialogAnswer);
+                    return null;
+                }
+            };
+        }
+    };
 
     private void accountChangeEvent(String event) {
         account.setValue(CurrentAccount.getAccount().getName());
@@ -181,6 +194,7 @@ public class MainSceneViewModel extends AbstractViewModel {
         visuals = visualViewHandler.getImages();
         addDialog = new EditorDialog(getScheme(), new ButtonType("addButton", ButtonBar.ButtonData.APPLY));
         editDialog = new EditorDialog(getScheme(), new ButtonType("editButton", ButtonBar.ButtonData.APPLY));
+        filterDialog = new FilterDialog(getScheme(), new ButtonType("filterButton", ButtonBar.ButtonData.APPLY));
         oldTableView.fireEvent(new Event(EventType.ROOT));
     }
 
@@ -201,20 +215,4 @@ public class MainSceneViewModel extends AbstractViewModel {
     public CollectibleScheme getScheme() {
         return Controllers.getCollectionClassesHandler().getCurrentCollectionHandler().getCollectibleScheme();
     }
-
-//    public ObjectProperty<? extends MainCollectible<?>> selectedItemProperty() {
-//        return new ObjectPropertyBase<MainCollectible<?>>() {
-//            @Override
-//            public Object getBean() {
-//                if (tableTabOpened.get()) return tableView.getSelectionModel().getSelectedItem();
-//                if (visualTabOpened.get()) return model.getSelectedVisual();
-//                return null;
-//            }
-//
-//            @Override
-//            public String getName() {
-//                return "selectedItemProperty";
-//            }
-//        };
-//    }
 }

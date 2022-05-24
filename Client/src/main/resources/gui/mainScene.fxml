@@ -93,6 +93,7 @@
     <bottom>
         <ButtonBar prefHeight="40.0" BorderPane.alignment="CENTER">
             <buttons>
+                <Button fx:id="filter" mnemonicParsing="false" onAction="#filter" text="Filter"/>
                 <Button fx:id="clear" mnemonicParsing="false" onAction="#clear" text="Clear"/>
                 <Button fx:id="delete" mnemonicParsing="false" onAction="#delete" text="Delete"/>
                 <Button fx:id="edit" mnemonicParsing="false" onAction="#edit" text="Edit"/>

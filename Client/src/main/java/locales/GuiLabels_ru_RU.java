@@ -21,6 +21,7 @@ public class GuiLabels_ru_RU extends ListResourceBundle {
             {"editButton", "редактировать"},
             {"deleteButton", "удалить"},
             {"clearButton", "очистить"},
+            {"filterButton", "отфильтровать"},
             {"cancelButton", "отмена"},
             {"logOutButton", "сменить аккаунт"},
             {"changeServerButton", "сменить сервер"},
@@ -32,6 +33,7 @@ public class GuiLabels_ru_RU extends ListResourceBundle {
             {"visualTab", "Визуал"},
             {"info", "информация"},
             {"error", "ошибка"},
-            {"ownedBy", "Владелец: {0}"}
+            {"ownedBy", "Владелец: {0}"},
+            {"emptyTable", "Подходящих объектов нет"}
     };
 }
