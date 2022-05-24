@@ -53,7 +53,6 @@ public class CollectionClassesHandler {
         try {
             for (CollectionChange<? extends MainCollectible<?>> collectionChange : collectionChanges) {
                 currentCollectionHandler.applyChange(collectionChange);
-                Notifications.publish(COLLECTION_CHANGE_EVENT);
                 consoleHandler.debugMessage("applied collectionChange: " + collectionChange);
             }
         } catch (CollectionVersionIsBehindException e) {

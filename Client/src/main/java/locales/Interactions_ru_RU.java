@@ -28,6 +28,7 @@ public class Interactions_ru_RU extends ListResourceBundle {
             {"connectFailure", "Не удалось подключиться к серверу"},
             {"invalidAddressException", "Введён невалидный адрес"},
             {"invalidPortException", "Введён невалидный порт"},
-            {"unknownHostException", "Не удалось найти хост \"{0}\""}
+            {"unknownHostException", "Не удалось найти хост \"{0}\""},
+            {"commandNonExistentException", "Комманды с именем \"{0}\" не существует!"}
     };
 }

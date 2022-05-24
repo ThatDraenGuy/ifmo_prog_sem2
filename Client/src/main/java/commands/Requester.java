@@ -22,7 +22,7 @@ public class Requester {
             return response.getActionResult();
         } catch (Exception e) {
             e.printStackTrace();
-            return null;
+            return new ActionResult(false, "commandNonExistentException", commandName);
         }
     }
 }

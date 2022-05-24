@@ -28,6 +28,7 @@ public class Interactions_en_IE extends ListResourceBundle {
             {"connectFailure", "Не удалось подключиться к серверу"},
             {"invalidAddressException", "Введён невалидный адрес"},
             {"invalidPortException", "Введён невалидный порт"},
-            {"unknownHostException", "Не удалось найти хост \"{0}\""}
+            {"unknownHostException", "Не удалось найти хост \"{0}\""},
+            {"commandNonExistentException", "Command \"{0}\" does not exist!"}
     };
 }

@@ -11,15 +11,28 @@ import javafx.beans.binding.BooleanBinding;
 import javafx.beans.property.*;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
+import javafx.event.Event;
+import javafx.event.EventHandler;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.*;
 import javafx.scene.paint.Color;
+import javafx.util.Callback;
+import javafx.util.StringConverter;
+import javafx.util.converter.FormatStringConverter;
+import jfxtras.scene.control.LocalDatePicker;
+import jfxtras.scene.control.LocalDateTimePicker;
+import locales.CollectibleFormatter;
 import locales.I18N;
 import lombok.Getter;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.Temporal;
 import java.util.*;
+import java.util.concurrent.Callable;
 
 
 public class EditorDialog {
@@ -118,23 +131,7 @@ public class EditorDialog {
     protected <T> Control generateChoice(FieldData fieldData, Class<T> fieldType, String fieldName) {
         BooleanProperty booleanProperty = new SimpleBooleanProperty();
         Control control;
-        if (!fieldType.isEnum()) {
-            TextField textField = new TextField();
-            textFields.put(fieldName, textField);
-            textField.promptTextProperty().bind(I18N.getCollectibleBinding(fieldName));
-            input.put(fieldName, textField.textProperty());
-            textField.textProperty().addListener((observable, oldValue, newValue) -> {
-                try {
-                    Validator.convertAndValidate(fieldData, fieldType, newValue);
-                    booleanProperty.setValue(true);
-                    textField.setBorder(validBorder);
-                } catch (ValueNotValidException e) {
-                    booleanProperty.setValue(false);
-                    textField.setBorder(invalidBorder);
-                }
-            });
-            control = textField;
-        } else {
+        if (fieldType.isEnum()) {
             ChoiceBox<T> box = new ChoiceBox<>(FXCollections.observableArrayList(fieldType.getEnumConstants()));
             choiceBoxes.put(fieldName, box);
             input.put(fieldName, box.valueProperty());
@@ -150,6 +147,28 @@ public class EditorDialog {
                 }
             }));
             control = box;
+        } else if (Temporal.class.isAssignableFrom(fieldType)) {
+            LocalDatePicker datePicker = new LocalDatePicker();
+            datePicker.localeProperty().bind(I18N.getLocale());
+            datePicker.setPrefWidth(datePicker.getPrefWidth() + 400);
+            input.put(fieldName, datePicker.localDateProperty());
+            control = datePicker;
+        } else {
+            TextField textField = new TextField();
+            textFields.put(fieldName, textField);
+            textField.promptTextProperty().bind(I18N.getCollectibleBinding(fieldName));
+            input.put(fieldName, textField.textProperty());
+            textField.textProperty().addListener((observable, oldValue, newValue) -> {
+                try {
+                    Validator.convertAndValidate(fieldData, fieldType, newValue);
+                    booleanProperty.setValue(true);
+                    textField.setBorder(validBorder);
+                } catch (ValueNotValidException e) {
+                    booleanProperty.setValue(false);
+                    textField.setBorder(invalidBorder);
+                }
+            });
+            control = textField;
         }
         validatedProperties.add(booleanProperty);
         control.setBorder(defaultBorder);

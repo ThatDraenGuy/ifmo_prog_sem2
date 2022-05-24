@@ -19,6 +19,16 @@ public class FilterDialog extends EditorDialog {
     }
 
     @Override
+    protected void handleCollectible(GridPane grid, CollectibleScheme scheme) {
+        for (String fieldName : scheme.getFieldsData().keySet()) {
+            FieldData data = scheme.getFieldsData().get(fieldName);
+            if (data.isUserReadable()) {
+                handleData(grid, fieldName, data);
+            }
+        }
+    }
+
+    @Override
     protected void handleData(GridPane grid, String fieldName, FieldData data) {
         Label label = new Label();
         CheckBox checkBox = new CheckBox();

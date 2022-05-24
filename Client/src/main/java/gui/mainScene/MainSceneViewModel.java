@@ -36,8 +36,6 @@ import java.util.stream.Stream;
 public class MainSceneViewModel extends AbstractViewModel {
     @Getter
     private VisualViewHandler<?> visualViewHandler;
-    //    @Getter
-//    private TableViewHandler<?> tableViewHandler;
     private ObservableCollection<?> observableCollection;
     @Getter
     private final StringProperty account = new SimpleStringProperty("");

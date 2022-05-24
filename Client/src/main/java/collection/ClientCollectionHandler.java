@@ -5,6 +5,7 @@ import collection.history.CollectionChange;
 import com.sun.javafx.collections.ObservableListWrapper;
 import exceptions.CollectionVersionIsBehindException;
 import exceptions.IncorrectCollectibleTypeException;
+import gui.Notifications;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import lombok.Getter;
@@ -31,8 +32,9 @@ public class ClientCollectionHandler<T extends MainCollectible<?>> extends Colle
             return;
         }
         CollectionChange<T> castedCollectionChange = castCollectionChange(collectionChange);
-        castedCollectionChange.apply(collection);
         lastChange = castedCollectionChange;
+        castedCollectionChange.apply(collection);
+        Notifications.publish(CollectionClassesHandler.COLLECTION_CHANGE_EVENT);
     }
 
     public void setCollection(ListAndId<? extends MainCollectible<?>> collection) throws IncorrectCollectibleTypeException {

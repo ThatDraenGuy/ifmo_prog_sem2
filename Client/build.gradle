@@ -25,6 +25,8 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     implementation 'org.projectlombok:lombok:1.18.20'
     implementation 'org.openjfx:javafx:18.0.1'
+    implementation 'org.jfxtras:jfxtras-controls:17-r1'
+
     annotationProcessor "org.projectlombok:lombok:1.18.22"
     implementation project(':common')
 }

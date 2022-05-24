@@ -33,11 +33,11 @@ public class ThreadHandler {
     }
 
     public void stop() {
+        System.exit(0);
+        Platform.exit();
         consoleHandler.message("stopping...");
         connectionHandler.disconnect();
         messageReader.shutdown();
         clientInteractionController.setExitQueried(true);
-        System.exit(0);
-        Platform.exit();
     }
 }

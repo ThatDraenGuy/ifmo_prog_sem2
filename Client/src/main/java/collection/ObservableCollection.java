@@ -12,6 +12,7 @@ import javafx.collections.transformation.FilteredList;
 import lombok.Getter;
 import utility.ListAndId;
 
+import java.time.temporal.Temporal;
 import java.util.Collection;
 import java.util.Map;
 
@@ -60,7 +61,11 @@ public class ObservableCollection<T extends MainCollectible<?>> {
                 FieldModel data = values.get(key);
                 Object value = data.getValue();
                 String str = value == null ? "" : value.toString();
-                if (!str.equals(filter.get(key))) return false;
+                if (Temporal.class.isAssignableFrom(data.getFieldData().getType())) {
+                    if (!str.contains(filter.get(key))) return false;
+                } else {
+                    if (!str.equals(filter.get(key))) return false;
+                }
             }
             return true;
         });

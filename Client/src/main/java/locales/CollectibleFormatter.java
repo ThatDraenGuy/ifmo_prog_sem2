@@ -6,6 +6,7 @@ import collection.meta.CollectibleScheme;
 import collection.meta.FieldData;
 import collection.meta.FieldModel;
 
+import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.Temporal;
 import java.time.temporal.TemporalAccessor;
@@ -34,5 +35,10 @@ public class CollectibleFormatter {
                 builder.append(formatData(model.getFieldData(), model.getFieldData().getType(), model.getValue())).append("\n");
         }
         return builder.toString();
+    }
+
+    public static LocalDate parseDate(String str) {
+        final DateTimeFormatter formatter = DateTimeFormatter.ofPattern("dd MMMM yyyy - hh:mm (zzzz)", I18N.getLocale().get());
+        return LocalDate.parse(str, formatter);
     }
 }

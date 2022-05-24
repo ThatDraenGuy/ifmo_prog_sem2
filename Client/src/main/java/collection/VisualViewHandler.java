@@ -1,9 +1,7 @@
 package collection;
 
 import collection.classes.MainCollectible;
-import collection.history.CollectionChange;
 import collection.meta.CollectibleScheme;
-import gui.Notifications;
 import javafx.animation.FadeTransition;
 import javafx.animation.Transition;
 import javafx.application.Platform;
@@ -23,13 +21,11 @@ import javafx.util.Duration;
 import locales.CollectibleFormatter;
 import locales.I18N;
 import lombok.Getter;
-import utility.ListAndId;
 
 import java.io.InputStream;
 import java.util.*;
 
 public class VisualViewHandler<T extends MainCollectible<?>> {
-    //    private final ClientCollectionHandler<T> collectionHandler;
     private final ObservableCollection<T> observableCollection;
     @Getter
     private final ObjectProperty<T> selected = new ObjectPropertyBase<>() {

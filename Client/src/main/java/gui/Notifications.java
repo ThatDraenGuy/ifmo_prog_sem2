@@ -1,5 +1,6 @@
 package gui;
 
+import app.Controllers;
 import javafx.application.Platform;
 import lombok.Getter;
 
@@ -20,7 +21,7 @@ public class Notifications {
     private static final Map<String, List<SubscriberObject>> subscribers = new LinkedHashMap<>();
 
     public static void publish(String event) {
-
+        System.out.println(event);
         Platform.runLater(() -> {
             List<SubscriberObject> subscriberList = subscribers.get(event);
 

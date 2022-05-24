@@ -1,12 +1,8 @@
 package collection;
 
 import collection.classes.*;
-import collection.history.CollectionChange;
-import collection.meta.CollectibleModel;
 import collection.meta.CollectibleScheme;
 import collection.meta.FieldData;
-import collection.meta.FieldModel;
-import gui.Notifications;
 import javafx.beans.binding.*;
 import javafx.beans.value.ObservableValueBase;
 import javafx.collections.FXCollections;
@@ -21,26 +17,21 @@ import javafx.util.Callback;
 import locales.CollectibleFormatter;
 import locales.I18N;
 import lombok.Getter;
-import utility.ListAndId;
 
 import java.lang.reflect.Field;
 import java.util.*;
-import java.util.function.Predicate;
 
 public class TableViewHandler<T extends MainCollectible<?>> {
-    //    private final ClientCollectionHandler<T> collectionHandler;
     @Getter
     private final TableView<T> tableView;
-    //    private final ObservableList<T> items = FXCollections.observableArrayList();
-    private final FilteredList<T> filteredItems;
+    private final ObservableList<T> items = FXCollections.observableArrayList();
     private final CollectibleScheme scheme;
 
     public TableViewHandler(ObservableCollection<T> observableCollection) {
         this.scheme = observableCollection.getCollectibleScheme();
-        filteredItems = new FilteredList<>(observableCollection.getItems());
+        Bindings.bindContent(items, observableCollection.getItems());
         tableView = generate(scheme);
-        filteredItems.setPredicate(x -> true);
-        tableView.setItems(filteredItems);
+        tableView.setItems(items);
     }
 
 
@@ -70,6 +61,7 @@ public class TableViewHandler<T extends MainCollectible<?>> {
             column.getColumns().addAll(create(data.getCollectibleScheme(), fieldName));
             return column;
         }
+        column.setSortable(true);
         if (!schemeName.equals("")) {
             column.setCellValueFactory(param -> {
                 T object = param.getValue();
