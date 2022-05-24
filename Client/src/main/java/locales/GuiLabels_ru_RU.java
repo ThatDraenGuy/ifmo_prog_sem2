@@ -20,6 +20,7 @@ public class GuiLabels_ru_RU extends ListResourceBundle {
             {"addButton", "добавить"},
             {"editButton", "редактировать"},
             {"deleteButton", "удалить"},
+            {"clearButton", "очистить"},
             {"cancelButton", "отмена"},
             {"logOutButton", "сменить аккаунт"},
             {"changeServerButton", "сменить сервер"},

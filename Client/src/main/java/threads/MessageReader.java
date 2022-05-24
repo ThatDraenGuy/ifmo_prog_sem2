@@ -1,9 +1,11 @@
 package threads;
 
+import commands.ActionResult;
 import commands.ExecutionController;
 import console.ConsoleHandler;
 import exceptions.CommandArgsAmountException;
 import exceptions.ConnectionException;
+import message.CommandResponse;
 import message.Message;
 import message.Request;
 import message.Response;
@@ -46,19 +48,24 @@ public class MessageReader implements Runnable {
                     executor.execute(commandsExecutor);
                 }
                 if (message.getData() instanceof Response response) {
-                    try {
-                        responseExchanger.exchange(response, 50, TimeUnit.MILLISECONDS);
-                    } catch (TimeoutException | InterruptedException ignored) {
-                    }
+                    returnResponse(response);
                 }
             } catch (EOFException e) {
                 if (!connectionHandler.isConnectionClosed()) connectionHandler.handleLostConnection();
             } catch (SocketException e) {
                 consoleHandler.message("(connection terminated)");
+                returnResponse(null);
 //                executor.shutdown();
             } catch (IOException | ClassNotFoundException e) {
                 consoleHandler.errorMessage(e);
             }
+        }
+    }
+
+    private void returnResponse(Response response) {
+        try {
+            responseExchanger.exchange(response, 500, TimeUnit.MILLISECONDS);
+        } catch (TimeoutException | InterruptedException ignored) {
         }
     }
 

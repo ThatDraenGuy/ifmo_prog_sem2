@@ -16,7 +16,7 @@
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
-<BorderPane maxHeight="700.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
+<BorderPane maxHeight="700.0" prefWidth="1200.0" xmlns="http://javafx.com/javafx/18" xmlns:fx="http://javafx.com/fxml/1"
             fx:controller="gui.mainScene.MainSceneView">
     <center>
         <AnchorPane BorderPane.alignment="CENTER">
@@ -93,6 +93,7 @@
     <bottom>
         <ButtonBar prefHeight="40.0" BorderPane.alignment="CENTER">
             <buttons>
+                <Button fx:id="clear" mnemonicParsing="false" onAction="#clear" text="Clear"/>
                 <Button fx:id="delete" mnemonicParsing="false" onAction="#delete" text="Delete"/>
                 <Button fx:id="edit" mnemonicParsing="false" onAction="#edit" text="Edit"/>
                 <Button fx:id="add" minWidth="53.0" mnemonicParsing="false" onAction="#add" prefHeight="24.0"

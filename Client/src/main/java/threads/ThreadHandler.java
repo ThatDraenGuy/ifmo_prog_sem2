@@ -37,7 +37,7 @@ public class ThreadHandler {
         connectionHandler.disconnect();
         messageReader.shutdown();
         clientInteractionController.setExitQueried(true);
-        Platform.exit();
         System.exit(0);
+        Platform.exit();
     }
 }

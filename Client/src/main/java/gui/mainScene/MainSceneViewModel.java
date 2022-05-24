@@ -10,7 +10,6 @@ import commands.ActionResult;
 import gui.AbstractViewModel;
 import gui.CommandService;
 import gui.Notifications;
-import gui.Utilities;
 import gui.editorDialog.EditorDialog;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -123,6 +122,12 @@ public class MainSceneViewModel extends AbstractViewModel {
     private void deleteEvent(ActionResult actionResult) {
         handleActionResult(actionResult);
     }
+
+    public void clear() {
+        clearTask.restart();
+    }
+
+    private final Service<Void> clearTask = CommandService.getNoArgs("clear", this::handleActionResult);
 
     public void add() {
         Optional<Map<String, String>> mapOptional = addDialog.getDialog().showAndWait();

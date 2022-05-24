@@ -79,7 +79,7 @@ public class VisualViewHandler<T extends MainCollectible<?>> {
         Collection<T> removed = change.getRemovedElements();
         Platform.runLater(() -> {
             for (T element : added) {
-                visuals.put(element, sample(scheme, element));
+                visuals.put(element, sample(element));
             }
             for (T element : removed) {
                 visuals.remove(element);
@@ -89,7 +89,7 @@ public class VisualViewHandler<T extends MainCollectible<?>> {
 
     public void put(ListAndId<T> listAndId) {
         for (T element : listAndId.getList()) {
-            Node node = sample(scheme, element);
+            Node node = sample(element);
             visuals.put(element, node);
         }
     }
@@ -107,40 +107,38 @@ public class VisualViewHandler<T extends MainCollectible<?>> {
         return transition;
     }
 
-    private void sampleScheme(CollectibleScheme scheme) {
-
+    private Image getImage(T element) {
+        collection.classes.Color color = element.getColor();
+        if (variants.containsKey(color)) return variants.get(color);
+        InputStream imageInput = getClass().getClassLoader().getResourceAsStream("images/" + scheme.getSimpleName() + "/" + element.getColor() + ".png");
+        Image image = new Image(imageInput, 100, 100, true, true);
+        variants.put(color, image);
+        return image;
     }
 
-    private Node sample(CollectibleScheme scheme, T element) {
-        InputStream imageInput = getClass().getClassLoader().getResourceAsStream("images/" + scheme.getSimpleName() + "/" + element.getColor() + ".png");
-        System.out.println("yes image");
-        if (imageInput != null) {
-            Button button = new Button();
-            Image image = new Image(imageInput, 100, 100, true, true);
-            ImageView imageView = new ImageView(image);
-            button.setGraphic(imageView);
-            button.setText(element.getName());
-            button.setBackground(new Background(new BackgroundFill(getColoredOwner(element.getOwner()), CornerRadii.EMPTY, new Insets(1, 1, 1, 1))));
-            Tooltip tooltip = new Tooltip();
-            tooltip.textProperty().bind(I18N.getGuiLabelBinding("ownedBy", element.getOwner()));
-            button.setTooltip(tooltip);
-            button.setOnAction((event -> {
-                selected.setValue(element);
-                if (selectedButton != null) selectedButton.setBorder(defaultBorder);
-                selectedButton = button;
-                button.setBorder(selectedBorder);
-                Alert alert = new Alert(Alert.AlertType.INFORMATION, CollectibleFormatter.getDescription(element.toModel()));
-                alert.setHeaderText(element.getName());
-                alert.setTitle(I18N.getGuiLabel("info"));
-                alert.setGraphic(new ImageView(image));
-                alert.show();
-            }));
-            animations.put(element, getAnimation(button));
-            return button;
-        }
-        return null;
-
-        //TODO
+    private Node sample(T element) {
+        Image image = getImage(element);
+        Button button = new Button();
+        ImageView imageView = new ImageView(image);
+        button.setGraphic(imageView);
+        button.setText(element.getName());
+        button.setBackground(new Background(new BackgroundFill(getColoredOwner(element.getOwner()), CornerRadii.EMPTY, new Insets(1, 1, 1, 1))));
+        Tooltip tooltip = new Tooltip();
+        tooltip.textProperty().bind(I18N.getGuiLabelBinding("ownedBy", element.getOwner()));
+        button.setTooltip(tooltip);
+        button.setOnAction((event -> {
+            selected.setValue(element);
+            if (selectedButton != null) selectedButton.setBorder(defaultBorder);
+            selectedButton = button;
+            button.setBorder(selectedBorder);
+            Alert alert = new Alert(Alert.AlertType.INFORMATION, CollectibleFormatter.getDescription(element.toModel()));
+            alert.setHeaderText(element.getName());
+            alert.setTitle(I18N.getGuiLabel("info"));
+            alert.setGraphic(new ImageView(image));
+            alert.show();
+        }));
+        animations.put(element, getAnimation(button));
+        return button;
     }
 
     private Color getColoredOwner(String owner) {

@@ -16,6 +16,8 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.channels.SocketChannel;
 import java.util.Queue;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
@@ -143,9 +145,15 @@ public class UserHandler extends Thread {
     }
 
     public void sendDisconnectRequest() {
-        silentSendRequest(commandsHandler.formulateDisconnectRequest(userData, userAccount));
-        disconnected = true;
-        logger.info("Disconnecting the user");
+        Timer timer = new Timer();
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                silentSendRequest(commandsHandler.formulateDisconnectRequest(userData, userAccount));
+                disconnected = true;
+                logger.info("Disconnecting the user");
+            }
+        }, 1000);
     }
 
 }

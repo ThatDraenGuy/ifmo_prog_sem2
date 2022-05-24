@@ -29,7 +29,7 @@ public class MainSceneView extends AbstractView {
     @FXML
     private FlowPane visual;
     @FXML
-    private Button add, edit, delete, logOut, changeServer, exit;
+    private Button add, edit, delete, clear, logOut, changeServer, exit;
     @FXML
     private TabPane tabPane;
     @FXML
@@ -70,6 +70,7 @@ public class MainSceneView extends AbstractView {
         add.textProperty().bind(I18N.getGuiLabelBinding("addButton"));
         edit.textProperty().bind(I18N.getGuiLabelBinding("editButton"));
         delete.textProperty().bind(I18N.getGuiLabelBinding("deleteButton"));
+        clear.textProperty().bind(I18N.getGuiLabelBinding("clearButton"));
         logOut.textProperty().bind(I18N.getGuiLabelBinding("logOutButton"));
         changeServer.textProperty().bind(I18N.getGuiLabelBinding("changeServerButton"));
         exit.textProperty().bind(I18N.getGuiLabelBinding("exitButton"));
@@ -108,5 +109,10 @@ public class MainSceneView extends AbstractView {
     @FXML
     private void edit(ActionEvent event) {
         viewModel.edit();
+    }
+
+    @FXML
+    private void clear(ActionEvent event) {
+        viewModel.clear();
     }
 }

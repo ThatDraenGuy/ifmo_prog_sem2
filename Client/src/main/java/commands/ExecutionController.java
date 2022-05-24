@@ -98,6 +98,7 @@ public class ExecutionController {
             history.add(request.getCommandData());
         Response response;
         consoleHandler.debugMessage("executing command: " + request.getCommandData().getName() + " " + request.getExecutionPayload().getAccount() + " " + CurrentAccount.getAccount());
+        consoleHandler.debugMessage("is client command: " + isClientCommand(request));
         if (isClientCommand(request)) response = clientCommandsHandler.executeCommand(request);
         else response = messageSender.sendRequest(request);
         return handleResponse(response);
@@ -115,6 +116,7 @@ public class ExecutionController {
 
     private Response handleResponse(Response response) {
         handleServerData(response.getServerData());
+        consoleHandler.debugMessage(response.getActionResult().getMessage());
         return response;
     }
 

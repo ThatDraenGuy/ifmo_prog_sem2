@@ -20,6 +20,7 @@ public class GuiLabels_en_IE extends ListResourceBundle {
             {"addButton", "add"},
             {"editButton", "edit"},
             {"deleteButton", "delete"},
+            {"clearButton", "clear"},
             {"cancelButton", "cancel"},
             {"logOutButton", "log out"},
             {"changeServerButton", "change server"},

@@ -6,14 +6,11 @@ import collection.meta.CollectibleScheme;
 import collection.meta.FieldData;
 import gui.Notifications;
 import javafx.beans.binding.*;
-import javafx.beans.property.StringProperty;
-import javafx.beans.value.ObservableValue;
 import javafx.beans.value.ObservableValueBase;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.text.Text;
 import javafx.util.Callback;
 import locales.CollectibleFormatter;
 import locales.I18N;
@@ -21,12 +18,7 @@ import lombok.Getter;
 import utility.ListAndId;
 
 import java.lang.reflect.Field;
-import java.text.SimpleDateFormat;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.Temporal;
-import java.time.temporal.TemporalAccessor;
 import java.util.*;
-import java.util.concurrent.Callable;
 
 public class TableViewHandler<T extends MainCollectible<?>> {
     private final ClientCollectionHandler<T> collectionHandler;
@@ -69,6 +61,7 @@ public class TableViewHandler<T extends MainCollectible<?>> {
         TableView<T> tableView = new TableView<>();
         tableView.getColumns().addAll(create(new CollectibleScheme(targetClass), ""));
         autoResizeColumns(tableView);
+        tableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         return tableView;
     }
 
@@ -90,26 +83,23 @@ public class TableViewHandler<T extends MainCollectible<?>> {
             return column;
         }
         if (!schemeName.equals("")) {
-            column.setCellValueFactory(new Callback<TableColumn.CellDataFeatures<T, S>, ObservableValue<S>>() {
-                @Override
-                public ObservableValue<S> call(TableColumn.CellDataFeatures<T, S> param) {
-                    T object = param.getValue();
-                    try {
-                        Field field = object.getClass().getDeclaredField(schemeName);
-                        field.setAccessible(true);
-                        Object collectible = field.get(object);
-                        Field finalField = collectible.getClass().getDeclaredField(fieldName);
-                        finalField.setAccessible(true);
-                        Object res = finalField.get(collectible);
-                        return new ObservableValueBase<S>() {
-                            @Override
-                            public S getValue() {
-                                return (S) res;
-                            }
-                        };
-                    } catch (NoSuchFieldException | IllegalAccessException e) {
-                        return null;
-                    }
+            column.setCellValueFactory(param -> {
+                T object = param.getValue();
+                try {
+                    Field field = object.getClass().getDeclaredField(schemeName);
+                    field.setAccessible(true);
+                    Object collectible = field.get(object);
+                    Field finalField = collectible.getClass().getDeclaredField(fieldName);
+                    finalField.setAccessible(true);
+                    Object res = finalField.get(collectible);
+                    return new ObservableValueBase<>() {
+                        @Override
+                        public S getValue() {
+                            return (S) res;
+                        }
+                    };
+                } catch (NoSuchFieldException | IllegalAccessException e) {
+                    return null;
                 }
             });
         } else column.setCellValueFactory(new PropertyValueFactory<>(fieldName));
@@ -133,7 +123,6 @@ public class TableViewHandler<T extends MainCollectible<?>> {
     }
 
     public static void autoResizeColumns(TableView<?> table) {
-        table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 //        table.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
 //        table.getColumns().forEach((column) -> {
 //            Text header = new Text(column.getText());

@@ -28,6 +28,8 @@ public class MessageSender {
             return responseExchanger.exchange(null);
         } catch (InterruptedException e) {
             return new CommandResponse(new ActionResult(false, "Couldn't get response"));
+        } finally {
+            consoleHandler.debugMessage("returned response");
         }
     }
 }
