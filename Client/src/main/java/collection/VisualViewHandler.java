@@ -9,10 +9,7 @@ import javafx.animation.Transition;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
-import javafx.collections.FXCollections;
-import javafx.collections.MapChangeListener;
-import javafx.collections.ObservableList;
-import javafx.collections.ObservableMap;
+import javafx.collections.*;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
 import javafx.scene.control.Alert;
@@ -32,7 +29,8 @@ import java.io.InputStream;
 import java.util.*;
 
 public class VisualViewHandler<T extends MainCollectible<?>> {
-    private final ClientCollectionHandler<T> collectionHandler;
+    //    private final ClientCollectionHandler<T> collectionHandler;
+    private final ObservableCollection<T> observableCollection;
     @Getter
     private final ObjectProperty<T> selected = new ObjectPropertyBase<>() {
         @Override
@@ -57,47 +55,31 @@ public class VisualViewHandler<T extends MainCollectible<?>> {
     private final Border defaultBorder = new Border(new BorderStroke(Color.WHITE, null, null, BorderWidths.EMPTY));
     private final Border selectedBorder = new Border(new BorderStroke(Color.AQUA, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.MEDIUM));
 
-    public VisualViewHandler(ClientCollectionHandler<T> clientCollectionHandler) {
-        this.scheme = clientCollectionHandler.getCollectibleScheme();
-        visuals.addListener(new MapChangeListener<>() {
-            @Override
-            public void onChanged(Change<? extends T, ? extends Node> change) {
-                selected.setValue(null);
-                if (change.wasAdded()) images.add(change.getValueAdded());
-                if (change.wasRemoved()) images.remove(change.getValueRemoved());
+    public VisualViewHandler(ObservableCollection<T> observableCollection) {
+        this.observableCollection = observableCollection;
+        this.scheme = observableCollection.getCollectibleScheme();
+        observableCollection.getItems().addListener((ListChangeListener<T>) c -> {
+            while (c.next()) {
+                if (c.wasRemoved()) {
+                    for (T removed : c.getRemoved()) {
+                        visuals.remove(removed);
+                    }
+                }
+                if (c.wasAdded()) {
+                    for (T added : c.getAddedSubList()) {
+                        visuals.put(added, sample(added));
+                    }
+                }
             }
         });
-        Notifications.subscribe(CollectionClassesHandler.COLLECTION_SET_EVENT, this, this::set);
-        Notifications.subscribe(CollectionClassesHandler.COLLECTION_CHANGE_EVENT, this, this::applyChange);
-        put(clientCollectionHandler.getCollection());
-        this.collectionHandler = clientCollectionHandler;
-    }
-
-    public void applyChange(String event) {
-        CollectionChange<T> change = collectionHandler.getLastChange();
-        Collection<T> added = change.getAddedElements();
-        Collection<T> removed = change.getRemovedElements();
-        Platform.runLater(() -> {
-            for (T element : added) {
-                visuals.put(element, sample(element));
-            }
-            for (T element : removed) {
-                visuals.remove(element);
-            }
-        });
-    }
-
-    public void put(ListAndId<T> listAndId) {
-        for (T element : listAndId.getList()) {
-            Node node = sample(element);
-            visuals.put(element, node);
+        visuals.addListener((MapChangeListener<T, Node>) change -> Platform.runLater(() -> {
+            selected.setValue(null);
+            if (change.wasAdded()) images.add(change.getValueAdded());
+            if (change.wasRemoved()) images.remove(change.getValueRemoved());
+        }));
+        for (T element : observableCollection.getItems()) {
+            visuals.put(element, sample(element));
         }
-    }
-
-    public void set(String event) {
-        ListAndId<T> listAndId = collectionHandler.getCollection();
-        visuals.clear();
-        put(listAndId);
     }
 
     private Transition getAnimation(Node node) {

@@ -2,6 +2,7 @@ package gui.mainScene;
 
 import app.Controllers;
 import collection.CollectionClassesHandler;
+import collection.ObservableCollection;
 import collection.TableViewHandler;
 import collection.VisualViewHandler;
 import collection.classes.MainCollectible;
@@ -35,8 +36,9 @@ import java.util.stream.Stream;
 public class MainSceneViewModel extends AbstractViewModel {
     @Getter
     private VisualViewHandler<?> visualViewHandler;
-    @Getter
-    private TableViewHandler<?> tableViewHandler;
+    //    @Getter
+//    private TableViewHandler<?> tableViewHandler;
+    private ObservableCollection<?> observableCollection;
     @Getter
     private final StringProperty account = new SimpleStringProperty("");
     @Getter
@@ -174,8 +176,8 @@ public class MainSceneViewModel extends AbstractViewModel {
         protected Task<Void> createTask() {
             return new Task<>() {
                 @Override
-                protected Void call() throws Exception {
-                    tableViewHandler.setFilter(dialogAnswer);
+                protected Void call() {
+                    observableCollection.setFilter(dialogAnswer);
                     return null;
                 }
             };
@@ -188,8 +190,9 @@ public class MainSceneViewModel extends AbstractViewModel {
 
     private void collectibleSchemeChangeEvent(String event) {
         TableView<?> oldTableView = tableView;
-        visualViewHandler = new VisualViewHandler<>(Controllers.getCollectionClassesHandler().getCurrentCollectionHandler());
-        tableViewHandler = new TableViewHandler<>(Controllers.getCollectionClassesHandler().getCurrentCollectionHandler());
+        observableCollection = new ObservableCollection<>(Controllers.getCollectionClassesHandler().getCurrentCollectionHandler());
+        visualViewHandler = new VisualViewHandler<>(observableCollection);
+        TableViewHandler<? extends MainCollectible<?>> tableViewHandler = new TableViewHandler<>(observableCollection);
         tableView = tableViewHandler.getTableView();
         visuals = visualViewHandler.getImages();
         addDialog = new EditorDialog(getScheme(), new ButtonType("addButton", ButtonBar.ButtonData.APPLY));
@@ -200,8 +203,8 @@ public class MainSceneViewModel extends AbstractViewModel {
 
     @Override
     public BooleanBinding isTaskRunning() {
-        return Stream.of(deleteTask.runningProperty(), exitTask.runningProperty(), disconnectTask.runningProperty()).
-                map(property -> property.isEqualTo(TRUE)).reduce(Bindings::or).get();
+        return Stream.of(deleteTask, exitTask, disconnectTask, clearTask, addTask, editTask, filterTask).
+                map(Service::runningProperty).map(property -> property.isEqualTo(TRUE)).reduce(Bindings::or).get();
     }
 
     public BooleanBinding isItemSelected() {

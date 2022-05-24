@@ -28,52 +28,25 @@ import java.util.*;
 import java.util.function.Predicate;
 
 public class TableViewHandler<T extends MainCollectible<?>> {
-    private final ClientCollectionHandler<T> collectionHandler;
+    //    private final ClientCollectionHandler<T> collectionHandler;
     @Getter
     private final TableView<T> tableView;
-    private final ObservableList<T> items = FXCollections.observableArrayList();
-    private final FilteredList<T> filteredItems = new FilteredList<>(items);
-    private final Class<T> targetClass;
+    //    private final ObservableList<T> items = FXCollections.observableArrayList();
+    private final FilteredList<T> filteredItems;
+    private final CollectibleScheme scheme;
 
-    public TableViewHandler(ClientCollectionHandler<T> collectionHandler) {
-        this.collectionHandler = collectionHandler;
-        this.targetClass = collectionHandler.getTargetClass();
-        tableView = generate(targetClass);
+    public TableViewHandler(ObservableCollection<T> observableCollection) {
+        this.scheme = observableCollection.getCollectibleScheme();
+        filteredItems = new FilteredList<>(observableCollection.getItems());
+        tableView = generate(scheme);
         filteredItems.setPredicate(x -> true);
         tableView.setItems(filteredItems);
-        Notifications.subscribe(CollectionClassesHandler.COLLECTION_SET_EVENT, this, this::set);
-        Notifications.subscribe(CollectionClassesHandler.COLLECTION_CHANGE_EVENT, this, this::applyChange);
-        put(collectionHandler.getCollection());
-    }
-
-    public void applyChange(String event) {
-        CollectionChange<T> change = collectionHandler.getLastChange();
-        Collection<T> added = change.getAddedElements();
-        Collection<T> removed = change.getRemovedElements();
-        items.addAll(added);
-        items.removeAll(removed);
-//        tableView.getItems().addAll(added);
-//        tableView.getItems().removeAll(removed);
-    }
-
-    public void put(ListAndId<T> listAndId) {
-        items.addAll(listAndId.getList());
-//        for (T element : listAndId.getList()) {
-//            tableView.getItems().add(element);
-//        }
-    }
-
-    public void set(String event) {
-        ListAndId<T> listAndId = collectionHandler.getCollection();
-        items.clear();
-//        tableView.getItems().clear();
-        put(listAndId);
     }
 
 
-    public TableView<T> generate(Class<T> targetClass) {
+    public TableView<T> generate(CollectibleScheme scheme) {
         TableView<T> tableView = new TableView<>();
-        tableView.getColumns().addAll(create(new CollectibleScheme(targetClass), ""));
+        tableView.getColumns().addAll(create(scheme, ""));
         tableView.setColumnResizePolicy(TableView.UNCONSTRAINED_RESIZE_POLICY);
         Label placeholder = new Label();
         placeholder.textProperty().bind(I18N.getGuiLabelBinding("emptyTable"));
@@ -135,20 +108,5 @@ public class TableViewHandler<T extends MainCollectible<?>> {
             }
         }, I18N.getLocale()));
         return column;
-    }
-
-    public void setFilter(Map<String, String> filter) {
-        filteredItems.setPredicate(t -> {
-            CollectibleModel model = t.toModel();
-            Map<String, FieldModel> values = model.getValues();
-            for (String key : filter.keySet()) {
-                if (!values.containsKey(key)) return false;
-                FieldModel data = values.get(key);
-                Object value = data.getValue();
-                String str = value == null ? "" : value.toString();
-                if (!str.equals(filter.get(key))) return false;
-            }
-            return true;
-        });
     }
 }
