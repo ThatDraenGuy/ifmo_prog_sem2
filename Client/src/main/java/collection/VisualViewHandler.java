@@ -2,11 +2,14 @@ package collection;
 
 import collection.classes.MainCollectible;
 import collection.meta.CollectibleScheme;
+import gui.utils.Axes;
+import gui.utils.Plot;
 import javafx.animation.FadeTransition;
 import javafx.animation.Transition;
 import javafx.application.Platform;
 import javafx.beans.property.ObjectProperty;
 import javafx.beans.property.ObjectPropertyBase;
+import javafx.beans.value.ObservableObjectValue;
 import javafx.collections.*;
 import javafx.geometry.Insets;
 import javafx.scene.Node;
@@ -41,7 +44,7 @@ public class VisualViewHandler<T extends MainCollectible<?>> {
     };
     private Button selectedButton;
     @Getter
-    private final ObservableList<Node> images = FXCollections.observableArrayList();
+    private final Plot images;
     private final ObservableMap<T, Node> visuals = FXCollections.observableHashMap();
     private final ObservableMap<T, Transition> animations = FXCollections.observableHashMap();
     private final CollectibleScheme scheme;
@@ -52,6 +55,7 @@ public class VisualViewHandler<T extends MainCollectible<?>> {
     private final Border selectedBorder = new Border(new BorderStroke(Color.AQUA, BorderStrokeStyle.SOLID, CornerRadii.EMPTY, BorderStroke.MEDIUM));
 
     public VisualViewHandler(ObservableCollection<T> observableCollection) {
+        images = new Plot(new Axes(800, 800, -100, 100, 2, -100, 100, 2));
         this.observableCollection = observableCollection;
         this.scheme = observableCollection.getCollectibleScheme();
         observableCollection.getItems().addListener((ListChangeListener<T>) c -> {
@@ -70,7 +74,7 @@ public class VisualViewHandler<T extends MainCollectible<?>> {
         });
         visuals.addListener((MapChangeListener<T, Node>) change -> Platform.runLater(() -> {
             selected.setValue(null);
-            if (change.wasAdded()) images.add(change.getValueAdded());
+            if (change.wasAdded()) images.add(change.getKey(), change.getValueAdded());
             if (change.wasRemoved()) images.remove(change.getValueRemoved());
         }));
         for (T element : observableCollection.getItems()) {
@@ -89,7 +93,7 @@ public class VisualViewHandler<T extends MainCollectible<?>> {
         collection.classes.Color color = element.getColor();
         if (variants.containsKey(color)) return variants.get(color);
         InputStream imageInput = getClass().getClassLoader().getResourceAsStream("images/" + scheme.getSimpleName() + "/" + element.getColor() + ".png");
-        Image image = new Image(imageInput, 100, 100, true, true);
+        Image image = new Image(imageInput, 20, 20, true, true);
         variants.put(color, image);
         return image;
     }

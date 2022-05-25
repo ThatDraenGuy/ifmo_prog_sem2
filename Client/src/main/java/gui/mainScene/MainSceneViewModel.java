@@ -42,7 +42,7 @@ public class MainSceneViewModel extends AbstractViewModel {
     @Getter
     private final ObjectProperty<TableView<? extends MainCollectible<?>>> tableView;
     @Getter
-    private ObservableList<Node> visuals;
+    private Node visuals;
     @Getter
     private EditorDialog addDialog;
     @Getter

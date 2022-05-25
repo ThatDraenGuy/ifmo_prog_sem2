@@ -30,7 +30,7 @@ public class ConnectionHandler {
     public void connect(String host, int port) throws IOException {
         this.host = host;
         this.port = port;
-        consoleHandler.message("Attempting to connect to " + host + ":" + port);
+        consoleHandler.debugMessage("Attempting to connect to " + host + ":" + port);
         socket = new Socket(host, port);
         out = new ObjectOutputStream(socket.getOutputStream());
         out.flush();
@@ -42,7 +42,7 @@ public class ConnectionHandler {
         while (true) {
             try {
                 connect(host, port);
-                consoleHandler.message("Successfully reconnected to the server");
+                consoleHandler.debugMessage("Successfully reconnected to the server");
                 return;
             } catch (IOException e) {
                 consoleHandler.errorMessage(e);

@@ -12,7 +12,6 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.FlowPane?>
 <?import javafx.scene.layout.GridPane?>
 <?import javafx.scene.layout.RowConstraints?>
 
@@ -39,7 +38,7 @@
                                                     AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0"
                                                     AnchorPane.topAnchor="0.0">
                                             <content>
-                                                <FlowPane fx:id="visual" hgap="10.0" vgap="10.0"/>
+                                                <AnchorPane fx:id="visual"/>
                                             </content>
                                         </ScrollPane>
                                     </children>

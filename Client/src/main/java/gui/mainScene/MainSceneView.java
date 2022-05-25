@@ -5,6 +5,7 @@ import gui.AbstractView;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
@@ -24,7 +25,7 @@ public class MainSceneView extends AbstractView {
     @FXML
     private AnchorPane tablePlace;
     @FXML
-    private FlowPane visual;
+    private AnchorPane visual;
     @FXML
     private Button add, edit, delete, clear, filter, logOut, changeServer, exit;
     @FXML
@@ -58,7 +59,13 @@ public class MainSceneView extends AbstractView {
             AnchorPane.setRightAnchor(tableView, 0.0);
             delete.disableProperty().bind(viewModel.isItemSelected().not());
             edit.disableProperty().bind(viewModel.isItemSelected().not());
-            Bindings.bindContent(visual.getChildren(), viewModel.getVisuals());
+//            Bindings.bindContent(visual.getChildren(), viewModel.getVisuals());
+            Node images = viewModel.getVisuals();
+            visual.getChildren().add(images);
+            AnchorPane.setTopAnchor(images, 50.0);
+            AnchorPane.setBottomAnchor(images, 10.0);
+            AnchorPane.setLeftAnchor(images, 100.0);
+            AnchorPane.setRightAnchor(images, 10.0);
         }));
     }
 

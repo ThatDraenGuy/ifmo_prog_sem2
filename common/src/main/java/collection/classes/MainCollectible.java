@@ -12,6 +12,8 @@ public interface MainCollectible<T> extends Collectible, Comparable<T> {
 
     DragonType getType();
 
+    Coordinates getCoordinates();
+
     Long getAge();
 
     String getOwner();

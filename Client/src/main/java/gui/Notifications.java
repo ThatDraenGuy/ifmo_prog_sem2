@@ -21,7 +21,7 @@ public class Notifications {
     private static final Map<String, List<SubscriberObject>> subscribers = new LinkedHashMap<>();
 
     public static void publish(String event) {
-        System.out.println(event);
+//        System.out.println(event);
         Platform.runLater(() -> {
             List<SubscriberObject> subscriberList = subscribers.get(event);
 
