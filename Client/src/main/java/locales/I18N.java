@@ -25,6 +25,7 @@ public class I18N {
         supportedLocales.add(Locale.forLanguageTag("ru-RU"));
         supportedLocales.add(Locale.forLanguageTag("en-IE"));
         supportedLocales.add(Locale.forLanguageTag("hu-HU"));
+        supportedLocales.add(Locale.forLanguageTag("nl-NL"));
         if (!supportedLocales.contains(locale.getValue())) locale.setValue(Locale.forLanguageTag("en-IE"));
         setLocale(locale.getValue());
     }

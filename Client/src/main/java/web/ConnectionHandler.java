@@ -4,6 +4,9 @@ package web;
 import console.ConsoleHandler;
 import exceptions.ConnectionException;
 import gui.Notifications;
+import javafx.beans.property.SimpleStringProperty;
+import javafx.beans.property.StringProperty;
+import lombok.Getter;
 import message.*;
 
 import java.io.*;
@@ -13,6 +16,8 @@ public class ConnectionHandler {
     public static final String DISCONNECT_EVENT = "DISCONNECT_EVENT";
     private String host;
     private int port;
+    @Getter
+    private final StringProperty address = new SimpleStringProperty();
     private final ConsoleHandler consoleHandler;
     private Socket socket;
     private ObjectInputStream in;
@@ -30,6 +35,7 @@ public class ConnectionHandler {
         out = new ObjectOutputStream(socket.getOutputStream());
         out.flush();
         in = new ObjectInputStream(socket.getInputStream());
+        address.setValue(host + ":" + port);
     }
 
     private void reconnect() {

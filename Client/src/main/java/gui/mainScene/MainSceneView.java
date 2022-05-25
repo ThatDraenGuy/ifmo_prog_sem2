@@ -1,12 +1,9 @@
 package gui.mainScene;
 
-import app.Controllers;
-import collection.VisualViewHandler;
 import collection.classes.MainCollectible;
 import gui.AbstractView;
 import javafx.beans.binding.Bindings;
 import javafx.event.ActionEvent;
-import javafx.event.EventType;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
@@ -52,8 +49,8 @@ public class MainSceneView extends AbstractView {
         server.textProperty().bind(viewModel.getServer());
         viewModel.getTableTabOpened().bind(tableTab.selectedProperty());
         viewModel.getVisualTabOpened().bind(visualTab.selectedProperty());
-        viewModel.getTableView().addEventHandler(EventType.ROOT, event -> {
-            tableView = viewModel.getTableView();
+        viewModel.getTableView().addListener(((observable, oldValue, newValue) -> {
+            tableView = newValue;
             tablePlace.getChildren().add(tableView);
             AnchorPane.setTopAnchor(tableView, 0.0);
             AnchorPane.setBottomAnchor(tableView, 0.0);
@@ -62,7 +59,7 @@ public class MainSceneView extends AbstractView {
             delete.disableProperty().bind(viewModel.isItemSelected().not());
             edit.disableProperty().bind(viewModel.isItemSelected().not());
             Bindings.bindContent(visual.getChildren(), viewModel.getVisuals());
-        });
+        }));
     }
 
     @Override

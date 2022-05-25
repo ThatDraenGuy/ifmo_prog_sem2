@@ -6,6 +6,7 @@ import gui.SceneController;
 import lombok.Getter;
 import lombok.Setter;
 import threads.ThreadHandler;
+import web.ConnectionHandler;
 
 public class Controllers {
     //    @Getter
@@ -26,4 +27,7 @@ public class Controllers {
     @Getter
     @Setter
     private static CollectionClassesHandler collectionClassesHandler;
+    @Getter
+    @Setter
+    private static ConnectionHandler connectionHandler;
 }

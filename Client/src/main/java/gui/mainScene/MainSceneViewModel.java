@@ -19,8 +19,6 @@ import javafx.beans.property.*;
 import javafx.collections.ObservableList;
 import javafx.concurrent.Service;
 import javafx.concurrent.Task;
-import javafx.event.Event;
-import javafx.event.EventType;
 import javafx.scene.Node;
 import javafx.scene.control.ButtonBar;
 import javafx.scene.control.ButtonType;
@@ -42,7 +40,7 @@ public class MainSceneViewModel extends AbstractViewModel {
     @Getter
     private final StringProperty server = new SimpleStringProperty("");
     @Getter
-    private TableView<? extends MainCollectible<?>> tableView;
+    private final ObjectProperty<TableView<? extends MainCollectible<?>>> tableView;
     @Getter
     private ObservableList<Node> visuals;
     @Getter
@@ -60,14 +58,14 @@ public class MainSceneViewModel extends AbstractViewModel {
     private final ObjectProperty<? extends MainCollectible<?>> selectedItemProperty = new ObjectPropertyBase<>() {
         @Override
         public Object getBean() {
-            if (tableTabOpened.get()) return tableView.getSelectionModel().getSelectedItem();
+            if (tableTabOpened.get()) return tableView.getValue().getSelectionModel().getSelectedItem();
             if (visualTabOpened.get()) return visualViewHandler.getSelected().get();
             return null;
         }
 
         @Override
         public MainCollectible<?> get() {
-            if (tableTabOpened.get()) return tableView.getSelectionModel().getSelectedItem();
+            if (tableTabOpened.get()) return tableView.getValue().getSelectionModel().getSelectedItem();
             if (visualTabOpened.get()) return visualViewHandler.getSelected().get();
             return null;
         }
@@ -79,7 +77,7 @@ public class MainSceneViewModel extends AbstractViewModel {
     };
 
     public MainSceneViewModel() {
-        tableView = new TableView<>();
+        tableView = new SimpleObjectProperty<>();
         Notifications.subscribe(Notifications.ACCOUNT_CHANGE_EVENT, this, this::accountChangeEvent);
         Notifications.subscribe(CollectionClassesHandler.COLLECTIBLE_SCHEME_CHANGE_EVENT, this, this::collectibleSchemeChangeEvent);
         Notifications.subscribe(ConnectionHandler.DISCONNECT_EVENT, this, this::handleDisconnection);
@@ -88,6 +86,7 @@ public class MainSceneViewModel extends AbstractViewModel {
                 visualViewHandler.playAnimation();
             }
         }));
+        server.bind(Controllers.getConnectionHandler().getAddress());
     }
 
     public void logOut() {
@@ -113,7 +112,20 @@ public class MainSceneViewModel extends AbstractViewModel {
         exitTask.restart();
     }
 
-    private final Service<Void> exitTask = CommandService.getNoArgs("exit", this::handleActionResult);
+//    private final Service<Void> exitTask = CommandService.getNoArgs("exit", this::handleActionResult);
+
+    private final Service<Void> exitTask = new Service<>() {
+        @Override
+        protected Task<Void> createTask() {
+            return new Task<>() {
+                @Override
+                protected Void call() {
+                    Controllers.getThreadHandler().stop();
+                    return null;
+                }
+            };
+        }
+    };
 
     public void delete() {
         deleteTask.restart();
@@ -187,16 +199,14 @@ public class MainSceneViewModel extends AbstractViewModel {
     }
 
     private void collectibleSchemeChangeEvent(String event) {
-        TableView<?> oldTableView = tableView;
         observableCollection = new ObservableCollection<>(Controllers.getCollectionClassesHandler().getCurrentCollectionHandler());
         visualViewHandler = new VisualViewHandler<>(observableCollection);
         TableViewHandler<? extends MainCollectible<?>> tableViewHandler = new TableViewHandler<>(observableCollection);
-        tableView = tableViewHandler.getTableView();
         visuals = visualViewHandler.getImages();
+        tableView.setValue(tableViewHandler.getTableView());
         addDialog = new EditorDialog(getScheme(), new ButtonType("addButton", ButtonBar.ButtonData.APPLY));
         editDialog = new EditorDialog(getScheme(), new ButtonType("editButton", ButtonBar.ButtonData.APPLY));
         filterDialog = new FilterDialog(getScheme(), new ButtonType("filterButton", ButtonBar.ButtonData.APPLY));
-        oldTableView.fireEvent(new Event(EventType.ROOT));
     }
 
     @Override
@@ -206,8 +216,8 @@ public class MainSceneViewModel extends AbstractViewModel {
     }
 
     public BooleanBinding isItemSelected() {
-        BooleanBinding tableBind = tableTabOpened.isEqualTo(TRUE).and(tableView.getSelectionModel().selectedItemProperty().isNotNull()).and(
-                Bindings.select(tableView.getSelectionModel().selectedItemProperty(), "owner").isEqualTo(account));
+        BooleanBinding tableBind = tableTabOpened.isEqualTo(TRUE).and(tableView.getValue().getSelectionModel().selectedItemProperty().isNotNull()).and(
+                Bindings.select(tableView.getValue().getSelectionModel().selectedItemProperty(), "owner").isEqualTo(account));
         BooleanBinding visualBind = visualTabOpened.isEqualTo(TRUE).and(visualViewHandler.getSelected().isNotNull()).and(
                 Bindings.select(visualViewHandler.getSelected(), "owner").isEqualTo(account));
         return Bindings.or(tableBind, visualBind);

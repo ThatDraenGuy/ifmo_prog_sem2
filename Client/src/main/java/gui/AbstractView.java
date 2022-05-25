@@ -1,6 +1,5 @@
 package gui;
 
-import javafx.application.Platform;
 import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.StringProperty;
 import javafx.scene.control.Alert;
@@ -47,13 +46,13 @@ public abstract class AbstractView {
             @Override
             public String toString(Locale object) {
                 if (object == null) return "";
-                return object.getDisplayName();
+                return object.getDisplayName(object);
             }
 
             @Override
             public Locale fromString(String string) {
                 for (Locale locale : I18N.getSupportedLocales()) {
-                    if (locale.getDisplayName().equals(string)) return locale;
+                    if (locale.getDisplayName(locale).equals(string)) return locale;
                 }
                 return I18N.getLocale().getValue();
             }

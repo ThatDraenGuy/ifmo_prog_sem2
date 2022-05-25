@@ -60,6 +60,7 @@ public class Main {
             Controllers.setThreadHandler(threadHandler);
             Controllers.setRequester(new Requester(executionController));
             Controllers.setCollectionClassesHandler(collectionClassesHandler);
+            Controllers.setConnectionHandler(connectionHandler);
             threadHandler.start();
         } catch (IOException | ClassNotFoundException e) {
             e.printStackTrace();
